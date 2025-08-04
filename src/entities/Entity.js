@@ -6,7 +6,6 @@ export default class Entity {
     this.y = y;
     this.width = width;
     this.height = height;
-    this.lastEntityState = this.entityState = 4;
     this.hitbox = null;
     this.frameX = 0;
   }

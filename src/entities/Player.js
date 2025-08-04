@@ -9,8 +9,12 @@ import {
 } from "../utilities/HelperMethods.js";
 
 export default class Player extends Entity {
-  constructor(x, y) {
+  constructor(x, y, game) {
     super(x, y, Constants.Player.PLAYER_WIDTH, Constants.Player.PLAYER_HEIGHT);
+
+    this.lastEntityState = this.entityState = Constants.Player.IDLE;
+
+    this.game = game;
 
     this.doorIn = false;
     this.doorOut = false;
@@ -22,7 +26,20 @@ export default class Player extends Entity {
     this.onGround = true;
     this.jumping = false;
     this.flip = false;
-    this.inAir = false;
+    this.inAir = true;
+    this.hasRecoiled = false;
+    this.enterDoor = false;
+    this.exitDoor = true;
+    this.stopAnimation = false;
+
+    this.startAnimation = false;
+
+    this.canDraw = false;
+
+    this.exitedDoor = false;
+    this.enteredDoor = false;
+
+    this.stopKeyPress = true;
 
     this.ySpeed = 0;
     this.gravity = 0.05;
@@ -56,10 +73,15 @@ export default class Player extends Entity {
   draw(ctx, XlvlOffset) {
     if (!this.playerImg) return;
 
+    if (!this.canDraw) return;
+
+    if (this.stopAnimation) return;
+
     // this.drawHitbox(ctx);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.playerImg,
       this.frameX * this.width + 1,
@@ -76,16 +98,57 @@ export default class Player extends Entity {
     ctx.restore();
   }
 
+  exitTheDoor() {
+    this.exitedDoor = true;
+    this.canDraw = true;
+  }
+
+  enterTheDoor() {
+    this.enteredDoor = true;
+  }
+
   update() {
+    if (this.stopAnimation) return;
+
     this.setAnimation();
     this.updatePosition();
+
+    if (this.entityState === Constants.Player.ATTACK) {
+      const recoilStrength = 0.5 * Constants.SCALE;
+
+      if (this.flip) {
+        this.updateXPos(recoilStrength);
+      } else {
+        this.updateXPos(-recoilStrength);
+      }
+    }
+
+    if (
+      this.entityState === Constants.Player.ATTACK &&
+      !this.hasRecoiled &&
+      !this.inAir
+    ) {
+      const jumpStrength = -1 * Constants.SCALE;
+
+      this.ySpeed = jumpStrength;
+      this.inAir = true;
+
+      this.hasRecoiled = true;
+    }
+
+    if (this.entityState !== Constants.Player.ATTACK) {
+      this.hasRecoiled = false;
+    }
+
     this.updateAnimationTick();
   }
 
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState == Constants.Player.ATTACK && this.attack) return;
+    if (this.entityState === Constants.Player.ATTACK) {
+      return;
+    }
 
     this.entityState = Constants.Player.IDLE;
 
@@ -101,9 +164,13 @@ export default class Player extends Entity {
       this.entityState = Constants.Player.ATTACK;
     }
 
+    if (this.exitedDoor) this.entityState = Constants.Player.DOOR_OUT;
+
+    if (this.enteredDoor) this.entityState = Constants.Player.DOOR_IN;
+
     if (this.lastEntityState != this.entityState) {
       this.frameX = 0;
-      this.cooldown = 0;
+      this.countdown = 0;
     }
   }
 
@@ -179,16 +246,35 @@ export default class Player extends Entity {
 
     if (this.countdown >= this.countdownTimer) {
       this.countdown = 0;
+
       this.frameX++;
 
       if (this.frameX >= Constants.Player.getSpriteAmount(this.entityState)) {
+        if (this.entityState === Constants.Player.DOOR_IN) {
+          this.stopAnimation = true;
+        }
+
+        if (this.entityState === Constants.Player.DOOR_OUT) {
+          this.exitDoor = false;
+          this.exitedDoor = false;
+          this.startAnimation = true;
+          this.stopKeyPress = false;
+        }
+
         this.frameX = 0;
         this.attack = false;
+        this.entityState = Constants.Player.IDLE;
       }
     }
   }
 
+  stopKeyPress() {
+    this.stopKeyPress = true;
+  }
+
   keyPressed(key) {
+    if (this.stopKeyPress) return;
+
     switch (key) {
       case "a":
       case "ArrowLeft":
@@ -197,6 +283,10 @@ export default class Player extends Entity {
       case "d":
       case "ArrowRight":
         this.right = true;
+        break;
+      case "w":
+      case "ArrowUp":
+        this.enterDoor = true;
         break;
       case " ":
         this.jumping = true;
@@ -227,7 +317,9 @@ export default class Player extends Entity {
   mouseClicked(mouse) {
     switch (mouse) {
       case 0:
-        if (!this.attack) this.attack = true;
+        if (!this.attack && this.entityState !== Constants.Player.ATTACK) {
+          this.attack = true;
+        }
         break;
       default:
         break;

@@ -4,6 +4,7 @@ import MouseInput from "../inputs/MouseInput.js";
 import LevelManager from "../level/LevelManager.js";
 import Constants from "../utilities/Constants.js";
 import { getLevelData } from "../utilities/loadSave.js";
+import KingPig from "../entities/KingPig.js";
 
 export default class Game {
   constructor() {
@@ -53,8 +54,9 @@ export default class Game {
     this.height = this.canvas.height = window.innerHeight;
 
     // Other Game objects.
-    this.levelManager = new LevelManager();
-    this.player = new Player(200, 300);
+    this.player = new Player(230, 300, this);
+    this.levelManager = new LevelManager(this.player);
+    this.kingPig = new KingPig(1000, 300, this.player);
     this.keyBoardInputs = new KeyBoardInputs(this.player);
     this.mouseInputs = new MouseInput(this.player);
   }
@@ -67,8 +69,12 @@ export default class Game {
     this.player.draw(this.ctx, this.XlvlOffset);
     this.player.loadLevelData(getLevelData(this.levelManager.levelDataImg));
 
+    this.kingPig.draw(this.ctx, this.XlvlOffset);
+    this.kingPig.loadLevelData(getLevelData(this.levelManager.levelDataImg));
+
     this.ctx.beginPath();
-    this.ctx.font = "bold 12px sans-serif";
+    this.ctx.fillStyle = "white";
+    this.ctx.font = "bold 14px sans-serif";
     this.ctx.fillText(
       `FPS: ${this.currentFrameCount}, UPS: ${this.currentUpdateCount}`,
       3,
@@ -91,7 +97,12 @@ export default class Game {
   }
 
   update() {
+    this.levelManager.door.forEach((d) => {
+      d.update();
+    });
+
     this.player.update();
+    this.kingPig.update();
     this.checkBorders();
   }
 
