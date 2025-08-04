@@ -63,3 +63,26 @@ export function isEntityOnFloor(hitbox, levelData) {
 
   return true;
 }
+
+export function detectAnySolidTile(x1, y1, x2, y2, levelData) {
+  const subject1XIndex = Math.floor(x1 / Constants.TILE_SIZE);
+  const subject1YIndex = Math.floor(y1 / Constants.TILE_SIZE);
+
+  const subject2XIndex = Math.floor(x2 / Constants.TILE_SIZE);
+  const subject2YIndex = Math.floor(y2 / Constants.TILE_SIZE);
+
+  if (subject1YIndex != subject2YIndex) return true;
+
+  for (let j = subject1XIndex; j <= subject2XIndex; j++) {
+    if (
+      isSolid(
+        j * Constants.TILE_SIZE,
+        subject1YIndex * Constants.TILE_SIZE,
+        levelData
+      )
+    )
+      return true;
+  }
+
+  return false;
+}

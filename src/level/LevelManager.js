@@ -3,12 +3,15 @@ import Levels from "./Levels.js";
 import { getSpriteAtlas, getLevelData } from "../utilities/loadSave.js";
 
 export default class LevelManager {
-  constructor() {
+  constructor(player) {
     this.tileSetImgPath = null;
     this.levelDataImgPath = null;
 
+    this.player = player;
+
     this.levelName = 1;
-    this.levels = new Levels(this);
+    this.door = [];
+    this.levels = new Levels(this, this.player);
     this.levels.getLevelImgPath(this.levelName);
 
     this.tileSetImg = null;
@@ -40,7 +43,7 @@ export default class LevelManager {
         const index = i * 19 + j;
 
         ctx.clearRect(0, 0, Constants.OG_TILE_SIZE, Constants.OG_TILE_SIZE);
-
+        ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
           this.tileSetImg,
           j * Constants.OG_TILE_SIZE,
@@ -69,6 +72,7 @@ export default class LevelManager {
 
     for (let i = 0; i < this.levelDataImg.height; i++) {
       for (let j = 0; j < this.levelDataImg.width; j++) {
+        ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
           this.levelSprite[getLevelData(this.levelDataImg)[i][j]],
           Math.floor(j * Constants.TILE_SIZE),
@@ -81,6 +85,7 @@ export default class LevelManager {
   }
 
   draw(ctx, XlvlOffset) {
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.altCanvas,
       XlvlOffset,
@@ -92,5 +97,9 @@ export default class LevelManager {
       ctx.canvas.width,
       ctx.canvas.height
     );
+
+    this.door.forEach((d) => {
+      d.draw(ctx, XlvlOffset);
+    });
   }
 }

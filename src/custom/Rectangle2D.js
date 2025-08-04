@@ -15,7 +15,7 @@ export default class Rectangle2D {
     );
   }
 
-  intersects(rect) {
+  intersects(other) {
     return !(
       other.x > this.x + this.width ||
       other.x + other.width < this.x ||

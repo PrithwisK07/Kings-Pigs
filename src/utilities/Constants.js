@@ -20,7 +20,6 @@ const Constants = {
 
     PLAYER_IMG_SRC: "../res/KingSprite.png",
     PLAYER_SPEED: 1.5,
-    JUMP_POWER: 400,
     PLAYER_WIDTH: 78,
     PLAYER_HEIGHT: 58,
 
@@ -56,6 +55,74 @@ const Constants = {
           return 7;
         default:
           return -1;
+      }
+    },
+  },
+  Door: {
+    IDLE: 0,
+    OPEN: 1,
+    CLOSE: 2,
+    FRAME_SPEED: 30,
+
+    DOOR_IMG_SRC: "../res/Door.png",
+    DOOR_WIDTH: 46,
+    DOOR_HEIGHT: 56,
+
+    getSpriteAmount(action) {
+      switch (action) {
+        case Constants.Door.IDLE:
+          return 1;
+        case Constants.Door.OPEN:
+          return 4;
+        case Constants.Door.CLOSE:
+          return 2;
+        default:
+          return -1;
+      }
+    },
+  },
+  Levels: {
+    level1: {
+      tileSetImgPath: "../res/Terrain (32x32).png",
+      levelDataImgPath: "../res/landing_page_data (2).png",
+    },
+  },
+  KingPig: {
+    KINGPIG_WIDTH: 38,
+    KINGPIG_HEIGHT: 28,
+    FRAME_SPEED: 20,
+    SPEED: 0.8,
+    KINGPIG_SRC: "../res/KingPig.png",
+
+    DEATH: 0,
+    HIT: 1,
+    ATTACK: 2,
+    GROUND: 3,
+    FALL: 4,
+    JUMP: 5,
+    RUNNING: 6,
+    IDLE: 7,
+
+    getSpriteAmount(entityState) {
+      switch (entityState) {
+        case Constants.KingPig.DEATH:
+          return 4;
+        case Constants.KingPig.HIT:
+          return 2;
+        case Constants.KingPig.ATTACK:
+          return 5;
+        case Constants.KingPig.GROUND:
+          return 1;
+        case Constants.KingPig.FALL:
+          return 1;
+        case Constants.KingPig.JUMP:
+          return 1;
+        case Constants.KingPig.RUNNING:
+          return 5;
+        case Constants.KingPig.IDLE:
+          return 12;
+        default:
+          break;
       }
     },
   },
