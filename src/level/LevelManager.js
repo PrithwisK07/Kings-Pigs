@@ -11,6 +11,7 @@ export default class LevelManager {
 
     this.levelName = 1;
     this.door = [];
+    this.boxes = [];
     this.levels = new Levels(this, this.player);
     this.levels.getLevelImgPath(this.levelName);
 
@@ -100,6 +101,10 @@ export default class LevelManager {
 
     this.door.forEach((d) => {
       d.draw(ctx, XlvlOffset);
+    });
+
+    this.boxes.forEach((box) => {
+      box.draw(ctx, XlvlOffset);
     });
   }
 }

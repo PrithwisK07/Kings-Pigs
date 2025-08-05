@@ -65,11 +65,14 @@ export function isEntityOnFloor(hitbox, levelData) {
 }
 
 export function detectAnySolidTile(x1, y1, x2, y2, levelData) {
-  const subject1XIndex = Math.floor(x1 / Constants.TILE_SIZE);
-  const subject1YIndex = Math.floor(y1 / Constants.TILE_SIZE);
+  let subject1XIndex = Math.floor(x1 / Constants.TILE_SIZE);
+  let subject1YIndex = Math.floor(y1 / Constants.TILE_SIZE);
 
-  const subject2XIndex = Math.floor(x2 / Constants.TILE_SIZE);
-  const subject2YIndex = Math.floor(y2 / Constants.TILE_SIZE);
+  let subject2XIndex = Math.floor(x2 / Constants.TILE_SIZE);
+  let subject2YIndex = Math.floor(y2 / Constants.TILE_SIZE);
+
+  subject1XIndex = Math.min(subject1XIndex, subject2XIndex);
+  subject2XIndex = Math.max(subject1XIndex, subject2XIndex);
 
   if (subject1YIndex != subject2YIndex) return true;
 
@@ -82,6 +85,29 @@ export function detectAnySolidTile(x1, y1, x2, y2, levelData) {
       )
     )
       return true;
+  }
+
+  return false;
+}
+
+export function detectOnDifferentPlatform(x1, y1, x2, y2, levelData) {
+  const startX = Math.floor(Math.min(x1, x2) / Constants.TILE_SIZE);
+  const endX = Math.floor(Math.max(x1, x2) / Constants.TILE_SIZE);
+  const tileY = Math.floor((y1 + Constants.TILE_SIZE) / Constants.TILE_SIZE);
+
+  const subject1YIndex = Math.floor(y1 / Constants.TILE_SIZE);
+  const subject2YIndex = Math.floor(y2 / Constants.TILE_SIZE);
+
+  if (subject1YIndex != subject2YIndex) return true;
+
+  for (let x = startX; x <= endX; x++) {
+    const tile = levelData[tileY]?.[x];
+    if (
+      !tile ||
+      !isSolid(x * Constants.TILE_SIZE, tileY * Constants.TILE_SIZE, levelData)
+    ) {
+      return true;
+    }
   }
 
   return false;

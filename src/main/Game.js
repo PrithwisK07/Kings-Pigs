@@ -5,6 +5,8 @@ import LevelManager from "../level/LevelManager.js";
 import Constants from "../utilities/Constants.js";
 import { getLevelData } from "../utilities/loadSave.js";
 import KingPig from "../entities/KingPig.js";
+import Pig from "../entities/Pig.js";
+import PigThrowingBox from "../entities/PigWithBoxes.js";
 
 export default class Game {
   constructor() {
@@ -56,7 +58,12 @@ export default class Game {
     // Other Game objects.
     this.player = new Player(230, 300, this);
     this.levelManager = new LevelManager(this.player);
+
     this.kingPig = new KingPig(1000, 300, this.player);
+
+    this.pig = new Pig(2000, 300, this.player);
+    this.pigThrowingBox = new PigThrowingBox(700, 300, this.player);
+
     this.keyBoardInputs = new KeyBoardInputs(this.player);
     this.mouseInputs = new MouseInput(this.player);
   }
@@ -71,6 +78,14 @@ export default class Game {
 
     this.kingPig.draw(this.ctx, this.XlvlOffset);
     this.kingPig.loadLevelData(getLevelData(this.levelManager.levelDataImg));
+
+    this.pig.draw(this.ctx, this.XlvlOffset);
+    this.pig.loadLevelData(getLevelData(this.levelManager.levelDataImg));
+
+    this.pigThrowingBox.draw(this.ctx, this.XlvlOffset);
+    this.pigThrowingBox.loadLevelData(
+      getLevelData(this.levelManager.levelDataImg)
+    );
 
     this.ctx.beginPath();
     this.ctx.fillStyle = "white";
@@ -101,8 +116,14 @@ export default class Game {
       d.update();
     });
 
+    this.levelManager.boxes.forEach((b) => {
+      b.update();
+    });
+
     this.player.update();
     this.kingPig.update();
+    this.pig.update();
+    this.pigThrowingBox.update();
     this.checkBorders();
   }
 

@@ -17,7 +17,7 @@ export default class Door extends Object {
 
     this.canExit = false;
     this.exitCountdown = 0;
-    this.exitCountTimer = 400;
+    this.exitCountTimer = 300;
 
     this.player = player;
 
@@ -59,13 +59,11 @@ export default class Door extends Object {
       return;
     }
 
-    if (this.doorType == 0) console.log("Hi");
-
     if (this.doorType == 0) {
       if (this.hitbox.intersects(this.player.hitbox)) {
         if (this.player.enterDoor) {
           this.opening = true;
-          console.log("opening");
+          this.player.stopKeyPressMethod();
         }
       }
     } else {
@@ -113,9 +111,16 @@ export default class Door extends Object {
           this.stopAnimation = true;
         }
 
-        if (this.player.stopAnimation || this.player.startAnimation) {
-          this.closing = true;
-          return;
+        if (this.doorType == 0) {
+          if (this.player.stopAnimation) {
+            this.closing = true;
+            return;
+          }
+        } else {
+          if (this.player.startAnimation) {
+            this.closing = true;
+            return;
+          }
         }
 
         if (this.opening) {

@@ -126,6 +126,91 @@ const Constants = {
       }
     },
   },
+  Pig: {
+    PIG_WIDTH: 34,
+    PIG_HEIGHT: 28,
+    FRAME_SPEED: 20,
+    SPEED: 0.8,
+    PIG_SRC: "../res/Pig.png",
+
+    DEATH: 0,
+    HIT: 1,
+    ATTACK: 2,
+    GROUND: 3,
+    FALL: 4,
+    JUMP: 5,
+    RUNNING: 6,
+    IDLE: 7,
+
+    getSpriteAmount(entityState) {
+      switch (entityState) {
+        case Constants.Pig.DEATH:
+          return 4;
+        case Constants.Pig.HIT:
+          return 2;
+        case Constants.Pig.ATTACK:
+          return 5;
+        case Constants.Pig.GROUND:
+          return 1;
+        case Constants.Pig.FALL:
+          return 1;
+        case Constants.Pig.JUMP:
+          return 1;
+        case Constants.Pig.RUNNING:
+          return 6;
+        case Constants.Pig.IDLE:
+          return 11;
+        default:
+          return -1;
+      }
+    },
+  },
+  PigThrowingBox: {
+    PIG_THROWING_BOX_WIDTH: 26,
+    PIG_THROWING_BOX_HEIGHT: 30,
+    PIG_THROWING_BOX_SRC: "../res/PigThrowingBox.png",
+
+    ATTACK: 0,
+    RUNNING: 1,
+    IDLE: 2,
+    PICKING: 3,
+    SPEED: 0.8,
+
+    getSpriteAmount(entityState) {
+      switch (entityState) {
+        case Constants.PigThrowingBox.PICKING:
+          return 5;
+        case Constants.PigThrowingBox.ATTACK:
+          return 5;
+        case Constants.PigThrowingBox.RUNNING:
+          return 6;
+        case Constants.PigThrowingBox.IDLE:
+          return 9;
+        default:
+          return -1;
+      }
+    },
+  },
+
+  Box: {
+    BOX_WIDTH: 22,
+    BOX_HEIGHT: 16,
+    BOX_SRC: "../res/Box.png",
+
+    HIT: 0,
+    IDLE: 1,
+
+    getSpriteAmount(entityState) {
+      switch (entityState) {
+        case Constants.Box.HIT:
+          return 1;
+        case Constants.Box.IDLE:
+          return 1;
+        default:
+          return -1;
+      }
+    },
+  },
 };
 
 export default Constants;

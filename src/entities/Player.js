@@ -268,8 +268,10 @@ export default class Player extends Entity {
     }
   }
 
-  stopKeyPress() {
+  stopKeyPressMethod() {
     this.stopKeyPress = true;
+    this.left = false;
+    this.right = false;
   }
 
   keyPressed(key) {

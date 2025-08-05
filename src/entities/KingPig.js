@@ -93,16 +93,6 @@ export default class KingPig extends Entity {
     this.setAnimation();
     this.updatePosition();
 
-    if (this.entityState === Constants.KingPig.ATTACK) {
-      const recoilStrength = 0.5 * Constants.SCALE;
-
-      if (this.flip) {
-        this.updateXPos(recoilStrength);
-      } else {
-        this.updateXPos(-recoilStrength);
-      }
-    }
-
     if (
       this.entityState === Constants.KingPig.ATTACK &&
       !this.hasRecoiled &&
