@@ -1,5 +1,6 @@
 import Door from "../objects/Door.js";
 import Constants from "../utilities/Constants.js";
+import { getBoxes, getSpriteAtlas } from "../utilities/loadSave.js";
 
 export default class Levels {
   constructor(levelManager, player) {
@@ -7,11 +8,11 @@ export default class Levels {
     this.player = player;
   }
 
-  getLevelImgPath(levelName) {
+  async getLevelImgPath(levelName) {
     const entryX = 250;
     const entryY = 400;
 
-    const exitX = Constants.OG_TILE_SIZE * 20;
+    const exitX = Constants.OG_TILE_SIZE * 85;
     const exitY = Constants.OG_TILE_SIZE * 12;
 
     switch (levelName) {
@@ -24,9 +25,13 @@ export default class Levels {
           new Door(entryX, entryY, this.player, 1),
           new Door(exitX, exitY, this.player, 0),
         ];
+
+        this.levelManager.boxes = await getBoxes(
+          this.levelManager.levelDataImgPath
+        );
+
+        console.log(this.levelManager.boxes);
         break;
     }
   }
 }
-
-// possible write two door classes, one for entry door and one for exit door.

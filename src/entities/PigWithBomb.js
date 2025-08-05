@@ -9,13 +9,18 @@ import {
   detectAnySolidTile,
 } from "../utilities/HelperMethods.js";
 
-export default class Pig extends Entity {
+export default class PigWithBomb extends Entity {
   constructor(x, y, player) {
-    super(x, y, Constants.Pig.PIG_WIDTH, Constants.Pig.PIG_HEIGHT);
+    super(
+      x,
+      y,
+      Constants.PigWithBomb.PIG_WIDTH,
+      Constants.PigWithBomb.PIG_HEIGHT
+    );
 
     this.player = player;
 
-    this.lastEntityState = this.entityState = Constants.Pig.IDLE;
+    this.lastEntityState = this.entityState = Constants.PigWithBomb.IDLE;
 
     this.death = false;
     this.gettingHit = false;
@@ -53,7 +58,7 @@ export default class Pig extends Entity {
 
   async loadImage() {
     try {
-      this.pigImg = await getSpriteAtlas(Constants.Pig.PIG_SRC);
+      this.pigImg = await getSpriteAtlas(Constants.PigWithBomb.PIG_SRC);
     } catch (error) {
       console.log(error.message);
     }
@@ -88,11 +93,14 @@ export default class Pig extends Entity {
     this.setAnimation();
     this.updatePosition();
 
-    if (this.entityState === Constants.Pig.ATTACK && !this.hasRecoiled) {
+    if (
+      this.entityState === Constants.PigWithBomb.ATTACK &&
+      !this.hasRecoiled
+    ) {
       this.hasRecoiled = true;
     }
 
-    if (this.entityState !== Constants.Pig.ATTACK) {
+    if (this.entityState !== Constants.PigWithBomb.ATTACK) {
       this.hasRecoiled = false;
     }
 
@@ -166,22 +174,22 @@ export default class Pig extends Entity {
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState === Constants.Pig.ATTACK) {
+    if (this.entityState === Constants.PigWithBomb.ATTACK) {
       return;
     }
 
-    this.entityState = Constants.Pig.IDLE;
+    this.entityState = Constants.PigWithBomb.IDLE;
 
     if (this.inAir)
-      if (this.ySpeed < 0) this.entityState = Constants.Pig.JUMP;
-      else this.entityState = Constants.Pig.FALL;
+      if (this.ySpeed < 0) this.entityState = Constants.PigWithBomb.JUMP;
+      else this.entityState = Constants.PigWithBomb.FALL;
 
     if ((this.left || this.right) && !this.inAir) {
-      this.entityState = Constants.Pig.RUNNING;
+      this.entityState = Constants.PigWithBomb.RUNNING;
     }
 
     if (this.attack) {
-      this.entityState = Constants.Pig.ATTACK;
+      this.entityState = Constants.PigWithBomb.ATTACK;
     }
 
     if (this.lastEntityState != this.entityState) {
@@ -224,11 +232,11 @@ export default class Pig extends Entity {
     }
 
     if (this.left) {
-      this.updateXPos(-Constants.Pig.SPEED);
+      this.updateXPos(-Constants.PigWithBomb.SPEED);
       this.flip = false;
     }
     if (this.right) {
-      this.updateXPos(Constants.Pig.SPEED);
+      this.updateXPos(Constants.PigWithBomb.SPEED);
       this.flip = true;
     }
   }
@@ -263,10 +271,12 @@ export default class Pig extends Entity {
 
       this.frameX++;
 
-      if (this.frameX >= Constants.Pig.getSpriteAmount(this.entityState)) {
+      if (
+        this.frameX >= Constants.PigWithBomb.getSpriteAmount(this.entityState)
+      ) {
         this.frameX = 0;
         this.attack = false;
-        this.entityState = Constants.Pig.IDLE;
+        this.entityState = Constants.PigWithBomb.IDLE;
       }
     }
   }
