@@ -1,21 +1,18 @@
 import Constants from "../utilities/Constants.js";
-import {
-  canMoveHere,
-  GetEntityYPosUnderRoofOrAboveFloor,
-} from "../utilities/HelperMethods.js";
+import { GetEntityYPosUnderRoofOrAboveFloor } from "../utilities/HelperMethods.js";
 import Object from "../objects/Object.js";
+import Projectile from "./Projectile.js";
 
 export default class Cannon extends Object {
   constructor(x, y) {
     super(x, y, Constants.Cannon.CANNON_WIDTH, Constants.Cannon.CANNON_HEIGHT);
 
-    this.velX = 2;
-    this.velY = -3;
-    this.gravity = 0.1;
+    this.attack = false;
+    this.shootProjectile = false;
+    this.projectileActive = false;
     this.levelData = null;
-    this.alive = true;
 
-    this.pause = false;
+    this.left = true;
 
     this.canDraw = true;
 
@@ -26,50 +23,79 @@ export default class Cannon extends Object {
       Constants.Cannon.CANNON_HEIGHT * Constants.SCALE
     );
 
+    this.objectState = this.lastObjectState = Constants.Cannon.IDLE;
+
+    this.countdownTimer = Constants.PigWithMatch.FRAME_SPEED;
+
     this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(this.hitbox, 1);
 
     this.loadImg(Constants.Cannon.CANNON_SRC);
   }
 
   update() {
-    this.velY += this.gravity;
-    this.x += this.velX;
-    this.y += this.velY;
+    this.updateAnimationTick();
+    this.setAnimation();
 
-    this.hitbox.x = this.x;
-    this.hitbox.y = this.y;
+    if (!this.projectileActive) return;
 
-    if (!canMoveHere(this.x, this.y, this.width, this.height, this.levelData)) {
-      this.alive = false;
-      this.explode();
-    }
+    this.projectile.update(this, this.left);
+  }
 
-    // Optional: hit player directly
-    if (this.hitbox.intersects(player.hitbox)) {
-      player.takeDamage();
-      this.alive = false;
+  updateAnimationTick() {
+    this.countdown++;
+
+    if (this.countdown >= this.countdownTimer) {
+      this.frameX++;
+      this.countdown = 0;
+
+      if (this.objectState == Constants.Cannon.ATTACK)
+        if (this.frameX == 1) this.shootProjectile = true;
+
+      if (this.frameX >= Constants.Cannon.getSpriteAmount(this.objectState)) {
+        this.frameX = 0;
+
+        if (this.objectState == Constants.Cannon.ATTACK) {
+          this.attack = false;
+        }
+      }
     }
   }
 
-  explode() {
-    for (let i = 0; i < 4; i++) {
-      const angle = (i * Math.PI) / 2;
-      const speed = 1.5 + Math.random() * 1;
-      const dx = Math.cos(angle) * speed;
-      const dy = Math.sin(angle) * speed - 1.5;
-      fragments.push(new CannonPiece(this.x, this.y, dx, dy));
+  setAnimation() {
+    this.lastObjectState = this.objectState;
+
+    this.objectState = Constants.Cannon.IDLE;
+
+    if (this.attack) {
+      this.objectState = Constants.Cannon.ATTACK;
+    }
+
+    if (this.lastObjectState != this.objectState) {
+      this.frameX = 0;
+      this.countdown = 0;
+    }
+  }
+
+  shoot() {
+    if (!this.projectileActive) {
+      this.attack = true;
+      this.projectile = new Projectile(
+        this.hitbox.x,
+        this.hitbox.y,
+        this.levelData
+      );
+      this.projectileActive = true;
     }
   }
 
   draw(ctx, XlvlOffset) {
-    if (this.pause) return;
-
     if (!this.objectImg) return;
     if (!this.canDraw) return;
 
     // this.drawHitbox(ctx, XlvlOffset);
 
-    this.frameX = 1;
+    if (this.projectileActive) this.projectile.draw(ctx, XlvlOffset);
+
     ctx.drawImage(
       this.objectImg,
       this.frameX * this.width,
@@ -83,7 +109,7 @@ export default class Cannon extends Object {
     );
   }
 
-  setLevelData(levelData) {
+  loadLevelData(levelData) {
     this.levelData = levelData;
   }
 }

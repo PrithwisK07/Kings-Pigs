@@ -8,6 +8,7 @@ import {
   getPigThrowingBoxes,
   getPigs,
   getCannons,
+  getPigWithMatches,
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
@@ -41,6 +42,7 @@ export default class LevelManager {
     this.game.kingPigs = await getKingPigs(this.levelDataImg);
     this.game.pigs = await getPigs(this.levelDataImg);
     this.game.pigThrowingBoxes = await getPigThrowingBoxes(this.levelDataImg);
+    this.game.pigWithMatches = await getPigWithMatches(this.levelDataImg);
 
     this.player.loadLevelData(this.levelData);
 
@@ -57,6 +59,14 @@ export default class LevelManager {
 
     this.game.pigThrowingBoxes.forEach((p) => {
       p.loadLevelData(this.levelData, this.boxes);
+    });
+
+    this.game.pigWithMatches.forEach((p) => {
+      p.loadLevelData(this.levelData);
+    });
+
+    this.cannons.forEach((cannon) => {
+      cannon.loadLevelData(this.levelData);
     });
   }
 
@@ -144,5 +154,17 @@ export default class LevelManager {
     this.cannons.forEach((cannon) => {
       cannon.draw(ctx, XlvlOffset);
     });
+  }
+
+  update() {
+    if (this.door)
+      this.door.forEach((d) => {
+        d.update();
+      });
+
+    if (this.cannons)
+      this.cannons.forEach((cannon) => {
+        cannon.update();
+      });
   }
 }

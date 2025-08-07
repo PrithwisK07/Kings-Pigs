@@ -232,14 +232,15 @@ const Constants = {
     PIG_WITH_MATCH_HEIGHT: 28,
     PIG_WITH_MATCH_SRC: "../res/PigWithMatch.png",
     SPEED: 0.8,
+    FRAME_SPEED: 30,
 
     withoutMatch: {
       IDLE: 0,
+      LIGHT: 3,
     },
     withMatch: {
       ATTACK: 1,
       IDLE: 2,
-      LIGHT: 3,
     },
 
     getSpriteAmount(entityState, hasMatch) {
@@ -249,8 +250,6 @@ const Constants = {
             return 3;
           case Constants.PigWithMatch.withMatch.IDLE:
             return 3;
-          case Constants.PigWithMatch.withMatch.LIGHT:
-            return 3;
           default:
             return -1;
         }
@@ -258,6 +257,8 @@ const Constants = {
         switch (entityState) {
           case Constants.PigWithMatch.withoutMatch.IDLE:
             return 11;
+          case Constants.PigWithMatch.withoutMatch.LIGHT:
+            return 3;
           default:
             return -1;
         }
@@ -290,18 +291,33 @@ const Constants = {
     CANNON_HEIGHT: 28,
     CANNON_SRC: "../res/Cannon.png",
 
-    IDLE: 0,
-    HIT: 1,
+    ATTACK: 0,
+    IDLE: 1,
 
     getSpriteAmount(entityState) {
       switch (entityState) {
-        case Constants.CANNON.HIT:
-          return 1;
-        case Constants.CANNON.IDLE:
+        case Constants.Cannon.ATTACK:
+          return 4;
+        case Constants.Cannon.IDLE:
           return 1;
         default:
           return -1;
       }
+    },
+  },
+
+  Projectile: {
+    PROJECTILE_WIDTH: 44,
+    PROJECTILE_HEIGHT: 28,
+    PROJECTILE_SRC: "../res/Cannon Ball.png",
+    PROJECTILE_SPEED: 1.2,
+
+    EXPLOSION_WIDTH: 52,
+    EXPLOSION_HEIGHT: 56,
+    EXPLOSION_SRC: "../res/Boooooom (52x56).png",
+
+    getSpriteAmount() {
+      return 6;
     },
   },
 };
