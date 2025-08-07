@@ -3,10 +3,6 @@ import KeyBoardInputs from "../inputs/KeyBoardInputs.js";
 import MouseInput from "../inputs/MouseInput.js";
 import LevelManager from "../level/LevelManager.js";
 import Constants from "../utilities/Constants.js";
-import { getLevelData } from "../utilities/loadSave.js";
-import KingPig from "../entities/KingPig.js";
-import Pig from "../entities/Pig.js";
-import PigThrowingBox from "../entities/PigWithBoxes.js";
 
 export default class Game {
   constructor() {
@@ -43,6 +39,11 @@ export default class Game {
 
     this.lastFpsCheck = performance.now();
 
+    // Entities and Objects
+    this.kingPigs = [];
+    this.pigs = [];
+    this.pigThrowingBoxes = [];
+
     this.loop(0);
   }
 
@@ -57,13 +58,7 @@ export default class Game {
 
     // Other Game objects.
     this.player = new Player(230, 300, this);
-    this.levelManager = new LevelManager(this.player);
-
-    this.kingPig = new KingPig(1000, 300, this.player);
-
-    this.pig = new Pig(2000, 300, this.player);
-    this.pigThrowingBox = new PigThrowingBox(700, 300, this.player);
-
+    this.levelManager = new LevelManager(this.player, this);
     this.keyBoardInputs = new KeyBoardInputs(this.player);
     this.mouseInputs = new MouseInput(this.player);
   }
@@ -74,18 +69,18 @@ export default class Game {
     this.levelManager.draw(this.ctx, this.XlvlOffset);
 
     this.player.draw(this.ctx, this.XlvlOffset);
-    this.player.loadLevelData(getLevelData(this.levelManager.levelDataImg));
 
-    this.kingPig.draw(this.ctx, this.XlvlOffset);
-    this.kingPig.loadLevelData(getLevelData(this.levelManager.levelDataImg));
+    this.kingPigs.forEach((kp) => {
+      kp.draw(this.ctx, this.XlvlOffset);
+    });
 
-    this.pig.draw(this.ctx, this.XlvlOffset);
-    this.pig.loadLevelData(getLevelData(this.levelManager.levelDataImg));
+    this.pigs.forEach((p) => {
+      p.draw(this.ctx, this.XlvlOffset);
+    });
 
-    this.pigThrowingBox.draw(this.ctx, this.XlvlOffset);
-    this.pigThrowingBox.loadLevelData(
-      getLevelData(this.levelManager.levelDataImg)
-    );
+    this.pigThrowingBoxes.forEach((p) => {
+      p.draw(this.ctx, this.XlvlOffset);
+    });
 
     this.ctx.beginPath();
     this.ctx.fillStyle = "white";
@@ -116,14 +111,20 @@ export default class Game {
       d.update();
     });
 
-    this.levelManager.boxes.forEach((b) => {
-      b.update();
+    this.player.update();
+
+    this.kingPigs.forEach((kp) => {
+      kp.update();
     });
 
-    this.player.update();
-    this.kingPig.update();
-    this.pig.update();
-    this.pigThrowingBox.update();
+    this.pigs.forEach((p) => {
+      p.update();
+    });
+
+    this.pigThrowingBoxes.forEach((p) => {
+      p.update();
+    });
+
     this.checkBorders();
   }
 

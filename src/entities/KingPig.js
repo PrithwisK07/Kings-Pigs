@@ -1,6 +1,6 @@
 import Constants from "../utilities/Constants.js";
 import Entity from "./entity.js";
-import { getSpriteAtlas } from "../utilities/loadSave.js";
+import { getSpriteAtlas } from "../utilities/LoadSave.js";
 import {
   canMoveHere,
   GetEntityXPosNextToWall,
@@ -65,9 +65,10 @@ export default class KingPig extends Entity {
   }
 
   draw(ctx, XlvlOffset) {
+    if (!this.levelData) return;
     if (!this.kingPigImg) return;
 
-    // this.drawHitbox(ctx);
+    // this.drawHitbox(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -80,8 +81,8 @@ export default class KingPig extends Entity {
       this.width,
       this.height,
       this.flip
-        ? -this.hitbox.x - this.hitbox.width + XlvlOffset
-        : this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
+        ? -this.hitbox.x - this.hitbox.width * 1.55 + XlvlOffset
+        : this.hitbox.x - this.hitbox.width / 1.9 - XlvlOffset,
       this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
@@ -90,8 +91,20 @@ export default class KingPig extends Entity {
   }
 
   update() {
+    if (!this.levelData) return;
+
     this.setAnimation();
     this.updatePosition();
+
+    if (this.entityState === Constants.KingPig.ATTACK) {
+      const recoilStrength = 0.3 * Constants.SCALE;
+
+      if (this.flip) {
+        this.updateXPos(recoilStrength);
+      } else {
+        this.updateXPos(-recoilStrength);
+      }
+    }
 
     if (
       this.entityState === Constants.KingPig.ATTACK &&

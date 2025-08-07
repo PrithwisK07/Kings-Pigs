@@ -1,5 +1,5 @@
 import Entity from "./entity.js";
-import { getSpriteAtlas } from "../utilities/loadSave.js";
+import { getSpriteAtlas } from "../utilities/LoadSave.js";
 import Constants from "../utilities/Constants.js";
 import {
   canMoveHere,
@@ -71,6 +71,7 @@ export default class Player extends Entity {
   }
 
   draw(ctx, XlvlOffset) {
+    if (!this.levelData) return;
     if (!this.playerImg) return;
 
     if (!this.canDraw) return;
@@ -108,6 +109,7 @@ export default class Player extends Entity {
   }
 
   update() {
+    if (!this.levelData) return;
     if (this.stopAnimation) return;
 
     this.setAnimation();

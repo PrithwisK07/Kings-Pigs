@@ -1,6 +1,6 @@
 import Constants from "../utilities/Constants.js";
 import Entity from "./entity.js";
-import { getSpriteAtlas } from "../utilities/loadSave.js";
+import { getSpriteAtlas } from "../utilities/LoadSave.js";
 import {
   canMoveHere,
   GetEntityXPosNextToWall,
@@ -60,9 +60,10 @@ export default class Pig extends Entity {
   }
 
   draw(ctx, XlvlOffset) {
+    if (!this.levelData) return;
     if (!this.pigImg) return;
 
-    // this.drawHitbox(ctx);
+    // this.drawHitbox(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -75,8 +76,8 @@ export default class Pig extends Entity {
       this.width,
       this.height,
       this.flip
-        ? -this.hitbox.x - this.hitbox.width + XlvlOffset
-        : this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
+        ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
+        : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
       this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
@@ -85,6 +86,8 @@ export default class Pig extends Entity {
   }
 
   update() {
+    if (!this.levelData) return;
+
     this.setAnimation();
     this.updatePosition();
 

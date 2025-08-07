@@ -14,10 +14,10 @@ export default class Entity {
     this.hitbox = new Rectangle2D(x, y, width, height);
   }
 
-  drawHitbox(ctx) {
+  drawHitbox(ctx, XlvlOffset) {
     ctx.beginPath();
     ctx.strokeRect(
-      this.hitbox.x,
+      this.hitbox.x - XlvlOffset,
       this.hitbox.y,
       this.hitbox.width,
       this.hitbox.height

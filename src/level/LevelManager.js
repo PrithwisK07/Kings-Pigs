@@ -1,17 +1,26 @@
 import Constants from "../utilities/Constants.js";
 import Levels from "./Levels.js";
-import { getSpriteAtlas, getLevelData } from "../utilities/loadSave.js";
+import {
+  getSpriteAtlas,
+  getLevelData,
+  getBoxes,
+  getKingPigs,
+  getPigThrowingBoxes,
+  getPigs,
+  getCannons,
+} from "../utilities/LoadSave.js";
 
 export default class LevelManager {
-  constructor(player) {
+  constructor(player, game) {
     this.tileSetImgPath = null;
     this.levelDataImgPath = null;
 
+    this.game = game;
     this.player = player;
+    this.levelData = null;
 
     this.levelName = 1;
     this.door = [];
-    this.boxes = [];
     this.levels = new Levels(this, this.player);
     this.levels.getLevelImgPath(this.levelName);
 
@@ -28,6 +37,27 @@ export default class LevelManager {
   async init() {
     await this.loadTileMap();
     this.loadLevel();
+
+    this.game.kingPigs = await getKingPigs(this.levelDataImg);
+    this.game.pigs = await getPigs(this.levelDataImg);
+    this.game.pigThrowingBoxes = await getPigThrowingBoxes(this.levelDataImg);
+
+    this.player.loadLevelData(this.levelData);
+
+    this.boxes = await getBoxes(this.levelDataImg);
+    this.cannons = await getCannons(this.levelDataImg);
+
+    this.game.kingPigs.forEach((kp) => {
+      kp.loadLevelData(this.levelData);
+    });
+
+    this.game.pigs.forEach((p) => {
+      p.loadLevelData(this.levelData);
+    });
+
+    this.game.pigThrowingBoxes.forEach((p) => {
+      p.loadLevelData(this.levelData, this.boxes);
+    });
   }
 
   async loadTileMap() {
@@ -38,6 +68,8 @@ export default class LevelManager {
     const ctx = canvas.getContext("2d");
 
     canvas.height = canvas.width = Constants.OG_TILE_SIZE;
+
+    this.levelData = getLevelData(this.levelDataImg, this.player);
 
     for (let i = 0; i < 5; i++) {
       for (let j = 0; j < 19; j++) {
@@ -75,7 +107,7 @@ export default class LevelManager {
       for (let j = 0; j < this.levelDataImg.width; j++) {
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
-          this.levelSprite[getLevelData(this.levelDataImg)[i][j]],
+          this.levelSprite[this.levelData[i][j]],
           Math.floor(j * Constants.TILE_SIZE),
           Math.floor(i * Constants.TILE_SIZE),
           Constants.TILE_SIZE,
@@ -103,8 +135,14 @@ export default class LevelManager {
       d.draw(ctx, XlvlOffset);
     });
 
+    if (!this.boxes) return;
+
     this.boxes.forEach((box) => {
       box.draw(ctx, XlvlOffset);
+    });
+
+    this.cannons.forEach((cannon) => {
+      cannon.draw(ctx, XlvlOffset);
     });
   }
 }

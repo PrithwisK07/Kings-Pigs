@@ -138,6 +138,8 @@ export default class Door extends Object {
   }
 
   draw(ctx, XlvlOffset) {
+    if (this.objectImg == null) return;
+
     ctx.save();
 
     // this.drawHitbox(ctx, XlvlOffset);

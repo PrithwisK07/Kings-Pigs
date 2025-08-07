@@ -1,6 +1,6 @@
 import Rectangle2D from "../custom/Rectangle2D.js";
 import Constants from "../utilities/Constants.js";
-import { getSpriteAtlas } from "../utilities/loadSave.js";
+import { getSpriteAtlas } from "../utilities/LoadSave.js";
 
 export default class Object {
   constructor(x, y, width, height) {
@@ -25,7 +25,7 @@ export default class Object {
   drawHitbox(ctx, XlvlOffset) {
     ctx.strokeStyle = "blue";
     ctx.strokeRect(
-      this.hitbox.x - this.hitbox.width - XlvlOffset,
+      this.hitbox.x - XlvlOffset,
       this.hitbox.y,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE

@@ -1,6 +1,6 @@
 import Constants from "../utilities/Constants.js";
 import Entity from "./entity.js";
-import { getSpriteAtlas } from "../utilities/loadSave.js";
+import { getSpriteAtlas, getBoxes } from "../utilities/LoadSave.js";
 import {
   canMoveHere,
   GetEntityXPosNextToWall,
@@ -14,7 +14,7 @@ import Rectangle2D from "../custom/Rectangle2D.js";
 export default class PigThrowingBox extends Entity {
   constructor(x, y, player) {
     super(
-      x,
+      x + Constants.PigThrowingBox.PIG_THROWING_BOX_WIDTH / 1.4,
       y,
       Constants.PigThrowingBox.PIG_THROWING_BOX_WIDTH,
       Constants.PigThrowingBox.PIG_THROWING_BOX_HEIGHT
@@ -22,7 +22,8 @@ export default class PigThrowingBox extends Entity {
 
     this.player = player;
 
-    this.lastEntityState = this.entityState = Constants.PigThrowingBox.IDLE;
+    this.lastEntityState = this.entityState =
+      Constants.PigThrowingBox.withBox.IDLE;
 
     this.death = false;
     this.gettingHit = false;
@@ -33,6 +34,9 @@ export default class PigThrowingBox extends Entity {
     this.jumping = false;
     this.flip = false;
     this.inAir = true;
+
+    this.hasBox = true;
+    this.pickingBox = false;
 
     this.ySpeed = 0;
     this.gravity = 0.05;
@@ -47,15 +51,20 @@ export default class PigThrowingBox extends Entity {
     this.countdownTimer = Constants.Player.FRAME_SPEED;
 
     this.initHitbox(
-      x,
+      x + Constants.PigThrowingBox.PIG_THROWING_BOX_WIDTH / 1.4,
       y,
       (this.width / 2) * Constants.SCALE,
       (this.height / 1.3) * Constants.SCALE
     );
 
     this.loadImage();
+    this.loadTheBoxes();
 
     this.levelData = null;
+  }
+
+  async loadTheBoxes() {
+    this.boxes = await getBoxes(this.levelDataImg);
   }
 
   async loadImage() {
@@ -69,9 +78,10 @@ export default class PigThrowingBox extends Entity {
   }
 
   draw(ctx, XlvlOffset) {
+    if (!this.levelData) return;
     if (!this.kingPigImg) return;
 
-    // this.drawHitbox(ctx);
+    // this.drawHitbox(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -84,8 +94,8 @@ export default class PigThrowingBox extends Entity {
       this.width,
       this.height,
       this.flip
-        ? -this.hitbox.x - this.hitbox.width + XlvlOffset
-        : this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
+        ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
+        : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
       this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
@@ -94,14 +104,30 @@ export default class PigThrowingBox extends Entity {
   }
 
   update() {
+    if (!this.levelData) return;
     this.setAnimation();
     this.updatePosition();
 
     if (this.attackCooldown > 0) this.attackCooldown--;
     if (this.chaseTimeout > 0) this.chaseTimeout--;
 
+    this.detectTheBox();
     this.detectAndChasePlayer();
     this.updateAnimationTick();
+  }
+
+  detectTheBox() {
+    if (!this.boxes) return;
+    if (this.hasBox) return;
+
+    this.boxes.forEach((box) => {
+      if (!box.pause)
+        if (box.hitbox.intersects(this.hitbox)) {
+          this.stopMoving();
+          box.pause = true;
+          this.pickingBox = true;
+        }
+    });
   }
 
   detectAndChasePlayer() {
@@ -171,22 +197,50 @@ export default class PigThrowingBox extends Entity {
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState === Constants.PigThrowingBox.ATTACK) {
-      return;
-    }
+    if (this.hasBox) {
+      if (this.entityState === Constants.PigThrowingBox.withBox.ATTACK) {
+        return;
+      }
 
-    this.entityState = Constants.PigThrowingBox.IDLE;
+      this.entityState = Constants.PigThrowingBox.withBox.IDLE;
 
-    if (this.inAir)
-      if (this.ySpeed < 0) this.entityState = Constants.PigThrowingBox.JUMP;
-      else this.entityState = Constants.PigThrowingBox.FALL;
+      if (this.inAir)
+        if (this.ySpeed < 0)
+          this.entityState = Constants.PigThrowingBox.withBox.JUMP;
+        else this.entityState = Constants.PigThrowingBox.withBox.FALL;
 
-    if ((this.left || this.right) && !this.inAir) {
-      this.entityState = Constants.PigThrowingBox.RUNNING;
-    }
+      if ((this.left || this.right) && !this.inAir) {
+        this.entityState = Constants.PigThrowingBox.withBox.RUNNING;
+      }
 
-    if (this.attack) {
-      this.entityState = Constants.PigThrowingBox.ATTACK;
+      if (this.attack) {
+        this.entityState = Constants.PigThrowingBox.withBox.ATTACK;
+      }
+    } else {
+      if (this.entityState === Constants.PigThrowingBox.withBox.PICKING) return;
+
+      if (this.entityState === Constants.PigThrowingBox.withoutBox.ATTACK) {
+        return;
+      }
+
+      this.entityState = Constants.PigThrowingBox.withoutBox.IDLE;
+
+      if (this.inAir)
+        if (this.ySpeed < 0)
+          this.entityState = Constants.PigThrowingBox.withoutBox.JUMP;
+        else this.entityState = Constants.PigThrowingBox.withoutBox.FALL;
+
+      if ((this.left || this.right) && !this.inAir) {
+        this.entityState = Constants.PigThrowingBox.withoutBox.RUNNING;
+      }
+
+      if (this.attack) {
+        this.entityState = Constants.PigThrowingBox.withoutBox.ATTACK;
+      }
+
+      if (this.pickingBox) {
+        this.entityState = Constants.PigThrowingBox.withBox.PICKING;
+      }
     }
 
     if (this.lastEntityState != this.entityState) {
@@ -259,27 +313,41 @@ export default class PigThrowingBox extends Entity {
 
     const isOnFloor = isEntityOnFloor(hitboxAlias, this.levelData);
 
-    // Edge detection: check if the tile just in front of the feet is walkable
-    const footX = this.flip
-      ? this.hitbox.x + this.hitbox.width + 1 // right edge
-      : this.hitbox.x - 1; // left edge
+    if (this.hasBox) {
+      const footX = this.flip
+        ? this.hitbox.x + this.hitbox.width + 1
+        : this.hitbox.x - 1;
 
-    const footY = this.hitbox.y + this.hitbox.height + 1;
+      const footY = this.hitbox.y + this.hitbox.height + 1;
 
-    const tileBelowAheadIsSolid = detectAnySolidTile(
-      footX,
-      footY,
-      footX,
-      footY + 1,
-      this.levelData
-    );
+      const tileBelowAheadIsSolid = detectAnySolidTile(
+        footX,
+        footY,
+        footX,
+        footY + 1,
+        this.levelData
+      );
 
-    if (canMove && isOnFloor && tileBelowAheadIsSolid) {
-      this.hitbox.x = newX;
+      if (canMove && isOnFloor && tileBelowAheadIsSolid) {
+        this.hitbox.x = newX;
+      } else {
+        this.attack = true;
+        this.left = false;
+        this.right = false;
+      }
     } else {
-      this.attack = true;
-      this.left = false;
-      this.right = false;
+      // when pig doesn't have box, allow it to walk and fall naturally
+      if (canMove) {
+        this.hitbox.x = newX;
+      } else {
+        if (xSpeed2 > 0) {
+          this.left = true;
+          this.right = false;
+        } else {
+          this.left = false;
+          this.right = true;
+        }
+      }
     }
   }
 
@@ -293,11 +361,22 @@ export default class PigThrowingBox extends Entity {
 
       if (
         this.frameX >=
-        Constants.PigThrowingBox.getSpriteAmount(this.entityState)
+        Constants.PigThrowingBox.getSpriteAmount(this.entityState, this.hasBox)
       ) {
+        if (this.entityState == Constants.PigThrowingBox.withBox.ATTACK)
+          this.hasBox = false;
+
+        if (this.entityState == Constants.PigThrowingBox.withBox.PICKING) {
+          this.pickingBox = false;
+          this.hasBox = true;
+        }
+
         this.frameX = 0;
         this.attack = false;
-        this.entityState = Constants.PigThrowingBox.IDLE;
+
+        if (this.hasBox)
+          this.entityState = Constants.PigThrowingBox.withBox.IDLE;
+        else this.entityState = Constants.PigThrowingBox.withoutBox.IDLE;
       }
     }
   }
