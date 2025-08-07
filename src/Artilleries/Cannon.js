@@ -3,11 +3,11 @@ import {
   canMoveHere,
   GetEntityYPosUnderRoofOrAboveFloor,
 } from "../utilities/HelperMethods.js";
-import Object from "./Object.js";
+import Object from "../objects/Object.js";
 
-export default class Box extends Object {
+export default class Cannon extends Object {
   constructor(x, y) {
-    super(x, y, Constants.Box.BOX_WIDTH, Constants.Box.BOX_HEIGHT);
+    super(x, y, Constants.Cannon.CANNON_WIDTH, Constants.Cannon.CANNON_HEIGHT);
 
     this.velX = 2;
     this.velY = -3;
@@ -22,13 +22,13 @@ export default class Box extends Object {
     this.initHitbox(
       x,
       y,
-      Constants.Box.BOX_WIDTH * Constants.SCALE,
-      Constants.Box.BOX_HEIGHT * Constants.SCALE
+      Constants.Cannon.CANNON_WIDTH * Constants.SCALE,
+      Constants.Cannon.CANNON_HEIGHT * Constants.SCALE
     );
 
     this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(this.hitbox, 1);
 
-    this.loadImg(Constants.Box.BOX_SRC);
+    this.loadImg(Constants.Cannon.CANNON_SRC);
   }
 
   update() {
@@ -57,7 +57,7 @@ export default class Box extends Object {
       const speed = 1.5 + Math.random() * 1;
       const dx = Math.cos(angle) * speed;
       const dy = Math.sin(angle) * speed - 1.5;
-      fragments.push(new BoxPiece(this.x, this.y, dx, dy));
+      fragments.push(new CannonPiece(this.x, this.y, dx, dy));
     }
   }
 
@@ -67,8 +67,9 @@ export default class Box extends Object {
     if (!this.objectImg) return;
     if (!this.canDraw) return;
 
-    this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset);
 
+    this.frameX = 1;
     ctx.drawImage(
       this.objectImg,
       this.frameX * this.width,
@@ -76,9 +77,9 @@ export default class Box extends Object {
       this.width,
       this.height,
       this.hitbox.x - XlvlOffset + 1,
-      this.hitbox.y,
-      this.width * Constants.SCALE,
-      this.height * Constants.SCALE
+      this.hitbox.y + 5 * Constants.SCALE,
+      this.hitbox.width,
+      this.hitbox.height
     );
   }
 

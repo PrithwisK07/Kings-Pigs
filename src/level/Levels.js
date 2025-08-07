@@ -25,12 +25,6 @@ export default class Levels {
           new Door(entryX, entryY, this.player, 1),
           new Door(exitX, exitY, this.player, 0),
         ];
-
-        this.levelManager.boxes = await getBoxes(
-          this.levelManager.levelDataImgPath
-        );
-
-        console.log(this.levelManager.boxes);
         break;
     }
   }
