@@ -43,6 +43,7 @@ export default class Game {
     this.kingPigs = [];
     this.pigs = [];
     this.pigThrowingBoxes = [];
+    this.pigWithMatches = [];
 
     this.loop(0);
   }
@@ -82,6 +83,10 @@ export default class Game {
       p.draw(this.ctx, this.XlvlOffset);
     });
 
+    this.pigWithMatches.forEach((p) => {
+      p.draw(this.ctx, this.XlvlOffset);
+    });
+
     this.ctx.beginPath();
     this.ctx.fillStyle = "white";
     this.ctx.font = "bold 14px sans-serif";
@@ -107,9 +112,7 @@ export default class Game {
   }
 
   update() {
-    this.levelManager.door.forEach((d) => {
-      d.update();
-    });
+    this.levelManager.update();
 
     this.player.update();
 
@@ -122,6 +125,10 @@ export default class Game {
     });
 
     this.pigThrowingBoxes.forEach((p) => {
+      p.update();
+    });
+
+    this.pigWithMatches.forEach((p) => {
       p.update();
     });
 

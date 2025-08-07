@@ -3,6 +3,7 @@ import Pig from "../entities/Pig.js";
 import PigThrowingBox from "../entities/PigWithBoxes.js";
 import Box from "../objects/Box.js";
 import Cannon from "../Artilleries/Cannon.js";
+import PigWithMatch from "../entities/PigWithMatch.js";
 import Constants from "./Constants.js";
 
 let boxes = [];
@@ -10,6 +11,7 @@ let cannons = [];
 let kingPigs = [];
 let pigs = [];
 let pigThrowingBoxes = [];
+let pigWithMatches = [];
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -108,6 +110,16 @@ export function getLevelData(levelDataImg, player, boxesArg) {
         );
       }
 
+      if (blueValue == 5) {
+        pigWithMatches.push(
+          new PigWithMatch(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            player
+          )
+        );
+      }
+
       row.push(redValue);
     }
     levelData.push(row);
@@ -134,4 +146,8 @@ export async function getPigThrowingBoxes() {
 
 export async function getCannons() {
   return cannons;
+}
+
+export async function getPigWithMatches() {
+  return pigWithMatches;
 }

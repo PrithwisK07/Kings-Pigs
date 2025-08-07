@@ -27,8 +27,8 @@ export default class Object {
     ctx.strokeRect(
       this.hitbox.x - XlvlOffset,
       this.hitbox.y,
-      this.width * Constants.SCALE,
-      this.height * Constants.SCALE
+      this.hitbox.width,
+      this.hitbox.height
     );
   }
 

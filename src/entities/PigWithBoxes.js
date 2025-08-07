@@ -64,7 +64,7 @@ export default class PigThrowingBox extends Entity {
   }
 
   async loadTheBoxes() {
-    this.boxes = await getBoxes(this.levelDataImg);
+    this.boxes = await getBoxes();
   }
 
   async loadImage() {
