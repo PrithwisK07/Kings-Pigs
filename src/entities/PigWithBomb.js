@@ -1,26 +1,32 @@
 import Constants from "../utilities/Constants.js";
 import Entity from "./entity.js";
-import { getSpriteAtlas } from "../utilities/loadSave.js";
+import { getSpriteAtlas, getBombs } from "../utilities/LoadSave.js";
 import {
   canMoveHere,
   GetEntityXPosNextToWall,
   GetEntityYPosUnderRoofOrAboveFloor,
   isEntityOnFloor,
   detectAnySolidTile,
+  detectOnDifferentPlatform,
 } from "../utilities/HelperMethods.js";
+import Rectangle2D from "../custom/Rectangle2D.js";
+import Bomb from "../objects/Bomb.js";
 
-export default class PigWithBomb extends Entity {
-  constructor(x, y, player) {
+export default class PigThrowingBomb extends Entity {
+  constructor(x, y, player, levelManager) {
     super(
-      x,
+      x + Constants.PigThrowingBomb.PIG_THROWING_BOMB_WIDTH / 1.4,
       y,
-      Constants.PigWithBomb.PIG_WIDTH,
-      Constants.PigWithBomb.PIG_HEIGHT
+      Constants.PigThrowingBomb.PIG_THROWING_BOMB_WIDTH,
+      Constants.PigThrowingBomb.PIG_THROWING_BOMB_HEIGHT
     );
+
+    this.levelManager = levelManager;
 
     this.player = player;
 
-    this.lastEntityState = this.entityState = Constants.PigWithBomb.IDLE;
+    this.lastEntityState = this.entityState =
+      Constants.PigThrowingBomb.withBomb.IDLE;
 
     this.death = false;
     this.gettingHit = false;
@@ -32,6 +38,9 @@ export default class PigWithBomb extends Entity {
     this.flip = false;
     this.inAir = true;
 
+    this.hasBomb = true;
+    this.pickingBomb = false;
+
     this.ySpeed = 0;
     this.gravity = 0.05;
     this.jumpSpeed = -1.95 * Constants.SCALE;
@@ -39,50 +48,60 @@ export default class PigWithBomb extends Entity {
 
     this.attackCooldown = 0;
     this.chaseTimeout = 0;
-    this.MAX_CHASE_TIMEOUT = 900;
+    this.MAX_CHASE_TIMEOUT = 1800;
 
     this.countdown = 0;
     this.countdownTimer = Constants.Player.FRAME_SPEED;
 
     this.initHitbox(
-      x,
+      x + Constants.PigThrowingBomb.PIG_THROWING_BOMB_WIDTH / 1.4,
       y,
       (this.width / 2) * Constants.SCALE,
       (this.height / 1.3) * Constants.SCALE
     );
 
     this.loadImage();
+    this.loadTheBombes();
 
     this.levelData = null;
   }
 
+  async loadTheBombes() {
+    this.bombs = await getBombs();
+  }
+
   async loadImage() {
     try {
-      this.pigImg = await getSpriteAtlas(Constants.PigWithBomb.PIG_SRC);
+      this.pigBomb = await getSpriteAtlas(
+        Constants.PigThrowingBomb.PIG_THROWING_BOMB_SRC
+      );
     } catch (error) {
       console.log(error.message);
     }
   }
 
   draw(ctx, XlvlOffset) {
-    if (!this.pigImg) return;
+    if (!this.levelData) return;
+    if (!this.pigBomb) return;
 
-    // this.drawHitbox(ctx);
+    if (this.bomb) this.bomb.draw(ctx, XlvlOffset);
+
+    // this.drawHitbox(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
     ctx.imageSmoothingEnabled = false;
 
     ctx.drawImage(
-      this.pigImg,
+      this.pigBomb,
       this.frameX * this.width,
       this.entityState * this.height,
       this.width,
       this.height,
       this.flip
-        ? -this.hitbox.x - this.hitbox.width + XlvlOffset
-        : this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE,
+        ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
+        : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
+      this.hitbox.y - this.hitbox.height / 3 + 3 * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
@@ -90,25 +109,31 @@ export default class PigWithBomb extends Entity {
   }
 
   update() {
+    // this.bomb.update();
+    if (!this.levelData) return;
     this.setAnimation();
     this.updatePosition();
-
-    if (
-      this.entityState === Constants.PigWithBomb.ATTACK &&
-      !this.hasRecoiled
-    ) {
-      this.hasRecoiled = true;
-    }
-
-    if (this.entityState !== Constants.PigWithBomb.ATTACK) {
-      this.hasRecoiled = false;
-    }
 
     if (this.attackCooldown > 0) this.attackCooldown--;
     if (this.chaseTimeout > 0) this.chaseTimeout--;
 
+    this.detectTheBomb();
     this.detectAndChasePlayer();
     this.updateAnimationTick();
+  }
+
+  detectTheBomb() {
+    if (!this.bombs) return;
+    if (this.hasBomb) return;
+
+    this.bombs.forEach((bomb) => {
+      if (!bomb.pause)
+        if (bomb.hitbox.intersects(this.hitbox)) {
+          this.stopMoving();
+          bomb.pause = true;
+          this.pickingBomb = true;
+        }
+    });
   }
 
   detectAndChasePlayer() {
@@ -131,12 +156,16 @@ export default class PigWithBomb extends Entity {
       }
       return;
     }
-    const canSeePlayer = this.hasLineOfSight(
-      pigCenterX,
-      pigY,
-      playerCenterX,
-      playerY
-    );
+
+    const canSeePlayer =
+      this.hasLineOfSight(pigCenterX, pigY, playerCenterX, playerY) &&
+      !detectOnDifferentPlatform(
+        this.hitbox.x,
+        this.hitbox.y,
+        this.player.hitbox.x,
+        this.player.hitbox.y,
+        this.levelData
+      );
 
     if (canSeePlayer) {
       this.chaseTimeout = this.MAX_CHASE_TIMEOUT;
@@ -174,22 +203,51 @@ export default class PigWithBomb extends Entity {
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState === Constants.PigWithBomb.ATTACK) {
-      return;
-    }
+    if (this.hasBomb) {
+      if (this.entityState === Constants.PigThrowingBomb.withBomb.ATTACK) {
+        return;
+      }
 
-    this.entityState = Constants.PigWithBomb.IDLE;
+      this.entityState = Constants.PigThrowingBomb.withBomb.IDLE;
 
-    if (this.inAir)
-      if (this.ySpeed < 0) this.entityState = Constants.PigWithBomb.JUMP;
-      else this.entityState = Constants.PigWithBomb.FALL;
+      if (this.inAir)
+        if (this.ySpeed < 0)
+          this.entityState = Constants.PigThrowingBomb.withBomb.JUMP;
+        else this.entityState = Constants.PigThrowingBomb.withBomb.FALL;
 
-    if ((this.left || this.right) && !this.inAir) {
-      this.entityState = Constants.PigWithBomb.RUNNING;
-    }
+      if ((this.left || this.right) && !this.inAir) {
+        this.entityState = Constants.PigThrowingBomb.withBomb.RUNNING;
+      }
 
-    if (this.attack) {
-      this.entityState = Constants.PigWithBomb.ATTACK;
+      if (this.attack) {
+        this.entityState = Constants.PigThrowingBomb.withBomb.ATTACK;
+      }
+    } else {
+      if (this.entityState === Constants.PigThrowingBomb.withBomb.PICKING)
+        return;
+
+      if (this.entityState === Constants.PigThrowingBomb.withoutBomb.ATTACK) {
+        return;
+      }
+
+      this.entityState = Constants.PigThrowingBomb.withoutBomb.IDLE;
+
+      if (this.inAir)
+        if (this.ySpeed < 0)
+          this.entityState = Constants.PigThrowingBomb.withoutBomb.JUMP;
+        else this.entityState = Constants.PigThrowingBomb.withoutBomb.FALL;
+
+      if ((this.left || this.right) && !this.inAir) {
+        this.entityState = Constants.PigThrowingBomb.withoutBomb.RUNNING;
+      }
+
+      if (this.attack) {
+        this.entityState = Constants.PigThrowingBomb.withoutBomb.ATTACK;
+      }
+
+      if (this.pickingBomb) {
+        this.entityState = Constants.PigThrowingBomb.withBomb.PICKING;
+      }
     }
 
     if (this.lastEntityState != this.entityState) {
@@ -232,33 +290,73 @@ export default class PigWithBomb extends Entity {
     }
 
     if (this.left) {
-      this.updateXPos(-Constants.PigWithBomb.SPEED);
+      this.updateXPos(
+        -Constants.PigThrowingBomb.SPEED,
+        -Constants.OG_TILE_SIZE
+      );
       this.flip = false;
     }
     if (this.right) {
-      this.updateXPos(Constants.PigWithBomb.SPEED);
+      this.updateXPos(Constants.PigThrowingBomb.SPEED, Constants.OG_TILE_SIZE);
       this.flip = true;
     }
   }
 
-  updateXPos(xSpeed2) {
-    if (
-      canMoveHere(
-        this.hitbox.x + xSpeed2,
-        this.hitbox.y,
-        this.hitbox.width,
-        this.hitbox.height,
+  updateXPos(xSpeed2, offset) {
+    const newX = this.hitbox.x + xSpeed2;
+    const newY = this.hitbox.y;
+
+    const hitboxAlias = new Rectangle2D(
+      this.hitbox.x + offset * 0.7,
+      this.hitbox.y,
+      this.hitbox.width,
+      this.hitbox.height
+    );
+
+    const canMove = canMoveHere(
+      newX,
+      newY,
+      this.hitbox.width,
+      this.hitbox.height,
+      this.levelData
+    );
+
+    const isOnFloor = isEntityOnFloor(hitboxAlias, this.levelData);
+
+    if (this.hasBomb) {
+      const footX = this.flip
+        ? this.hitbox.x + this.hitbox.width + 1
+        : this.hitbox.x - 1;
+
+      const footY = this.hitbox.y + this.hitbox.height + 1;
+
+      const tileBelowAheadIsSolid = detectAnySolidTile(
+        footX,
+        footY,
+        footX,
+        footY + 1,
         this.levelData
-      )
-    ) {
-      this.hitbox.x += xSpeed2;
-    } else {
-      if (xSpeed2 > 0) {
-        this.left = true;
-        this.right = false;
+      );
+
+      if (canMove && isOnFloor && tileBelowAheadIsSolid) {
+        this.hitbox.x = newX;
       } else {
+        this.attack = true;
         this.left = false;
-        this.right = true;
+        this.right = false;
+      }
+    } else {
+      // when pig doesn't have box, allow it to walk and fall naturally
+      if (canMove) {
+        this.hitbox.x = newX;
+      } else {
+        if (xSpeed2 > 0) {
+          this.left = true;
+          this.right = false;
+        } else {
+          this.left = false;
+          this.right = true;
+        }
       }
     }
   }
@@ -272,11 +370,28 @@ export default class PigWithBomb extends Entity {
       this.frameX++;
 
       if (
-        this.frameX >= Constants.PigWithBomb.getSpriteAmount(this.entityState)
+        this.frameX >=
+        Constants.PigThrowingBomb.getSpriteAmount(
+          this.entityState,
+          this.hasBomb
+        )
       ) {
+        if (this.entityState == Constants.PigThrowingBomb.withBomb.ATTACK) {
+          this.hasBomb = false;
+          this.bomb = new Bomb(this.hitbox.x, this.hitbox.y);
+        }
+
+        if (this.entityState == Constants.PigThrowingBomb.withBomb.PICKING) {
+          this.pickingBomb = false;
+          this.hasBomb = true;
+        }
+
         this.frameX = 0;
         this.attack = false;
-        this.entityState = Constants.PigWithBomb.IDLE;
+
+        if (this.hasBomb)
+          this.entityState = Constants.PigThrowingBomb.withBomb.IDLE;
+        else this.entityState = Constants.PigThrowingBomb.withoutBomb.IDLE;
       }
     }
   }

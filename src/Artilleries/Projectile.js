@@ -47,7 +47,6 @@ export default class Projectile extends Object {
   draw(ctx, XlvlOffset) {
     if (!this.objectImg || !this.levelData) return;
 
-    console.log(this.explosion);
     if (this.explosion) {
       this.drawExplosion(ctx, XlvlOffset);
       return;
@@ -71,15 +70,15 @@ export default class Projectile extends Object {
   }
 
   update(Cannon, left) {
-    this.updatePosition(Cannon, left);
+    this.updatePosition(left);
     if (this.gravityEnabled) {
       this.updatePositionY(Cannon);
     }
 
-    if (this.explosion) this.updateAnimationtick();
+    if (this.explosion) this.updateAnimationtick(Cannon);
   }
 
-  updateAnimationtick() {
+  updateAnimationtick(Cannon) {
     this.countdown++;
     if (this.countdown >= this.countdownTimer) {
       this.countdown = 0;
@@ -87,19 +86,20 @@ export default class Projectile extends Object {
       if (this.frameX >= Constants.Projectile.getSpriteAmount()) {
         this.frameX = 0;
         this.explosion = false;
+        Cannon.projectileActive = false;
       }
     }
   }
 
-  updatePosition(Cannon, left) {
+  updatePosition(left) {
     const xSpeed = left
       ? -Constants.Projectile.PROJECTILE_SPEED
       : Constants.Projectile.PROJECTILE_SPEED;
 
-    this.updatePositionX(Cannon, xSpeed);
+    this.updatePositionX(xSpeed);
   }
 
-  updatePositionX(Cannon, xSpeed) {
+  updatePositionX(xSpeed) {
     if (
       canMoveHere(
         this.hitbox.x + xSpeed,
@@ -112,20 +112,21 @@ export default class Projectile extends Object {
       this.hitbox.x += xSpeed;
       this.distanceTraveled += Math.abs(xSpeed);
 
-      if (this.distanceTraveled >= 100) {
+      if (this.distanceTraveled >= Math.random() * 100 + 50) {
         this.gravityEnabled = true;
       }
     } else {
-      this.explosion = true;
-      Cannon.projectileActive = false;
-      this.explosionPos = {
-        x: this.hitbox.x,
-        y: this.hitbox.y,
-      };
+      if (!this.explosion) {
+        this.explosion = true;
+        this.explosionPos = {
+          x: this.hitbox.x,
+          y: this.hitbox.y,
+        };
+      }
     }
   }
 
-  updatePositionY(Cannon) {
+  updatePositionY() {
     this.ySpeed += this.gravity;
 
     if (
@@ -139,25 +140,30 @@ export default class Projectile extends Object {
     ) {
       this.hitbox.y += this.ySpeed;
     } else {
-      this.explosion = true;
-      Cannon.projectileActive = false;
-      this.explosionPos = {
-        x: this.hitbox.x,
-        y: this.hitbox.y,
-      };
+      if (!this.explosion) {
+        this.explosion = true;
+        this.explosionPos = {
+          x: this.hitbox.x,
+          y: this.hitbox.y,
+        };
+      }
     }
   }
 
   drawExplosion(ctx, XlvlOffset) {
-    console.log(this.explosionImg);
     ctx.drawImage(
       this.explosionImg,
-      this.frameX * this.width,
-      0 * this.height,
+      this.frameX * Constants.Projectile.EXPLOSION_WIDTH,
+      0 * Constants.Projectile.EXPLOSION_HEIGHT,
       Constants.Projectile.EXPLOSION_WIDTH,
       Constants.Projectile.EXPLOSION_HEIGHT,
-      this.explosionPos.x - XlvlOffset,
-      this.explosionPos.y,
+      this.explosionPos.x -
+        XlvlOffset -
+        Constants.Projectile.EXPLOSION_WIDTH / 2 -
+        2 * Constants.SCALE,
+      this.explosionPos.y -
+        Constants.Projectile.EXPLOSION_HEIGHT / 2 -
+        2 * Constants.SCALE,
       Constants.Projectile.EXPLOSION_WIDTH * Constants.SCALE,
       Constants.Projectile.EXPLOSION_HEIGHT * Constants.SCALE
     );

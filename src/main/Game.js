@@ -44,6 +44,7 @@ export default class Game {
     this.pigs = [];
     this.pigThrowingBoxes = [];
     this.pigWithMatches = [];
+    this.pigThrowingBombs = [];
 
     this.loop(0);
   }
@@ -84,6 +85,10 @@ export default class Game {
     });
 
     this.pigWithMatches.forEach((p) => {
+      p.draw(this.ctx, this.XlvlOffset);
+    });
+
+    this.pigThrowingBombs.forEach((p) => {
       p.draw(this.ctx, this.XlvlOffset);
     });
 
@@ -129,6 +134,10 @@ export default class Game {
     });
 
     this.pigWithMatches.forEach((p) => {
+      p.update();
+    });
+
+    this.pigThrowingBombs.forEach((p) => {
       p.update();
     });
 

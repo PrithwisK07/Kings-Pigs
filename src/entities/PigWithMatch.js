@@ -117,7 +117,7 @@ export default class PigWithMatch extends Entity {
 
     if (this.hasMatch)
       if (
-        playerY + this.player.hitbox.height >= pigY &&
+        playerY + this.player.hitbox.height / 5 + 4 >= pigY &&
         playerY - pigY <= VERTICAL_TOLERANCE_RANGE
       ) {
         if (!this.cannon.projectileActive) {
@@ -139,11 +139,13 @@ export default class PigWithMatch extends Entity {
     const deltaX = playerCenterX - pigCenterX;
     const distanceX = Math.abs(deltaX);
 
-    const TOLERANCE_RANGE = 200 * Constants.SCALE;
+    const TOLERANCE_RANGE = 180 * Constants.SCALE;
 
     const canSeePlayer =
       distanceX < TOLERANCE_RANGE &&
-      pigCenterX > playerCenterX + this.player.hitbox.width;
+      pigCenterX > playerCenterX + this.player.hitbox.width; // Detect Player first and then shoot.
+
+    // const canSeePlayer = true; // Always shoot.
 
     if (canSeePlayer)
       if (this.attackCooldown === 0) {

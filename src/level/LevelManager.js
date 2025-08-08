@@ -9,6 +9,8 @@ import {
   getPigs,
   getCannons,
   getPigWithMatches,
+  getPigThrowingBombs,
+  getBombs,
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
@@ -43,11 +45,13 @@ export default class LevelManager {
     this.game.pigs = await getPigs(this.levelDataImg);
     this.game.pigThrowingBoxes = await getPigThrowingBoxes(this.levelDataImg);
     this.game.pigWithMatches = await getPigWithMatches(this.levelDataImg);
+    this.game.pigThrowingBombs = await getPigThrowingBombs(this.levelDataImg);
 
     this.player.loadLevelData(this.levelData);
 
     this.boxes = await getBoxes(this.levelDataImg);
     this.cannons = await getCannons(this.levelDataImg);
+    this.bombs = await getBombs(this.levelDataImg);
 
     this.game.kingPigs.forEach((kp) => {
       kp.loadLevelData(this.levelData);
@@ -65,6 +69,10 @@ export default class LevelManager {
       p.loadLevelData(this.levelData);
     });
 
+    this.game.pigThrowingBombs.forEach((p) => {
+      p.loadLevelData(this.levelData);
+    });
+
     this.cannons.forEach((cannon) => {
       cannon.loadLevelData(this.levelData);
     });
@@ -79,7 +87,7 @@ export default class LevelManager {
 
     canvas.height = canvas.width = Constants.OG_TILE_SIZE;
 
-    this.levelData = getLevelData(this.levelDataImg, this.player);
+    this.levelData = getLevelData(this.levelDataImg, this.player, this);
 
     for (let i = 0; i < 5; i++) {
       for (let j = 0; j < 19; j++) {
@@ -145,15 +153,20 @@ export default class LevelManager {
       d.draw(ctx, XlvlOffset);
     });
 
-    if (!this.boxes) return;
+    if (this.boxes)
+      this.boxes.forEach((box) => {
+        box.draw(ctx, XlvlOffset);
+      });
 
-    this.boxes.forEach((box) => {
-      box.draw(ctx, XlvlOffset);
-    });
+    if (this.cannons)
+      this.cannons.forEach((cannon) => {
+        cannon.draw(ctx, XlvlOffset);
+      });
 
-    this.cannons.forEach((cannon) => {
-      cannon.draw(ctx, XlvlOffset);
-    });
+    if (this.bombs)
+      this.bombs.forEach((bomb) => {
+        bomb.draw(ctx, XlvlOffset);
+      });
   }
 
   update() {
