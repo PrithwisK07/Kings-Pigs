@@ -227,12 +227,73 @@ const Constants = {
     },
   },
 
+  PigThrowingBomb: {
+    PIG_THROWING_BOMB_WIDTH: 34,
+    PIG_THROWING_BOMB_HEIGHT: 30,
+    PIG_THROWING_BOMB_SRC: "../res/PigThrowingBomb.png",
+    SPEED: 0.8,
+
+    withoutBomb: {
+      DEATH: 0,
+      HIT: 1,
+      ATTACK: 2,
+      GROUND: 3,
+      FALL: 4,
+      RUNNING: 5,
+      IDLE: 6,
+    },
+    withBomb: {
+      PICKING: 7,
+      ATTACK: 8,
+      RUNNING: 9,
+      IDLE: 10,
+    },
+
+    getSpriteAmount(entityState, hasBomb) {
+      if (hasBomb) {
+        switch (entityState) {
+          case Constants.PigThrowingBomb.withBomb.PICKING:
+            return 4;
+          case Constants.PigThrowingBomb.withBomb.ATTACK:
+            return 5;
+          case Constants.PigThrowingBomb.withBomb.RUNNING:
+            return 6;
+          case Constants.PigThrowingBomb.withBomb.IDLE:
+            return 10;
+          default:
+            return -1;
+        }
+      } else {
+        switch (entityState) {
+          case Constants.PigThrowingBomb.withoutBomb.DEATH:
+            return 4;
+          case Constants.PigThrowingBomb.withoutBomb.HIT:
+            return 2;
+          case Constants.PigThrowingBomb.withoutBomb.ATTACK:
+            return 5;
+          case Constants.PigThrowingBomb.withoutBomb.GROUND:
+            return 1;
+          case Constants.PigThrowingBomb.withoutBomb.FALL:
+            return 1;
+          case Constants.PigThrowingBomb.withoutBomb.JUMP:
+            return 1;
+          case Constants.PigThrowingBomb.withoutBomb.RUNNING:
+            return 6;
+          case Constants.PigThrowingBomb.withoutBomb.IDLE:
+            return 11;
+          default:
+            return -1;
+        }
+      }
+    },
+  },
+
   PigWithMatch: {
     PIG_WITH_MATCH_WIDTH: 34,
     PIG_WITH_MATCH_HEIGHT: 28,
     PIG_WITH_MATCH_SRC: "../res/PigWithMatch.png",
     SPEED: 0.8,
-    FRAME_SPEED: 30,
+    FRAME_SPEED: 25,
 
     withoutMatch: {
       IDLE: 0,
@@ -310,7 +371,7 @@ const Constants = {
     PROJECTILE_WIDTH: 44,
     PROJECTILE_HEIGHT: 28,
     PROJECTILE_SRC: "../res/Cannon Ball.png",
-    PROJECTILE_SPEED: 1.2,
+    PROJECTILE_SPEED: 1.4,
 
     EXPLOSION_WIDTH: 52,
     EXPLOSION_HEIGHT: 56,
@@ -318,6 +379,26 @@ const Constants = {
 
     getSpriteAmount() {
       return 6;
+    },
+  },
+
+  Bomb: {
+    BOMB_WIDTH: 52,
+    BOMB_HEIGHT: 56,
+    BOMB_SRC: "../res/Bomb.png",
+
+    EXPLODE: 0,
+    IDLE: 1,
+
+    getSpriteAmount(entityState) {
+      switch (entityState) {
+        case Constants.Bomb.EXPLODE:
+          return 1;
+        case Constants.Bomb.IDLE:
+          return 1;
+        default:
+          return -1;
+      }
     },
   },
 };

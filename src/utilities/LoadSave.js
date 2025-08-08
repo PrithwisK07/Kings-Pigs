@@ -3,15 +3,19 @@ import Pig from "../entities/Pig.js";
 import PigThrowingBox from "../entities/PigWithBoxes.js";
 import Box from "../objects/Box.js";
 import Cannon from "../Artilleries/Cannon.js";
+import Bomb from "../objects/Bomb.js";
 import PigWithMatch from "../entities/PigWithMatch.js";
+import PigThrowingBomb from "../entities/PigWithBomb.js";
 import Constants from "./Constants.js";
 
 let boxes = [];
 let cannons = [];
+let bombs = [];
 let kingPigs = [];
 let pigs = [];
 let pigThrowingBoxes = [];
 let pigWithMatches = [];
+let pigThrowingBombs = [];
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -32,7 +36,7 @@ export async function getSpriteAtlas(src) {
   }
 }
 
-export function getLevelData(levelDataImg, player, boxesArg) {
+export function getLevelData(levelDataImg, player, levelManager) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -120,6 +124,26 @@ export function getLevelData(levelDataImg, player, boxesArg) {
         );
       }
 
+      if (blueValue == 6) {
+        pigThrowingBombs.push(
+          new PigThrowingBomb(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            player,
+            levelManager
+          )
+        );
+      }
+
+      if (blueValue == 7) {
+        bombs.push(
+          new Bomb(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE
+          )
+        );
+      }
+
       row.push(redValue);
     }
     levelData.push(row);
@@ -150,4 +174,12 @@ export async function getCannons() {
 
 export async function getPigWithMatches() {
   return pigWithMatches;
+}
+
+export async function getPigThrowingBombs() {
+  return pigThrowingBombs;
+}
+
+export async function getBombs() {
+  return bombs;
 }
