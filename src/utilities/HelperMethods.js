@@ -71,12 +71,12 @@ export function detectAnySolidTile(x1, y1, x2, y2, levelData) {
   let subject2XIndex = Math.floor(x2 / Constants.TILE_SIZE);
   let subject2YIndex = Math.floor(y2 / Constants.TILE_SIZE);
 
-  subject1XIndex = Math.min(subject1XIndex, subject2XIndex);
-  subject2XIndex = Math.max(subject1XIndex, subject2XIndex);
+  const a = Math.min(subject1XIndex, subject2XIndex);
+  const b = Math.max(subject1XIndex, subject2XIndex);
 
   if (subject1YIndex != subject2YIndex) return true;
 
-  for (let j = subject1XIndex; j <= subject2XIndex; j++) {
+  for (let j = a; j <= b; j++) {
     if (
       isSolid(
         j * Constants.TILE_SIZE,

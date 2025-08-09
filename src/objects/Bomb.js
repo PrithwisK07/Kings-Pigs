@@ -3,15 +3,17 @@ import {
   canMoveHere,
   GetEntityYPosUnderRoofOrAboveFloor,
 } from "../utilities/HelperMethods.js";
+import { getSpriteAtlas } from "../utilities/LoadSave.js";
 import Object from "./Object.js";
 
 export default class Bomb extends Object {
-  constructor(x, y) {
+  constructor(x, y, flip, levelManager) {
     super(x, y, Constants.Bomb.BOMB_WIDTH, Constants.Bomb.BOMB_HEIGHT);
 
-    this.active = false;
-    this.pause = false;
+    this.levelManager = levelManager;
 
+    this.flip = flip ? false : true;
+    this.pause = false;
     this.canDraw = true;
 
     this.initHitbox(
@@ -21,22 +23,88 @@ export default class Bomb extends Object {
       (Constants.Bomb.BOMB_HEIGHT / 4) * Constants.SCALE
     );
 
+    this.explosion = false;
+    this.loadExplosionImg();
+    this.explosionPos = {
+      x: 0,
+      y: 0,
+    };
+
+    this.countdownTimer = Constants.PigWithMatch.FRAME_SPEED;
+
     this.objectState = Constants.Bomb.IDLE;
     this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(this.hitbox, 1);
 
     this.loadImg(Constants.Bomb.BOMB_SRC);
+
+    this.gravity = 0.025;
   }
 
-  update(left) {
-    this.updatePosition(left);
-    if (this.gravityEnabled) {
-      this.updatePositionY(Cannon);
+  async loadExplosionImg() {
+    this.explosionImg = await getSpriteAtlas(
+      Constants.Projectile.EXPLOSION_SRC
+    );
+  }
+
+  setProps(vx, vy) {
+    this.active = true;
+    this.vx = this.flip ? -vx : vx;
+    this.vy = vy;
+  }
+
+  update() {
+    if (!this.levelData) return;
+
+    if (!this.active) return;
+
+    if (
+      canMoveHere(
+        this.hitbox.x + this.vx,
+        this.hitbox.y,
+        this.hitbox.width,
+        this.hitbox.height,
+        this.levelData
+      )
+    ) {
+      this.hitbox.x += this.vx;
+    } else {
+      this.vy = 0;
+      this.vx = 0;
+      if (!this.explosion) {
+        this.explosion = true;
+        this.explosionPos = {
+          x: this.hitbox.x,
+          y: this.hitbox.y,
+        };
+      }
+    }
+    this.vy += this.gravity;
+    if (
+      canMoveHere(
+        this.hitbox.x,
+        this.hitbox.y + this.vy,
+        this.hitbox.width,
+        this.hitbox.height,
+        this.levelData
+      )
+    ) {
+      this.hitbox.y += this.vy;
+    } else {
+      this.vy = 0;
+      this.vx = 0;
+      if (!this.explosion) {
+        this.explosion = true;
+        this.explosionPos = {
+          x: this.hitbox.x,
+          y: this.hitbox.y,
+        };
+      }
     }
 
-    if (this.explosion) this.updateAnimationtick(Cannon);
+    if (this.explosion) this.updateAnimationtick();
   }
 
-  updateAnimationtick(Cannon) {
+  updateAnimationtick() {
     this.countdown++;
     if (this.countdown >= this.countdownTimer) {
       this.countdown = 0;
@@ -44,77 +112,27 @@ export default class Bomb extends Object {
       if (this.frameX >= Constants.Projectile.getSpriteAmount()) {
         this.frameX = 0;
         this.explosion = false;
-        Cannon.projectileActive = false;
+        this.active = false;
+        this.popActiveBombs();
       }
     }
   }
 
-  updatePosition(left) {
-    const xSpeed = left
-      ? -Constants.Projectile.PROJECTILE_SPEED
-      : Constants.Projectile.PROJECTILE_SPEED;
-
-    this.updatePositionX(xSpeed);
-  }
-
-  updatePositionX(xSpeed) {
-    if (
-      canMoveHere(
-        this.hitbox.x + xSpeed,
-        this.hitbox.y,
-        this.hitbox.width,
-        this.hitbox.height,
-        this.levelData
-      )
-    ) {
-      this.hitbox.x += xSpeed;
-      this.distanceTraveled += Math.abs(xSpeed);
-
-      if (this.distanceTraveled >= Math.random() * 100 + 50) {
-        this.gravityEnabled = true;
-      }
-    } else {
-      if (!this.explosion) {
-        this.explosion = true;
-        this.explosionPos = {
-          x: this.hitbox.x,
-          y: this.hitbox.y,
-        };
-      }
-    }
-  }
-
-  updatePositionY() {
-    this.ySpeed += this.gravity;
-
-    if (
-      canMoveHere(
-        this.hitbox.x,
-        this.hitbox.y + this.ySpeed,
-        this.hitbox.width,
-        this.hitbox.height,
-        this.levelData
-      )
-    ) {
-      this.hitbox.y += this.ySpeed;
-    } else {
-      if (!this.explosion) {
-        this.explosion = true;
-        this.explosionPos = {
-          x: this.hitbox.x,
-          y: this.hitbox.y,
-        };
-      }
-    }
+  popActiveBombs() {
+    this.canDraw = false;
+    this.levelManager.activeBombs.splice(
+      this.levelManager.activeBombs.indexOf(this),
+      1
+    );
   }
 
   draw(ctx, XlvlOffset) {
-    if (this.pause) return;
+    if (this.pause || !this.objectImg || !this.canDraw) return;
 
-    if (!this.objectImg) return;
-    if (!this.canDraw) return;
-
-    // this.drawHitbox(ctx, XlvlOffset);
+    if (this.explosion) {
+      this.drawExplosion(ctx, XlvlOffset);
+      return;
+    }
 
     ctx.drawImage(
       this.objectImg,
@@ -129,7 +147,26 @@ export default class Bomb extends Object {
     );
   }
 
-  setLevelData(levelData) {
+  drawExplosion(ctx, XlvlOffset) {
+    ctx.drawImage(
+      this.explosionImg,
+      this.frameX * Constants.Projectile.EXPLOSION_WIDTH,
+      0 * Constants.Projectile.EXPLOSION_HEIGHT,
+      Constants.Projectile.EXPLOSION_WIDTH,
+      Constants.Projectile.EXPLOSION_HEIGHT,
+      this.explosionPos.x -
+        XlvlOffset -
+        Constants.Projectile.EXPLOSION_WIDTH / 2 -
+        2 * Constants.SCALE,
+      this.explosionPos.y -
+        Constants.Projectile.EXPLOSION_HEIGHT / 2 -
+        2 * Constants.SCALE,
+      Constants.Projectile.EXPLOSION_WIDTH * Constants.SCALE,
+      Constants.Projectile.EXPLOSION_HEIGHT * Constants.SCALE
+    );
+  }
+
+  loadLevelData(levelData) {
     this.levelData = levelData;
   }
 }

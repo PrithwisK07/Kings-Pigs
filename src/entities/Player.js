@@ -40,6 +40,7 @@ export default class Player extends Entity {
     this.enteredDoor = false;
 
     this.stopKeyPress = true;
+    this.stopMousePress = true;
 
     this.ySpeed = 0;
     this.gravity = 0.05;
@@ -261,6 +262,7 @@ export default class Player extends Entity {
           this.exitedDoor = false;
           this.startAnimation = true;
           this.stopKeyPress = false;
+          this.stopMousePress = false;
         }
 
         this.frameX = 0;
@@ -319,6 +321,8 @@ export default class Player extends Entity {
   }
 
   mouseClicked(mouse) {
+    if (this.stopMousePress) return;
+
     switch (mouse) {
       case 0:
         if (!this.attack && this.entityState !== Constants.Player.ATTACK) {

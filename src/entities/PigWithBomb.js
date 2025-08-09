@@ -61,13 +61,28 @@ export default class PigThrowingBomb extends Entity {
     );
 
     this.loadImage();
-    this.loadTheBombes();
+    this.loadTheBombs();
 
     this.levelData = null;
   }
 
-  async loadTheBombes() {
+  async loadTheBombs() {
     this.bombs = await getBombs();
+  }
+
+  pushActiveBombs() {
+    const pigY = this.hitbox.y;
+    const playerY = this.player.hitbox.y;
+
+    if (pigY - playerY >= 20 * Constants.SCALE) this.bomb.setProps(1.25, -3);
+    else this.bomb.setProps(1, -2.5);
+
+    this.bomb.loadLevelData(this.levelData);
+    this.levelManager.activeBombs.push(this.bomb);
+  }
+
+  popBombs(bomb) {
+    this.levelManager.bombs.splice(this.levelManager.bombs.indexOf(bomb), 1);
   }
 
   async loadImage() {
@@ -109,7 +124,6 @@ export default class PigThrowingBomb extends Entity {
   }
 
   update() {
-    // this.bomb.update();
     if (!this.levelData) return;
     this.setAnimation();
     this.updatePosition();
@@ -130,6 +144,7 @@ export default class PigThrowingBomb extends Entity {
       if (!bomb.pause)
         if (bomb.hitbox.intersects(this.hitbox)) {
           this.stopMoving();
+          this.popBombs(bomb);
           bomb.pause = true;
           this.pickingBomb = true;
         }
@@ -148,7 +163,9 @@ export default class PigThrowingBomb extends Entity {
     const distanceX = Math.abs(deltaX);
 
     const TOLERANCE_RANGE = 200 * Constants.SCALE;
-    const ATTACK_RANGE = 20 * Constants.SCALE;
+    const ATTACK_RANGE = this.hasBomb
+      ? 100 * Constants.SCALE
+      : 20 * Constants.SCALE;
 
     if (distanceX > TOLERANCE_RANGE) {
       if (this.chaseTimeout <= 0) {
@@ -157,15 +174,9 @@ export default class PigThrowingBomb extends Entity {
       return;
     }
 
-    const canSeePlayer =
-      this.hasLineOfSight(pigCenterX, pigY, playerCenterX, playerY) &&
-      !detectOnDifferentPlatform(
-        this.hitbox.x,
-        this.hitbox.y,
-        this.player.hitbox.x,
-        this.player.hitbox.y,
-        this.levelData
-      );
+    const canSeePlayer = this.hasBomb
+      ? distanceX < 120 * Constants.SCALE
+      : this.hasLineOfSight(pigCenterX, pigY, playerCenterX, playerY);
 
     if (canSeePlayer) {
       this.chaseTimeout = this.MAX_CHASE_TIMEOUT;
@@ -173,7 +184,15 @@ export default class PigThrowingBomb extends Entity {
       this.flip = deltaX > 0;
 
       if (distanceX < ATTACK_RANGE && !this.inAir) {
-        if (this.hitbox.intersects(this.player.hitbox)) {
+        if (!this.hasBomb) {
+          if (this.hitbox.intersects(this.player.hitbox)) {
+            if (this.attackCooldown === 0) {
+              this.stopMoving();
+              this.attack = true;
+              this.attackCooldown = 75;
+            }
+          }
+        } else {
           if (this.attackCooldown === 0) {
             this.stopMoving();
             this.attack = true;
@@ -378,7 +397,13 @@ export default class PigThrowingBomb extends Entity {
       ) {
         if (this.entityState == Constants.PigThrowingBomb.withBomb.ATTACK) {
           this.hasBomb = false;
-          this.bomb = new Bomb(this.hitbox.x, this.hitbox.y);
+          this.bomb = new Bomb(
+            this.hitbox.x,
+            this.hitbox.y,
+            this.flip,
+            this.levelManager
+          );
+          this.pushActiveBombs();
         }
 
         if (this.entityState == Constants.PigThrowingBomb.withBomb.PICKING) {
