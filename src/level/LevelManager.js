@@ -24,6 +24,10 @@ export default class LevelManager {
 
     this.levelName = 1;
     this.door = [];
+
+    this.activeBoxes = [];
+    this.activeBombs = [];
+
     this.levels = new Levels(this, this.player);
     this.levels.getLevelImgPath(this.levelName);
 
@@ -167,6 +171,16 @@ export default class LevelManager {
       this.bombs.forEach((bomb) => {
         bomb.draw(ctx, XlvlOffset);
       });
+
+    if (this.activeBombs)
+      this.activeBombs.forEach((bomb) => {
+        bomb.draw(ctx, XlvlOffset);
+      });
+
+    if (this.activeBoxes)
+      this.activeBoxes.forEach((box) => {
+        box.draw(ctx, XlvlOffset);
+      });
   }
 
   update() {
@@ -178,6 +192,16 @@ export default class LevelManager {
     if (this.cannons)
       this.cannons.forEach((cannon) => {
         cannon.update();
+      });
+
+    if (this.activeBombs)
+      this.activeBombs.forEach((bomb) => {
+        bomb.update();
+      });
+
+    if (this.activeBoxes)
+      this.activeBoxes.forEach((box) => {
+        box.update();
       });
   }
 }

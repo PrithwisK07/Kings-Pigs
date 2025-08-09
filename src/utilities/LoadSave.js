@@ -100,7 +100,8 @@ export function getLevelData(levelDataImg, player, levelManager) {
           new PigThrowingBox(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE,
-            player
+            player,
+            levelManager
           )
         );
       }
