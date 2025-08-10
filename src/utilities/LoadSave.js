@@ -110,7 +110,8 @@ export function getLevelData(levelDataImg, player, levelManager) {
         cannons.push(
           new Cannon(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
-            i * Constants.OG_TILE_SIZE * Constants.SCALE
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            levelManager
           )
         );
       }
