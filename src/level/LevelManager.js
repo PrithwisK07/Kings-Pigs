@@ -25,6 +25,9 @@ export default class LevelManager {
     this.levelName = 1;
     this.door = [];
 
+    this.shakeTime = 0;
+    this.shakeIntensity = 0;
+
     this.activeBoxes = [];
     this.activeBombs = [];
 
@@ -139,8 +142,26 @@ export default class LevelManager {
     }
   }
 
+  triggerShake(duration, intensity) {
+    this.shakeTime = duration;
+    this.shakeIntensity = intensity;
+  }
+
   draw(ctx, XlvlOffset) {
     ctx.imageSmoothingEnabled = false;
+
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (this.shakeTime > 0) {
+      offsetX = (Math.random() - 0.5) * 2 * this.shakeIntensity;
+      offsetY = (Math.random() - 0.5) * 2 * this.shakeIntensity;
+      this.shakeTime--;
+    }
+
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+
     ctx.drawImage(
       this.altCanvas,
       XlvlOffset,
@@ -181,6 +202,8 @@ export default class LevelManager {
       this.activeBoxes.forEach((box) => {
         box.draw(ctx, XlvlOffset);
       });
+
+    ctx.restore();
   }
 
   update() {

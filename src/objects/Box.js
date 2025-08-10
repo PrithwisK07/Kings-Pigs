@@ -135,6 +135,9 @@ export default class Box extends Object {
       return;
     }
 
+    // this.drawHitbox(ctx, XlvlOffset);
+
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
       this.frameX * this.width,
@@ -142,13 +145,14 @@ export default class Box extends Object {
       this.width,
       this.height,
       this.hitbox.x - XlvlOffset + 1,
-      this.hitbox.y,
+      this.hitbox.y + 1 * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
   }
 
   drawExplosion(ctx, XlvlOffset) {
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.explosionImg,
       this.frameX * Constants.Projectile.EXPLOSION_WIDTH,

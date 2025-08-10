@@ -4,13 +4,15 @@ import { canMoveHere } from "../utilities/HelperMethods.js";
 import { getSpriteAtlas } from "../utilities/LoadSave.js";
 
 export default class Projectile extends Object {
-  constructor(x, y, levelData) {
+  constructor(x, y, levelData, levelManager) {
     super(
       x,
       y,
       Constants.Projectile.PROJECTILE_WIDTH,
       Constants.Projectile.PROJECTILE_HEIGHT
     );
+
+    this.levelManager = levelManager;
 
     this.levelData = levelData;
 
@@ -54,6 +56,7 @@ export default class Projectile extends Object {
 
     // this.drawHitbox(ctx, XlvlOffset);
 
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
       0 * this.width,
@@ -116,6 +119,7 @@ export default class Projectile extends Object {
         this.gravityEnabled = true;
       }
     } else {
+      // this.levelManager.triggerShake(1, 0.5);
       if (!this.explosion) {
         this.explosion = true;
         this.explosionPos = {
@@ -140,6 +144,7 @@ export default class Projectile extends Object {
     ) {
       this.hitbox.y += this.ySpeed;
     } else {
+      // this.levelManager.triggerShake(1, 0.5);
       if (!this.explosion) {
         this.explosion = true;
         this.explosionPos = {
@@ -151,6 +156,7 @@ export default class Projectile extends Object {
   }
 
   drawExplosion(ctx, XlvlOffset) {
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.explosionImg,
       this.frameX * Constants.Projectile.EXPLOSION_WIDTH,

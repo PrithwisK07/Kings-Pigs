@@ -393,7 +393,7 @@ const Constants = {
     getSpriteAmount(entityState) {
       switch (entityState) {
         case Constants.Bomb.EXPLODE:
-          return 1;
+          return 6;
         case Constants.Bomb.IDLE:
           return 1;
         default:

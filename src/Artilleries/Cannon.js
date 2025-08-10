@@ -4,13 +4,15 @@ import Object from "../objects/Object.js";
 import Projectile from "./Projectile.js";
 
 export default class Cannon extends Object {
-  constructor(x, y) {
+  constructor(x, y, levelManager) {
     super(x, y, Constants.Cannon.CANNON_WIDTH, Constants.Cannon.CANNON_HEIGHT);
 
     this.attack = false;
     this.shootProjectile = false;
     this.projectileActive = false;
     this.levelData = null;
+
+    this.levelManager = levelManager;
 
     this.left = true;
 
@@ -82,7 +84,8 @@ export default class Cannon extends Object {
       this.projectile = new Projectile(
         this.hitbox.x,
         this.hitbox.y,
-        this.levelData
+        this.levelData,
+        this.levelManager
       );
       this.projectileActive = true;
     }
@@ -96,6 +99,7 @@ export default class Cannon extends Object {
 
     if (this.projectileActive) this.projectile.draw(ctx, XlvlOffset);
 
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
       this.frameX * this.width,
