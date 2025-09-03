@@ -22,10 +22,79 @@
 
         background-color: #3e3750;
       }
+
+      .overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #3e3750aa;
+      }
+
+      video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        scale: 1.05;
+      }
+
+      .overlay > img {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        opacity: 0.2;
+      }
+
+      .overlay-inner {
+        margin: 5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .overlay-inner img:nth-child(1) {
+        position: absolute;
+        margin-top: 10rem;
+        scale: 1.5;
+      }
+
+      .overlay-inner img:nth-child(2) {
+        height: 4rem;
+        position: relative;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
-    <!-- <canvas></canvas> -->
-    <script type="module" src="./Main.js"></script>
+    <div>
+      <video
+        src="../res/Screen Recording 2025-08-12 232001.mp4"
+        autoplay
+        muted
+        loop
+      ></video>
+      <div class="overlay">
+        <img src="../res/background_for_menu.png" alt="menu_bg" />
+        <div class="overlay-inner">
+          <img src="../res/menu_background.png" alt="Menu_GB" />
+          <img src="../res/Kings and Pigs (3).png" alt="kingstitle" />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("keydown", (e) => {
+        if (e.key == "Enter") {
+          window.location.href = "./game.html";
+        }
+
+        if (e.key == "Control") {
+          window.location.href = "./editor.html";
+        }
+      });
+    </script>
   </body>
 </html>
