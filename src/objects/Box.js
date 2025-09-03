@@ -69,15 +69,7 @@ export default class Box extends Object {
     ) {
       this.hitbox.x += this.vx;
     } else {
-      this.vy = 0;
-      this.vx = 0;
-      if (!this.explosion) {
-        this.explosion = true;
-        this.explosionPos = {
-          x: this.hitbox.x,
-          y: this.hitbox.y,
-        };
-      }
+      this.stopAndExplode();
     }
     this.vy += this.gravity;
     if (
@@ -91,18 +83,24 @@ export default class Box extends Object {
     ) {
       this.hitbox.y += this.vy;
     } else {
-      this.vy = 0;
-      this.vx = 0;
-      if (!this.explosion) {
-        this.explosion = true;
-        this.explosionPos = {
-          x: this.hitbox.x,
-          y: this.hitbox.y,
-        };
-      }
+      this.stopAndExplode();
     }
 
     if (this.explosion) this.updateAnimationtick();
+  }
+
+  stopAndExplode() {
+    this.vy = 0;
+    this.vx = 0;
+    this.levelManager.triggerShake(1, 1);
+
+    if (!this.explosion) {
+      this.explosion = true;
+      this.explosionPos = {
+        x: this.hitbox.x,
+        y: this.hitbox.y,
+      };
+    }
   }
 
   updateAnimationtick() {

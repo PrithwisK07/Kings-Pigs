@@ -1,0 +1,55 @@
+/* Layout */
+.inner-canvas-container {
+  display: flex;
+}
+
+.canvas-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@font-face {
+  font-family: "PressStart2P";
+  src: url("../../res/fonts/PressStart2P-Regular.ttf");
+}
+
+.upper-num {
+  font-family: "PressStart2P", monospace;
+  margin-left: 42px;
+  display: grid;
+}
+
+.left-num {
+  font-family: "PressStart2P", monospace;
+  display: grid;
+}
+
+/* Numbering cells */
+.num-cell {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 500;
+  color: #333;
+  color: white;
+  border: 1px solid transparent;
+}
+
+/* Canvas Grid */
+.canvas {
+  display: grid;
+  background-color: #282336;
+  border: 3px solid #625d70;
+}
+
+.cell {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #625d70;
+}
