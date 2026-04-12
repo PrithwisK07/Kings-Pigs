@@ -13,7 +13,6 @@ export default class Object {
     this.lastObjectState = this.objectState = Constants.Door.IDLE;
 
     this.countdown = 0;
-    this.countdownTimer = Constants.Door.FRAME_SPEED;
 
     this.hitbox = null;
   }

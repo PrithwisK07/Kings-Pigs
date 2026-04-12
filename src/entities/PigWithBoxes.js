@@ -18,7 +18,7 @@ export default class PigThrowingBox extends Entity {
       x + Constants.PigThrowingBox.PIG_THROWING_BOX_WIDTH / 1.4,
       y,
       Constants.PigThrowingBox.PIG_THROWING_BOX_WIDTH,
-      Constants.PigThrowingBox.PIG_THROWING_BOX_HEIGHT
+      Constants.PigThrowingBox.PIG_THROWING_BOX_HEIGHT,
     );
 
     this.player = player;
@@ -49,6 +49,8 @@ export default class PigThrowingBox extends Entity {
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 1800;
 
+    this.damage = 10;
+
     this.countdown = 0;
     this.countdownTimer = Constants.Player.FRAME_SPEED;
 
@@ -56,7 +58,7 @@ export default class PigThrowingBox extends Entity {
       x + Constants.PigThrowingBox.PIG_THROWING_BOX_WIDTH / 1.4,
       y,
       (this.width / 2) * Constants.SCALE,
-      (this.height / 1.3) * Constants.SCALE
+      (this.height / 1.3) * Constants.SCALE,
     );
 
     this.loadImage();
@@ -87,7 +89,7 @@ export default class PigThrowingBox extends Entity {
   async loadImage() {
     try {
       this.kingPigImg = await getSpriteAtlas(
-        Constants.PigThrowingBox.PIG_THROWING_BOX_SRC
+        Constants.PigThrowingBox.PIG_THROWING_BOX_SRC,
       );
     } catch (error) {
       console.log(error.message);
@@ -101,6 +103,7 @@ export default class PigThrowingBox extends Entity {
     if (this.box) this.box.draw(ctx, XlvlOffset);
 
     // this.drawHitbox(ctx, XlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -117,7 +120,7 @@ export default class PigThrowingBox extends Entity {
         : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
       this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE,
       this.width * Constants.SCALE,
-      this.height * Constants.SCALE
+      this.height * Constants.SCALE,
     );
     ctx.restore();
   }
@@ -133,10 +136,12 @@ export default class PigThrowingBox extends Entity {
     this.detectTheBox();
     this.detectAndChasePlayer();
     this.updateAnimationTick();
+    this.isDeathWaitOver();
   }
 
   detectTheBox() {
     if (!this.boxes) return;
+    if(this.isDead) return;
     if (this.hasBox) return;
 
     this.boxes.forEach((box) => {
@@ -150,8 +155,21 @@ export default class PigThrowingBox extends Entity {
     });
   }
 
+  isDeathWaitOver() {
+    if (this.dyingWait) {
+      this.deathCountDown++;
+      if (this.deathCountDown >= this.deathCountDownMax) {
+        this.dyingWait = false;
+        this.afterDeath = true;
+        this.deathCountDown = 0;
+      }
+    }
+  }
+
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
+    if (this.player.isDead) return;
+    if (this.isDead || this.afterDeath || this.dyingWait) return;
 
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
@@ -221,51 +239,67 @@ export default class PigThrowingBox extends Entity {
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.hasBox) {
-      if (this.entityState === Constants.PigThrowingBox.withBox.ATTACK) {
-        return;
-      }
+    if (!this.isDead) {
+      if (this.hasBox) {
+        if (this.entityState === Constants.PigThrowingBox.withBox.ATTACK) {
+          return;
+        }
 
-      this.entityState = Constants.PigThrowingBox.withBox.IDLE;
+        this.entityState = Constants.PigThrowingBox.withBox.IDLE;
 
-      if (this.inAir)
-        if (this.ySpeed < 0)
-          this.entityState = Constants.PigThrowingBox.withBox.JUMP;
-        else this.entityState = Constants.PigThrowingBox.withBox.FALL;
+        if (this.inAir)
+          if (this.ySpeed < 0)
+            this.entityState = Constants.PigThrowingBox.withBox.JUMP;
+          else this.entityState = Constants.PigThrowingBox.withBox.FALL;
 
-      if ((this.left || this.right) && !this.inAir) {
-        this.entityState = Constants.PigThrowingBox.withBox.RUNNING;
-      }
+        if ((this.left || this.right) && !this.inAir) {
+          this.entityState = Constants.PigThrowingBox.withBox.RUNNING;
+        }
 
-      if (this.attack) {
-        this.entityState = Constants.PigThrowingBox.withBox.ATTACK;
-      }
-    } else {
-      if (this.entityState === Constants.PigThrowingBox.withBox.PICKING) return;
+        if (this.attack) {
+          this.entityState = Constants.PigThrowingBox.withBox.ATTACK;
+        }
+      } else {
+        if (this.entityState === Constants.PigThrowingBox.withBox.PICKING)
+          return;
 
-      if (this.entityState === Constants.PigThrowingBox.withoutBox.ATTACK) {
-        return;
-      }
+        if (this.entityState === Constants.PigThrowingBox.withoutBox.ATTACK) {
+          return;
+        }
 
-      this.entityState = Constants.PigThrowingBox.withoutBox.IDLE;
+        this.entityState = Constants.PigThrowingBox.withoutBox.IDLE;
 
-      if (this.inAir)
-        if (this.ySpeed < 0)
-          this.entityState = Constants.PigThrowingBox.withoutBox.JUMP;
-        else this.entityState = Constants.PigThrowingBox.withoutBox.FALL;
+        if (this.inAir)
+          if (this.ySpeed < 0)
+            this.entityState = Constants.PigThrowingBox.withoutBox.JUMP;
+          else this.entityState = Constants.PigThrowingBox.withoutBox.FALL;
 
-      if ((this.left || this.right) && !this.inAir) {
-        this.entityState = Constants.PigThrowingBox.withoutBox.RUNNING;
-      }
+        if ((this.left || this.right) && !this.inAir) {
+          this.entityState = Constants.PigThrowingBox.withoutBox.RUNNING;
+        }
 
-      if (this.attack) {
-        this.entityState = Constants.PigThrowingBox.withoutBox.ATTACK;
-      }
+        if(this.gettingHit) {
+          this.entityState = Constants.PigThrowingBox.withoutBox.HIT;
+        }
 
-      if (this.pickingBox) {
-        this.entityState = Constants.PigThrowingBox.withBox.PICKING;
+        if (this.attack) {
+          this.entityState = Constants.PigThrowingBox.withoutBox.ATTACK;
+        }
+
+        if (this.pickingBox) {
+          this.entityState = Constants.PigThrowingBox.withBox.PICKING;
+        }
       }
     }
+
+    if (this.isDead)
+      this.entityState = Constants.PigThrowingBox.withoutBox.DEATH;
+
+    if (this.dyingWait)
+      this.entityState = Constants.PigThrowingBox.withoutBox.DEATH_WAIT;
+
+    if (this.afterDeath)
+      this.entityState = Constants.PigThrowingBox.withoutBox.AFTER_DEATH;
 
     if (this.lastEntityState != this.entityState) {
       this.frameX = 0;
@@ -286,7 +320,7 @@ export default class PigThrowingBox extends Entity {
           this.hitbox.y + this.ySpeed,
           this.hitbox.width,
           this.hitbox.height,
-          this.levelData
+          this.levelData,
         )
       ) {
         this.hitbox.y += this.ySpeed;
@@ -294,7 +328,7 @@ export default class PigThrowingBox extends Entity {
       } else {
         this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(
           this.hitbox,
-          this.ySpeed
+          this.ySpeed,
         );
 
         if (this.ySpeed > 0) {
@@ -317,6 +351,8 @@ export default class PigThrowingBox extends Entity {
   }
 
   updateXPos(xSpeed2, offset) {
+    if (this.isDead) return;
+
     const newX = this.hitbox.x + xSpeed2;
     const newY = this.hitbox.y;
 
@@ -324,7 +360,7 @@ export default class PigThrowingBox extends Entity {
       this.hitbox.x + offset * 0.7,
       this.hitbox.y,
       this.hitbox.width,
-      this.hitbox.height
+      this.hitbox.height,
     );
 
     const canMove = canMoveHere(
@@ -332,7 +368,7 @@ export default class PigThrowingBox extends Entity {
       newY,
       this.hitbox.width,
       this.hitbox.height,
-      this.levelData
+      this.levelData,
     );
 
     const isOnFloor = isEntityOnFloor(hitboxAlias, this.levelData);
@@ -349,7 +385,7 @@ export default class PigThrowingBox extends Entity {
         footY,
         footX,
         footY + 1,
-        this.levelData
+        this.levelData,
       );
 
       if (canMove && isOnFloor && tileBelowAheadIsSolid) {
@@ -384,16 +420,35 @@ export default class PigThrowingBox extends Entity {
       this.frameX++;
 
       if (
+        this.entityState === Constants.PigThrowingBox.withoutBox.ATTACK &&
+        this.frameX == 3
+      )
+        this.damagePlayer(this.damage);
+
+      if (
         this.frameX >=
         Constants.PigThrowingBox.getSpriteAmount(this.entityState, this.hasBox)
       ) {
+        if (
+          this.entityState === Constants.PigThrowingBox.withoutBox.AFTER_DEATH
+        ) {
+          this.afterDeath = false;
+          this.active = false;
+          return;
+        }
+
+        if (this.entityState === Constants.PigThrowingBox.withoutBox.DEATH) {
+          this.dyingWait = true;
+          return;
+        }
+
         if (this.entityState == Constants.PigThrowingBox.withBox.ATTACK) {
           this.hasBox = false;
           this.box = new Box(
             this.hitbox.x,
             this.hitbox.y,
             this.flip,
-            this.levelManager
+            this.levelManager,
           );
           this.pushActiveBoxes();
         }
@@ -405,12 +460,19 @@ export default class PigThrowingBox extends Entity {
 
         this.frameX = 0;
         this.attack = false;
+        this.gettingHit = false;
+
+        if (this.isDead || this.afterDeath || this.dyingWait) return;
 
         if (this.hasBox)
           this.entityState = Constants.PigThrowingBox.withBox.IDLE;
         else this.entityState = Constants.PigThrowingBox.withoutBox.IDLE;
       }
     }
+  }
+
+  damagePlayer(damage) {
+    if (this.attack && !this.hasBox) this.player.takeDamage(damage);
   }
 
   loadLevelData(levelData) {

@@ -65,6 +65,7 @@ export default class PigWithMatch extends Entity {
     if (!this.pigWithMatch) return;
 
     // this.drawHitbox(ctx, XlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -110,6 +111,7 @@ export default class PigWithMatch extends Entity {
   detectTheCannon() {
     if (!this.cannon) return;
     if (!this.hasMatch) return;
+    if(this.player.isDead) return;
 
     const playerY = this.player.hitbox.y;
     const pigY = this.hitbox.y;

@@ -18,12 +18,10 @@ export default class Player extends Entity {
 
     this.doorIn = false;
     this.doorOut = false;
-    this.death = false;
-    this.gettingHit = false;
     this.attack = false;
     this.left = false;
     this.right = false;
-    this.onGround = true;
+    // this.onGround = true;
     this.jumping = false;
     this.flip = false;
     this.inAir = true;
@@ -48,11 +46,36 @@ export default class Player extends Entity {
     this.jumpSpeed = -2.3 * Constants.SCALE;
     this.fallSpeedAfterCollision = 0.2 * Constants.SCALE;
 
+    // Health Factors.
+    this.healthCountDown = 0;
+    this.healthCountDownMax = 1200;
+
+    this.deathCountDownMax = 500;
+
     this.countdown = 0;
     this.countdownTimer = Constants.Player.FRAME_SPEED;
 
+    // Enemies store.
+    this.pigs = [];
+    this.pigThrowingBombs = [];
+    this.pigThrowingBoxes = [];
+    this.kingPigs = [];
+    this.pigWithMatches = [];
+
+    // Objects store.
+    this.cannons = [];
+    this.bombs = [];
+    this.boxes = [];
+    
     this.initHitbox(
       x,
+      y,
+      (this.width / 4) * Constants.SCALE,
+      (this.height / 2) * Constants.SCALE
+    );
+
+    this.initAttackbox(
+      x + this.width / 2 + this.hitbox.width / 2,
       y,
       (this.width / 4) * Constants.SCALE,
       (this.height / 2) * Constants.SCALE
@@ -79,7 +102,9 @@ export default class Player extends Entity {
 
     if (this.stopAnimation) return;
 
-    // this.drawHitbox(ctx);
+    // this.drawHitbox(ctx, XlvlOffset);
+    // this.drawAttackbox(ctx, XlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -103,33 +128,56 @@ export default class Player extends Entity {
   exitTheDoor() {
     this.exitedDoor = true;
     this.canDraw = true;
+    this.getEnemies();
+    this.getObjects();
+  }
+
+  getEnemies() {
+    this.pigs = this.game.pigs;
+    this.kingPigs = this.game.kingPigs;
+    this.pigThrowingBoxes = this.game.pigThrowingBoxes;
+    this.pigWithMatches = this.game.pigWithMatches;
+    this.pigThrowingBombs = this.game.pigThrowingBombs;
+  }
+
+  getObjects() {
+    this.boxes = this.game.boxes;
+    this.bombs = this.game.bombs;
+    this.cannons = this.game.cannons;
   }
 
   enterTheDoor() {
     this.enteredDoor = true;
   }
 
+  updateAttackBox() {
+    this.attackbox.x = this.flip ? this.hitbox.x - this.width / 2 - this.hitbox.width / 2: this.hitbox.x + this.width / 2 + this.hitbox.width / 2;
+    this.attackbox.y = this.hitbox.y;
+  }
+
   update() {
     if (!this.levelData) return;
-    if (this.stopAnimation) return;
+    if (this.stopAnimation) return; 
 
+    this.updateAttackBox();
     this.setAnimation();
     this.updatePosition();
-
+    this.autoHealing();
+    this.isDeathWaitOver();
+    
     if (this.entityState === Constants.Player.ATTACK) {
       const recoilStrength = 0.5 * Constants.SCALE;
-
+      
       if (this.flip) {
         this.updateXPos(recoilStrength);
       } else {
         this.updateXPos(-recoilStrength);
       }
     }
-
+    
     if (
       this.entityState === Constants.Player.ATTACK &&
-      !this.hasRecoiled &&
-      !this.inAir
+      !this.hasRecoiled && !this.inAir
     ) {
       const jumpStrength = -1 * Constants.SCALE;
 
@@ -146,12 +194,47 @@ export default class Player extends Entity {
     this.updateAnimationTick();
   }
 
+  inflictDamage() {
+    this.pigs.forEach(pig => {
+      if(this.attackbox.intersects(pig.hitbox)) {
+        pig.takeDamage(50);
+      }
+    });
+
+    this.kingPigs.forEach(pig => {
+      if(this.attackbox.intersects(pig.hitbox)) {
+        pig.takeDamage(25);
+      }
+    });
+
+    this.pigThrowingBombs.forEach(pig => {
+      if(this.attackbox.intersects(pig.hitbox)) {
+        pig.takeDamage(50);
+      }
+    });
+
+    this.pigThrowingBoxes.forEach(pig => {
+      if(this.attackbox.intersects(pig.hitbox)) {
+        pig.takeDamage(50);
+      }
+    });
+  }
+
+  autoHealing() {
+    if(this.isDead) return;
+
+    if(this.healthCountDown >= this.healthCountDownMax) {
+      this.healthCountDown = 0;
+      if(this.health < 100) this.health += 1;
+    }
+
+    this.healthCountDown++;
+  }
+
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState === Constants.Player.ATTACK) {
-      return;
-    }
+    if (this.entityState === Constants.Player.ATTACK && !this.isDead) return;
 
     this.entityState = Constants.Player.IDLE;
 
@@ -163,6 +246,8 @@ export default class Player extends Entity {
       this.entityState = Constants.Player.RUNNING;
     }
 
+    if(this.gettingHit) this.entityState = Constants.Player.HIT;
+
     if (this.attack) {
       this.entityState = Constants.Player.ATTACK;
     }
@@ -171,9 +256,26 @@ export default class Player extends Entity {
 
     if (this.enteredDoor) this.entityState = Constants.Player.DOOR_IN;
 
+    if(this.isDead) this.entityState = Constants.Player.DEATH;
+
+    if(this.dyingWait) this.entityState = Constants.Player.DEATH_WAIT;
+
+    if(this.afterDeath) this.entityState = Constants.Player.AFTER_DEATH;
+
     if (this.lastEntityState != this.entityState) {
       this.frameX = 0;
       this.countdown = 0;
+    }
+  }
+
+  isDeathWaitOver() {
+    if(this.dyingWait) {
+      this.deathCountDown++;
+      if(this.deathCountDown >= this.deathCountDownMax) {
+        this.dyingWait = false;
+        this.afterDeath = true;
+        this.deathCountDown = 0;
+      }
     }
   }
 
@@ -203,7 +305,7 @@ export default class Player extends Entity {
           this.ySpeed
         );
 
-        if (this.ySpeed > 0) {
+        if (this.ySpeed > 0 && !this.attack) {
           this.inAir = false;
           this.ySpeed = 0;
         } else {
@@ -252,9 +354,25 @@ export default class Player extends Entity {
 
       this.frameX++;
 
+      if(this.entityState === Constants.Player.ATTACK && this.frameX === 1) {
+        this.inflictDamage();
+      }
+
       if (this.frameX >= Constants.Player.getSpriteAmount(this.entityState)) {
+        if(this.entityState === Constants.Player.AFTER_DEATH) {
+          this.afterDeath = false;
+          this.active = false;
+          return;
+        }
+
+        if(this.entityState === Constants.Player.DEATH) {
+          this.dyingWait = true;
+          return;
+        }
+
         if (this.entityState === Constants.Player.DOOR_IN) {
           this.stopAnimation = true;
+          return;
         }
 
         if (this.entityState === Constants.Player.DOOR_OUT) {
@@ -264,12 +382,18 @@ export default class Player extends Entity {
           this.stopKeyPress = false;
           this.stopMousePress = false;
         }
-
+        
         this.frameX = 0;
         this.attack = false;
+        this.gettingHit = false;
+        
+        if(this.isDead) return;
+        
         this.entityState = Constants.Player.IDLE;
       }
     }
+    
+    this.enterDoor = false;
   }
 
   stopKeyPressMethod() {
@@ -279,6 +403,7 @@ export default class Player extends Entity {
   }
 
   keyPressed(key) {
+    if(this.isDead) return;
     if (this.stopKeyPress) return;
 
     switch (key) {

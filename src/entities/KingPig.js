@@ -41,6 +41,8 @@ export default class KingPig extends Entity {
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 1800;
 
+    this.damage = 15;
+
     this.countdown = 0;
     this.countdownTimer = Constants.Player.FRAME_SPEED;
 
@@ -69,6 +71,7 @@ export default class KingPig extends Entity {
     if (!this.kingPigImg) return;
 
     // this.drawHitbox(ctx, XlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -95,6 +98,7 @@ export default class KingPig extends Entity {
 
     this.setAnimation();
     this.updatePosition();
+    this.isDeathWaitOver();
 
     if (this.entityState === Constants.KingPig.ATTACK) {
       const recoilStrength = 0.3 * Constants.SCALE;
@@ -130,8 +134,21 @@ export default class KingPig extends Entity {
     this.updateAnimationTick();
   }
 
+  isDeathWaitOver() {
+    if(this.dyingWait) {
+      this.deathCountDown++;
+      if(this.deathCountDown >= this.deathCountDownMax) {
+        this.dyingWait = false;
+        this.afterDeath = true;
+        this.deathCountDown = 0;
+      }
+    }
+  }
+
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
+    if(this.player.isDead) return;
+    if(this.isDead || this.afterDeath || this.dyingWait) return;
 
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
@@ -193,7 +210,7 @@ export default class KingPig extends Entity {
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState === Constants.KingPig.ATTACK) {
+    if (this.entityState === Constants.KingPig.ATTACK && !this.isDead) {
       return;
     }
 
@@ -207,9 +224,17 @@ export default class KingPig extends Entity {
       this.entityState = Constants.KingPig.RUNNING;
     }
 
+    if(this.gettingHit) this.entityState = Constants.KingPig.HIT;
+
     if (this.attack) {
       this.entityState = Constants.KingPig.ATTACK;
     }
+
+    if(this.isDead) this.entityState = Constants.KingPig.DEATH;
+
+    if(this.dyingWait) this.entityState = Constants.KingPig.DEATH_WAIT;
+
+    if(this.afterDeath) this.entityState = Constants.KingPig.AFTER_DEATH;
 
     if (this.lastEntityState != this.entityState) {
       this.frameX = 0;
@@ -261,6 +286,8 @@ export default class KingPig extends Entity {
   }
 
   updateXPos(xSpeed2) {
+    if(this.isDead) return;
+
     if (
       canMoveHere(
         this.hitbox.x + xSpeed2,
@@ -290,11 +317,36 @@ export default class KingPig extends Entity {
 
       this.frameX++;
 
+      if (this.entityState === Constants.KingPig.ATTACK && this.frameX == 3)
+        this.damagePlayer(this.damage);
+
       if (this.frameX >= Constants.KingPig.getSpriteAmount(this.entityState)) {
+
+        if(this.entityState === Constants.KingPig.AFTER_DEATH) {
+          this.afterDeath = false;
+          this.active = false;
+          return;
+        }
+
+        if(this.entityState === Constants.KingPig.DEATH) {
+          this.dyingWait = true;
+          return;
+        }
+
         this.frameX = 0;
         this.attack = false;
+        this.gettingHit = false;
+        
+        if(this.afterDeath || this.dyingWait || this.isDead) return;
+
         this.entityState = Constants.KingPig.IDLE;
       }
+    }
+  }
+
+  damagePlayer(damage) {
+    if (this.attack) {
+      this.player.takeDamage(damage);
     }
   }
 

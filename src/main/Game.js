@@ -39,18 +39,51 @@ export default class Game {
 
     this.lastFpsCheck = performance.now();
 
-    // Entities and Objects
+    // Entities 
     this.kingPigs = [];
     this.pigs = [];
     this.pigThrowingBoxes = [];
     this.pigWithMatches = [];
     this.pigThrowingBombs = [];
 
+    // Objects
+    this.cannons = [];
+    this.boxes = [];
+    this.bombs = [];
+
     this.loop(0);
   }
 
   getPlayer() {
     return this.player;
+  }
+
+  getPigs() {
+    return this.pigs;
+  }
+
+  getKingPigs() {
+    return this.kingPigs;
+  }
+
+  getPigThrowingBoxes() {
+    return this.pigThrowingBoxes;
+  }
+
+  getPigWithMatches() {
+    return this.pigWithMatches;
+  }
+
+  getBombs() {
+    return this.bombs;
+  }
+
+  getBoxes() {
+    return this.boxes;
+  }
+
+  getCannons() {
+    return this.cannons;
   }
 
   init() {
@@ -70,26 +103,26 @@ export default class Game {
 
     this.levelManager.draw(this.ctx, this.XlvlOffset);
 
-    this.player.draw(this.ctx, this.XlvlOffset);
+    if(this.player.active) this.player.draw(this.ctx, this.XlvlOffset);
 
     this.kingPigs.forEach((kp) => {
-      kp.draw(this.ctx, this.XlvlOffset);
+      if(kp.active) kp.draw(this.ctx, this.XlvlOffset);
     });
 
     this.pigs.forEach((p) => {
-      p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset);
     });
 
     this.pigThrowingBoxes.forEach((p) => {
-      p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset);
     });
 
     this.pigWithMatches.forEach((p) => {
-      p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset);
     });
 
     this.pigThrowingBombs.forEach((p) => {
-      p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset);
     });
 
     this.ctx.beginPath();
@@ -119,26 +152,26 @@ export default class Game {
   update() {
     this.levelManager.update();
 
-    this.player.update();
+    if(this.player.active) this.player.update();
 
     this.kingPigs.forEach((kp) => {
-      kp.update();
+      if(kp.active) kp.update();
     });
 
     this.pigs.forEach((p) => {
-      p.update();
+      if(p.active) p.update();
     });
 
     this.pigThrowingBoxes.forEach((p) => {
-      p.update();
+      if(p.active) p.update();
     });
 
     this.pigWithMatches.forEach((p) => {
-      p.update();
+      if(p.active) p.update();
     });
 
     this.pigThrowingBombs.forEach((p) => {
-      p.update();
+      if(p.active) p.update();
     });
 
     this.checkBorders();

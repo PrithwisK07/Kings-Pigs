@@ -36,6 +36,8 @@ export default class Pig extends Entity {
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 900;
 
+    this.damage = 10;
+
     this.countdown = 0;
     this.countdownTimer = Constants.Player.FRAME_SPEED;
 
@@ -64,6 +66,7 @@ export default class Pig extends Entity {
     if (!this.pigImg) return;
 
     // this.drawHitbox(ctx, XlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -90,6 +93,7 @@ export default class Pig extends Entity {
 
     this.setAnimation();
     this.updatePosition();
+    this.isDeathWaitOver();
 
     if (this.entityState === Constants.Pig.ATTACK && !this.hasRecoiled) {
       this.hasRecoiled = true;
@@ -106,8 +110,21 @@ export default class Pig extends Entity {
     this.updateAnimationTick();
   }
 
+  isDeathWaitOver() {
+    if(this.dyingWait) {
+      this.deathCountDown++;
+      if(this.deathCountDown >= this.deathCountDownMax) {
+        this.dyingWait = false;
+        this.afterDeath = true;
+        this.deathCountDown = 0;
+      }
+    }
+  }
+
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
+    if(this.player.isDead) return;
+    if(this.isDead || this.afterDeath || this.dyingWait) return;
 
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
@@ -169,7 +186,7 @@ export default class Pig extends Entity {
   setAnimation() {
     this.lastEntityState = this.entityState;
 
-    if (this.entityState === Constants.Pig.ATTACK) {
+    if (this.entityState === Constants.Pig.ATTACK && !this.isDead) {
       return;
     }
 
@@ -183,9 +200,17 @@ export default class Pig extends Entity {
       this.entityState = Constants.Pig.RUNNING;
     }
 
+    if(this.gettingHit) this.entityState = Constants.Pig.HIT;
+
     if (this.attack) {
       this.entityState = Constants.Pig.ATTACK;
     }
+
+    if(this.isDead) this.entityState = Constants.Pig.DEATH;
+
+    if(this.dyingWait) this.entityState = Constants.Pig.DEATH_WAIT;
+
+    if(this.afterDeath) this.entityState = Constants.Pig.AFTER_DEATH;
 
     if (this.lastEntityState != this.entityState) {
       this.frameX = 0;
@@ -237,6 +262,8 @@ export default class Pig extends Entity {
   }
 
   updateXPos(xSpeed2) {
+    if(this.isDead) return;
+
     if (
       canMoveHere(
         this.hitbox.x + xSpeed2,
@@ -266,11 +293,35 @@ export default class Pig extends Entity {
 
       this.frameX++;
 
+      if(this.entityState === Constants.Pig.ATTACK && this.frameX == 3) this.damagePlayer(this.damage);
+
       if (this.frameX >= Constants.Pig.getSpriteAmount(this.entityState)) {
+
+        if(this.entityState === Constants.Pig.AFTER_DEATH) {
+          this.afterDeath = false;
+          this.active = false;
+          return;
+        }
+
+        if(this.entityState === Constants.Pig.DEATH) {
+          this.dyingWait = true;
+          return;
+        }
+
         this.frameX = 0;
         this.attack = false;
+        this.gettingHit = false;
+        
+        if(this.afterDeath || this.isDead || this.dyingWait) return;
+        
         this.entityState = Constants.Pig.IDLE;
       }
+    }
+  }
+
+  damagePlayer(damage) {
+    if (this.attack) {
+      this.player.takeDamage(damage);
     }
   }
 
