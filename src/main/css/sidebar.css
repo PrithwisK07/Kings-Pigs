@@ -1,0 +1,92 @@
+.left-sidebar {
+  width: fit-content;
+  background-color: #eef2f7;
+  border-right: 1px solid #d1d5db;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-sidebar p {
+  font-size: 10px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.tileSet {
+  display: grid;
+  grid-template-columns: repeat(7, 42px);
+  gap: 5px;
+  overflow-y: auto;
+  max-height: 50vh;
+  overflow: auto;
+  scrollbar-width: none;
+  cursor: url("../../res/hand_small_point.svg"), auto;
+  margin-top: 0.25rem;
+}
+
+.Enemy {
+  display: grid;
+  grid-template-columns: repeat(5, calc(38 * 1.3125px));
+  gap: 5px;
+  overflow-y: auto;
+  height: 8vh;
+  border-radius: 0.4rem;
+  align-items: end;
+  padding: 0.5rem;
+  max-height: 20vh;
+  background-color: #fff;
+  overflow: auto;
+  scrollbar-width: none;
+  cursor: url("../../res/hand_small_point.svg"), auto;
+  margin-top: 0.25rem;
+}
+
+.Objects {
+  display: grid;
+  grid-template-columns: repeat(4, calc(52 * 1.3125px));
+  gap: 5px;
+  overflow-y: auto;
+  height: fit-content;
+  border-radius: 0.4rem;
+  align-items: end;
+  padding: 0.5rem;
+  max-height: 20vh;
+  background-color: #fff;
+  overflow: auto;
+  scrollbar-width: none;
+  cursor: url("../../res/hand_small_point.svg"), auto;
+  margin-top: 0.25rem;
+}
+
+.tile {
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  cursor: url("../../res/hand_small_point.svg"), auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.enemy,
+.object {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.enemy {
+  width: calc(38 * 1.5px);
+  height: calc(30 * 1.5px);
+}
+
+.object {
+  width: calc(52 * 1.5px);
+  height: calc(56 * 1.5px);
+}
+
+.tile:hover,
+.object:hover,
+.enemy:hover {
+  border: 3px solid #3b82f6;
+  border-radius: 3px;
+}

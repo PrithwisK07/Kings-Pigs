@@ -60,6 +60,10 @@ export default class LevelManager {
     this.cannons = await getCannons(this.levelDataImg);
     this.bombs = await getBombs(this.levelDataImg);
 
+    this.game.boxes = this.boxes;
+    this.game.bombs = this.bombs;
+    this.game.cannons = this.cannons;
+
     this.game.kingPigs.forEach((kp) => {
       kp.loadLevelData(this.levelData);
     });

@@ -9,13 +9,15 @@ const Constants = {
     DOOR_OUT: 0,
     DOOR_IN: 1,
     DEATH: 2,
-    HIT: 3,
-    ATTACK: 4,
-    RUNNING: 5,
-    GROUND: 6,
-    FALL: 7,
-    JUMP: 8,
-    IDLE: 9,
+    DEATH_WAIT: 3,
+    AFTER_DEATH: 4,
+    HIT: 5,
+    ATTACK: 6,
+    RUNNING: 7,
+    GROUND: 8,
+    FALL: 9,
+    JUMP: 10,
+    IDLE: 11,
     FRAME_SPEED: 20,
 
     PLAYER_IMG_SRC: "../res/KingSprite.png",
@@ -38,7 +40,11 @@ const Constants = {
         case Constants.Player.DOOR_OUT:
           return 8;
         case Constants.Player.DEATH:
-          return 4;
+          return 3;
+        case Constants.Player.DEATH_WAIT:
+          return 1;
+        case Constants.Player.AFTER_DEATH:
+          return 8;
         case Constants.Player.HIT:
           return 2;
         case Constants.Player.ATTACK:
@@ -95,18 +101,24 @@ const Constants = {
     KINGPIG_SRC: "../res/KingPig.png",
 
     DEATH: 0,
-    HIT: 1,
-    ATTACK: 2,
-    GROUND: 3,
-    FALL: 4,
-    JUMP: 5,
-    RUNNING: 6,
-    IDLE: 7,
+    DEATH_WAIT: 1,
+    AFTER_DEATH: 2,
+    HIT: 3,
+    ATTACK: 4,
+    GROUND: 5,
+    FALL: 6,
+    JUMP: 7,
+    RUNNING: 8,
+    IDLE: 9,
 
     getSpriteAmount(entityState) {
       switch (entityState) {
         case Constants.KingPig.DEATH:
           return 4;
+        case Constants.KingPig.DEATH_WAIT:
+          return 1;
+        case Constants.KingPig.AFTER_DEATH:
+          return 10;
         case Constants.KingPig.HIT:
           return 2;
         case Constants.KingPig.ATTACK:
@@ -134,18 +146,24 @@ const Constants = {
     PIG_SRC: "../res/Pig.png",
 
     DEATH: 0,
-    HIT: 1,
-    ATTACK: 2,
-    GROUND: 3,
-    FALL: 4,
-    JUMP: 5,
-    RUNNING: 6,
-    IDLE: 7,
+    DEATH_WAIT: 1,
+    AFTER_DEATH: 2,
+    HIT: 3,
+    ATTACK: 4,
+    GROUND: 5,
+    FALL: 6,
+    JUMP: 7,
+    RUNNING: 8,
+    IDLE: 9,
 
     getSpriteAmount(entityState) {
       switch (entityState) {
         case Constants.Pig.DEATH:
           return 4;
+        case Constants.Pig.DEATH_WAIT:
+          return 1;
+        case Constants.Pig.AFTER_DEATH:
+          return 8;
         case Constants.Pig.HIT:
           return 2;
         case Constants.Pig.ATTACK:
@@ -173,19 +191,20 @@ const Constants = {
 
     withoutBox: {
       DEATH: 0,
-      HIT: 1,
-      ATTACK: 2,
-      GROUND: 3,
-      FALL: 4,
-      JUMP: 5,
-      RUNNING: 6,
-      IDLE: 7,
+      DEATH_WAIT: 1,
+      AFTER_DEATH: 2,
+      HIT: 3,
+      ATTACK: 4,
+      GROUND: 5,
+      FALL: 6,
+      RUNNING: 7,
+      IDLE: 8,
     },
     withBox: {
-      ATTACK: 8,
-      RUNNING: 9,
-      IDLE: 10,
-      PICKING: 11,
+      ATTACK: 9,
+      RUNNING: 10,
+      IDLE: 11,
+      PICKING: 12,
     },
 
     getSpriteAmount(entityState, hasBox) {
@@ -206,6 +225,10 @@ const Constants = {
         switch (entityState) {
           case Constants.PigThrowingBox.withoutBox.DEATH:
             return 4;
+          case Constants.PigThrowingBox.withoutBox.DEATH_WAIT:
+            return 1;
+          case Constants.PigThrowingBox.withoutBox.AFTER_DEATH:
+            return 8;
           case Constants.PigThrowingBox.withoutBox.HIT:
             return 2;
           case Constants.PigThrowingBox.withoutBox.ATTACK:
@@ -235,18 +258,20 @@ const Constants = {
 
     withoutBomb: {
       DEATH: 0,
-      HIT: 1,
-      ATTACK: 2,
-      GROUND: 3,
-      FALL: 4,
-      RUNNING: 5,
-      IDLE: 6,
+      DEATH_WAIT: 1,
+      AFTER_DEATH: 2,
+      HIT: 3,
+      ATTACK: 4,
+      GROUND: 5,
+      FALL: 6,
+      RUNNING: 7,
+      IDLE: 8,
     },
     withBomb: {
-      PICKING: 7,
-      ATTACK: 8,
-      RUNNING: 9,
-      IDLE: 10,
+      PICKING: 9,
+      ATTACK: 10,
+      RUNNING: 11,
+      IDLE: 12,
     },
 
     getSpriteAmount(entityState, hasBomb) {
@@ -267,6 +292,10 @@ const Constants = {
         switch (entityState) {
           case Constants.PigThrowingBomb.withoutBomb.DEATH:
             return 4;
+          case Constants.PigThrowingBomb.withoutBomb.DEATH_WAIT:
+            return 1;
+          case Constants.PigThrowingBomb.withoutBomb.AFTER_DEATH:
+            return 8;
           case Constants.PigThrowingBomb.withoutBomb.HIT:
             return 2;
           case Constants.PigThrowingBomb.withoutBomb.ATTACK:

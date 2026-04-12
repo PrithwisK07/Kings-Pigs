@@ -4,7 +4,7 @@ import { canMoveHere } from "../utilities/HelperMethods.js";
 import { getSpriteAtlas } from "../utilities/LoadSave.js";
 
 export default class Projectile extends Object {
-  constructor(x, y, levelData, levelManager) {
+  constructor(x, y, levelData, levelManager, player) {
     super(
       x,
       y,
@@ -13,8 +13,11 @@ export default class Projectile extends Object {
     );
 
     this.levelManager = levelManager;
+    this.player = player;
 
     this.levelData = levelData;
+
+    this.damage = 35;
 
     this.initHitbox(
       x + Constants.Projectile.PROJECTILE_WIDTH / 1.2,
@@ -72,8 +75,83 @@ export default class Projectile extends Object {
     );
   }
 
+  checkCollisionPlayer() {
+    if(this.player.hitbox.intersects(this.hitbox) && !this.explosion) {
+      this.player.takeDamage(this.damage);
+
+      if (!this.explosion) {
+        this.explosion = true;
+        this.explosionPos = {
+          x: this.hitbox.x,
+          y: this.hitbox.y,
+        };
+      }
+    }
+  }
+  
+  checkCollisionPigs() {
+    this.player.kingPigs.forEach((pig) => {
+      if(pig.hitbox.intersects(this.hitbox) && !this.explosion) {
+        pig.takeDamage(this.damage);
+
+        if (!this.explosion) {
+          this.explosion = true;
+          this.explosionPos = {
+            x: this.hitbox.x,
+            y: this.hitbox.y,
+          };
+        }
+      }
+    });
+    
+    this.player.pigs.forEach((pig) => {
+      if(pig.hitbox.intersects(this.hitbox) && !this.explosion) {
+        pig.takeDamage(this.damage);
+
+        if (!this.explosion) {
+          this.explosion = true;
+          this.explosionPos = {
+            x: this.hitbox.x,
+            y: this.hitbox.y,
+          };
+        }
+      }
+    });
+    
+    this.player.pigThrowingBombs.forEach((pig) => {
+      if(pig.hitbox.intersects(this.hitbox) && !this.explosion) {
+        pig.takeDamage(this.damage);
+
+        if (!this.explosion) {
+          this.explosion = true;
+          this.explosionPos = {
+            x: this.hitbox.x,
+            y: this.hitbox.y,
+          };
+        }
+      }
+    });
+    
+    this.player.pigThrowingBoxes.forEach((pig) => {
+      if(pig.hitbox.intersects(this.hitbox) && !this.explosion) {
+        pig.takeDamage(this.damage);
+
+        if (!this.explosion) {
+          this.explosion = true;
+          this.explosionPos = {
+            x: this.hitbox.x,
+            y: this.hitbox.y,
+          };
+        }
+      }
+    });
+  }
+
   update(Cannon, left) {
     this.updatePosition(left);
+    this.checkCollisionPlayer();
+    this.checkCollisionPigs();
+    
     if (this.gravityEnabled) {
       this.updatePositionY(Cannon);
     }

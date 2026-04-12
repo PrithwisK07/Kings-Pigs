@@ -19,6 +19,7 @@ export default class Door extends Object {
     this.exitCountdown = 0;
     this.exitCountTimer = 300;
 
+    this.countdownTimer = Constants.Door.FRAME_SPEED;
     this.player = player;
 
     this.initHitbox(
@@ -114,11 +115,13 @@ export default class Door extends Object {
         if (this.doorType == 0) {
           if (this.player.stopAnimation) {
             this.closing = true;
+            this.opening = false; 
             return;
           }
         } else {
           if (this.player.startAnimation) {
             this.closing = true;
+            this.opening = false; 
             return;
           }
         }
@@ -126,12 +129,11 @@ export default class Door extends Object {
         if (this.opening) {
           this.frameX = Constants.Door.getSpriteAmount(this.objectState);
 
-          if (this.doorType == 0) this.player.enterTheDoor();
-          else {
+          if (this.doorType == 0) {
+            this.player.enterTheDoor();
+          } else {
             if (this.canExit) this.player.exitTheDoor();
           }
-
-          this.opening = false;
         }
       }
     }
