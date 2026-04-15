@@ -1,6 +1,5 @@
 import Door from "../objects/Door.js";
 import Constants from "../utilities/Constants.js";
-import { getBoxes, getSpriteAtlas } from "../utilities/loadSave.js";
 
 export default class Levels {
   constructor(levelManager, player) {
@@ -19,8 +18,10 @@ export default class Levels {
       case 1:
         this.levelManager.tileSetImgPath =
           Constants.Levels.level1.tileSetImgPath;
+        // this.levelManager.levelDataImgPath =
+        //   Constants.Levels.level1.levelDataImgPath;
         this.levelManager.levelDataImgPath =
-          Constants.Levels.level1.levelDataImgPath;
+          "../res/level_data_15x30.png";
         this.levelManager.door = [
           new Door(entryX, entryY, this.player, 1),
           new Door(exitX, exitY, this.player, 0),

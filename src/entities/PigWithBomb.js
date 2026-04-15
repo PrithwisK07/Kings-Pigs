@@ -454,6 +454,7 @@ export default class PigThrowingBomb extends Entity {
             this.hitbox.y,
             this.flip,
             this.levelManager,
+            this.player
           );
           this.pushActiveBombs();
         }

@@ -7,7 +7,7 @@ import Object from "./Object.js";
 import { getSpriteAtlas } from "../utilities/LoadSave.js";
 
 export default class Box extends Object {
-  constructor(x, y, flip, levelManager) {
+  constructor(x, y, flip, levelManager, player) {
     super(x, y, Constants.Box.BOX_WIDTH, Constants.Box.BOX_HEIGHT);
 
     this.levelManager = levelManager;
@@ -15,6 +15,9 @@ export default class Box extends Object {
     this.flip = flip ? false : true;
     this.pause = false;
     this.canDraw = true;
+    this.player = player;
+
+    this.damage = 25;
 
     this.initHitbox(
       x,
@@ -47,6 +50,21 @@ export default class Box extends Object {
     );
   }
 
+  checkCollisionPlayer() {
+    if(this.player.hitbox.intersects(this.hitbox) && !this.explosion) {
+      this.player.takeDamage(this.damage);
+
+      if (!this.explosion) {
+        this.explosion = true;
+        this.explosionPos = {
+          x: this.hitbox.x,
+          y: this.hitbox.y,
+        };
+      }
+    }
+  }
+
+
   setProps(vx, vy) {
     this.active = true;
     this.vx = this.flip ? -vx : vx;
@@ -57,6 +75,8 @@ export default class Box extends Object {
     if (!this.levelData) return;
 
     if (!this.active) return;
+
+    this.checkCollisionPlayer();
 
     if (
       canMoveHere(

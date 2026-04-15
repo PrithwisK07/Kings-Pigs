@@ -10,18 +10,15 @@ const tileSize = 32;
 
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      if (j * rows + i === 94) continue; // skip empty tile
+      if (j * rows + i === 94) continue; 
 
-      const img = cropImage(
-        image,
-        j * tileSize,
-        i * tileSize,
-        tileSize,
-        tileSize
-      );
+      const img = cropImage(image, j * tileSize, i * tileSize, tileSize, tileSize);
       const tile = document.createElement("img");
       tile.classList.add("tile");
       tile.src = img.src;
+      
+      const tileIndex = (i * cols) + j;
+      tile.dataset.id = tileIndex; 
 
       sidebar.appendChild(tile);
     }

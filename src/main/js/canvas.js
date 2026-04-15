@@ -1,18 +1,41 @@
 import { floatingTile, setFloatingTile, zoomLevel } from "./floating.js";
 import { saveState } from "./history.js";
 
+// ==========================================
+// 1. ALL DOM QUERIES (Moved to the very top)
+// ==========================================
 const container = document.querySelector(".container");
+const modal = document.querySelector("#gridModal");
+const confirmBtn = document.querySelector("#confirmGrid");
+const cancelBtn = document.querySelector("#cancelGrid");
+const canvasContainer = document.querySelector(".canvas-container");
+const canvas = document.querySelector(".canvas");
+const upperNum = document.querySelector(".upper-num");
+const leftNum = document.querySelector(".left-num");
+const zoomWrapper = document.querySelector(".zoom-wrapper");
+
+// ==========================================
+// 2. GLOBAL STATE VARIABLES
+// ==========================================
+export let ROWS, COLS;
+export let offsetX = 0, offsetY = 0;
+export let isEraserActive = false;
+export const cells = [];
+
+const CELL_SIZE = 42;
+let isPanning = false;
+let isPlacing = false;
+let lastX = 0, lastY = 0;
+let velocityX = 0, velocityY = 0;
+
+// ==========================================
+// 3. INITIALIZATION & LISTENERS
+// ==========================================
 container.addEventListener("contextmenu", (e) => {
   e.preventDefault();
 });
 
-// Modal logic.
-const modal = document.querySelector("#gridModal");
-const confirmBtn = document.querySelector("#confirmGrid");
-const cancelBtn = document.querySelector("#cancelGrid");
-
-let ROWS, COLS;
-
+// Modal logic
 modal.addEventListener("click", (e) => {
   if (e.target === confirmBtn) {
     modal.style.display = "none";
@@ -31,24 +54,14 @@ modal.addEventListener("click", (e) => {
   }
 });
 
-const canvasContainer = document.querySelector(".canvas-container");
-
-// --- New wrappers for clean separation ---
+// Wrappers for clean separation
 const panWrapper = document.createElement("div");
-const zoomWrapper = document.querySelector(".zoom-wrapper");
-
 canvasContainer.appendChild(panWrapper);
 panWrapper.appendChild(zoomWrapper);
 
-// Pan state
-let isPanning = false;
-let lastX = 0,
-  lastY = 0;
-let velocityX = 0,
-  velocityY = 0;
-export let offsetX = 0,
-  offsetY = 0;
-
+// ==========================================
+// 4. PANNING & ZOOM LOGIC
+// ==========================================
 export function setOffset({ offsetX: newX, offsetY: newY }) {
   offsetX = newX;
   offsetY = newY;
@@ -67,12 +80,13 @@ function animatePan() {
   requestAnimationFrame(animatePan);
 }
 
-animatePan();
+// FIX: Wait for all modules to finish loading before starting the loop!
+setTimeout(() => {
+  requestAnimationFrame(animatePan);
+}, 0);
 
-// --- Panning logic ---
 canvasContainer.addEventListener("mousedown", (e) => {
   if (e.button === 0) return;
-
   isPanning = true;
   lastX = e.clientX;
   lastY = e.clientY;
@@ -80,34 +94,69 @@ canvasContainer.addEventListener("mousedown", (e) => {
 
 canvasContainer.addEventListener("mousemove", (e) => {
   if (!isPanning) return;
-
   const dx = e.clientX - lastX;
   const dy = e.clientY - lastY;
-
   velocityX = dx;
   velocityY = dy;
-
   lastX = e.clientX;
   lastY = e.clientY;
 });
 
-canvasContainer.addEventListener("mouseup", () => {
-  isPanning = false;
-});
+canvasContainer.addEventListener("mouseup", () => (isPanning = false));
+canvasContainer.addEventListener("mouseleave", () => (isPanning = false));
 
-canvasContainer.addEventListener("mouseleave", () => {
-  isPanning = false;
-});
+// ==========================================
+// 5. ERASER LOGIC
+// ==========================================
+export function setEraserMode(state) {
+  isEraserActive = state;
+  const eraserBtn = document.querySelector(".eraser button");
+  
+  if (eraserBtn) {
+    if (isEraserActive) {
+      eraserBtn.style.backgroundColor = "#ef4444"; // Red to indicate delete mode
+      eraserBtn.style.color = "white";
+      setFloatingTile(null); // Drop whatever tile is currently held
+    } else {
+      eraserBtn.style.backgroundColor = "";
+      eraserBtn.style.color = "";
+    }
+  }
+}
 
-// --- Grid setup ---
-const canvas = document.querySelector(".canvas");
-const upperNum = document.querySelector(".upper-num");
-const leftNum = document.querySelector(".left-num");
+export function eraseFromCell(cell) {
+  const objectLayer = cell.querySelector(".object-layer");
+  const tileLayer = cell.querySelector(".tile-layer");
 
-const CELL_SIZE = 42;
-export const cells = [];
+  // Smart Erase: Erase object first. If no object, erase tile.
+  if (objectLayer && objectLayer.innerHTML !== "") {
+    saveState();
+    objectLayer.innerHTML = "";
+  } else if (tileLayer && tileLayer.innerHTML !== "") {
+    saveState();
+    tileLayer.innerHTML = "";
+  }
+}
 
-function makeGrid() {
+// ==========================================
+// 6. GRID GENERATION & TILE PLACEMENT
+// ==========================================
+export function setGridDimensions(rows, cols) {
+  ROWS = rows;
+  COLS = cols;
+  
+  const rowsInput = document.querySelector("#rowsInput");
+  const colsInput = document.querySelector("#colsInput");
+  if (rowsInput) rowsInput.value = rows;
+  if (colsInput) colsInput.value = cols;
+}
+
+export function makeGrid() {
+  canvas.innerHTML = ""; 
+  cells.length = 0;
+  upperNum.innerHTML = "";
+  leftNum.innerHTML = "";
+  
   canvas.style.gridTemplateRows = `repeat(${ROWS}, ${CELL_SIZE}px)`;
   canvas.style.gridTemplateColumns = `repeat(${COLS}, ${CELL_SIZE}px)`;
 
@@ -139,48 +188,41 @@ function makeGrid() {
 
   document.querySelectorAll(".cell").forEach((cell) => {
     cell.addEventListener("mouseenter", () => {
-      if (isPlacing && floatingTile) placeTile(cell);
+      if (isPlacing) {
+        if (isEraserActive) eraseFromCell(cell);
+        else if (floatingTile) placeTile(cell);
+      }
     });
 
     // Right-click to pick up a topmost object OR tile
     cell.addEventListener("contextmenu", (e) => {
       e.preventDefault();
+      
+      setEraserMode(false); // Turn off eraser if picking up a tile
 
-      // Prefer topmost object, then tile
       const objectImg = cell.querySelector(".object-layer img:last-child");
       const tileImg = cell.querySelector(".tile-layer img");
       const placedImg = objectImg || tileImg || cell.querySelector("img");
 
       if (!placedImg) return;
-
       if (floatingTile) floatingTile.remove();
 
-      // clone but DON'T wipe classes with className = '...' — preserve type info
       const newFloating = placedImg.cloneNode(true);
+      if (newFloating.classList.contains("placed-object")) return;
 
-      if (newFloating.classList.contains("placed-object")) {
-        return;
-      }
-
-      // remove 'placed-*' classes but keep type info
       newFloating.classList.remove("placed-tile");
       newFloating.classList.add("floating-tile");
 
-      // preserve a clean explicit marker so placeTile can decide
       const type = getTypeFromElement(placedImg);
       newFloating.dataset.type = type;
-      if (type === "tile") newFloating.classList.add("tile"); // keep shorthand for earlier checks if needed
+      if (type === "tile") newFloating.classList.add("tile"); 
 
-      // size & position for floating preview (natural size scaled by zoom)
       const targetBox = placedImg.getBoundingClientRect();
       const natW = placedImg.naturalWidth || placedImg.width || CELL_SIZE;
       const natH = placedImg.naturalHeight || placedImg.height || CELL_SIZE;
 
-      newFloating.style.left =
-        targetBox.left + (targetBox.width / 2) * zoomLevel + "px";
-      newFloating.style.top =
-        targetBox.top + (targetBox.height / 2) * zoomLevel + "px";
-
+      newFloating.style.left = targetBox.left + (targetBox.width / 2) * zoomLevel + "px";
+      newFloating.style.top = targetBox.top + (targetBox.height / 2) * zoomLevel + "px";
       newFloating.style.position = "fixed";
       newFloating.style.pointerEvents = "none";
       newFloating.style.zIndex = "1000";
@@ -198,25 +240,18 @@ export function getCell() {
   return document.querySelectorAll(".cell");
 }
 
-/* -------------------------
-   Helper: read element type
-   ------------------------- */
 function getTypeFromElement(el) {
   if (!el) return null;
-  if (el.dataset && el.dataset.type) return el.dataset.type; // prefer explicit marker
+  if (el.dataset && el.dataset.type) return el.dataset.type; 
   if (el.classList.contains("tile") || el.classList.contains("placed-tile"))
     return "tile";
   return "object";
 }
 
-/* -------------------------
-   Place tile/object into cell
-   ------------------------- */
 export function placeTile(cell) {
   if (!floatingTile) return;
   saveState();
 
-  // ensure layers exist
   let tileLayer = cell.querySelector(".tile-layer");
   let objectLayer = cell.querySelector(".object-layer");
 
@@ -235,22 +270,21 @@ export function placeTile(cell) {
   const newImg = document.createElement("img");
   newImg.src = floatingTile.src;
 
+  if (floatingTile.hasAttribute("data-id")) {
+    newImg.setAttribute("data-id", floatingTile.getAttribute("data-id"));
+  }
+
   const type = getTypeFromElement(floatingTile);
 
   if (type === "tile") {
-    // Always overwrite the tile layer
     newImg.classList.add("placed-tile");
     newImg.dataset.type = "tile";
+    newImg.width = 42;  
+    newImg.height = 42; 
 
-    // Snap tile to cell size
-    newImg.width = CELL_SIZE;
-    newImg.height = CELL_SIZE;
-
-    // Clear old tile(s) before adding the new one
     tileLayer.innerHTML = "";
     tileLayer.appendChild(newImg);
   } else {
-    // place as object on top
     newImg.classList.add("placed-object");
 
     if (floatingTile.classList.contains("enemy")) {
@@ -261,9 +295,8 @@ export function placeTile(cell) {
 
     newImg.dataset.type = "object";
 
-    // Preserve object's natural pixel size (prevents stretching)
-    const natW = floatingTile.naturalWidth || floatingTile.width || CELL_SIZE;
-    const natH = floatingTile.naturalHeight || floatingTile.height || CELL_SIZE;
+    const natW = floatingTile.naturalWidth || floatingTile.width || 42;
+    const natH = floatingTile.naturalHeight || floatingTile.height || 42;
     newImg.width = natW;
     newImg.height = natH;
 
@@ -271,18 +304,20 @@ export function placeTile(cell) {
   }
 }
 
-let isPlacing = false;
-
-// Place tile on left-click
+// Place tile or Erase on left-click
 canvas.addEventListener("mousedown", (e) => {
   if (e.button !== 0) return;
-  if (!floatingTile) return;
 
   const cell = e.target.closest(".cell");
   if (!cell) return;
 
   isPlacing = true;
-  placeTile(cell);
+  
+  if (isEraserActive) {
+    eraseFromCell(cell);
+  } else if (floatingTile) {
+    placeTile(cell);
+  }
 });
 
 canvas.addEventListener("mouseup", () => (isPlacing = false));

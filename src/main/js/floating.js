@@ -1,8 +1,13 @@
+import { setEraserMode } from "./canvas.js";
+
 export let floatingTile = null;
 export let zoomLevel = 1;
 const baseTileSize = 42;
 
 export function setFloatingTile(tile) {
+  if (tile === null && floatingTile) {
+    floatingTile.remove(); 
+  }
   floatingTile = tile;
 }
 
@@ -18,6 +23,8 @@ const objSet = document.querySelector(".Objects");
 // Generic handler to start floating an element
 function startFloating(e, className) {
   if (e.target.classList.contains(className)) {
+    setEraserMode(false);
+    
     if (floatingTile) floatingTile.remove();
 
     floatingTile = e.target.cloneNode(true);
