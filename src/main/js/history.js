@@ -8,10 +8,18 @@ export function saveState() {
     const objects = [...cell.querySelectorAll(".object-layer img")];
 
     state.push({
-      tile: tile ? { src: tile.src, className: tile.className } : null,
+      // ADDED: Capture the data-id for the tile
+      tile: tile ? { 
+        src: tile.src, 
+        className: tile.className,
+        dataId: tile.getAttribute("data-id") 
+      } : null,
+      
+      // ADDED: Capture the data-id for all objects
       objects: objects.map((img) => ({
         src: img.src,
         className: img.className,
+        dataId: img.getAttribute("data-id")
       })),
     });
   });
@@ -40,6 +48,11 @@ export function undo() {
       const img = document.createElement("img");
       img.src = lastState[i].tile.src;
       img.className = lastState[i].tile.className;
+      
+      // ADDED: Restore the data-id
+      if (lastState[i].tile.dataId) {
+        img.setAttribute("data-id", lastState[i].tile.dataId);
+      }
       tileLayer.appendChild(img);
     }
 
@@ -48,6 +61,11 @@ export function undo() {
       const img = document.createElement("img");
       img.src = data.src;
       img.className = data.className;
+      
+      // ADDED: Restore the data-id
+      if (data.dataId) {
+        img.setAttribute("data-id", data.dataId);
+      }
       objectLayer.appendChild(img);
     });
   });

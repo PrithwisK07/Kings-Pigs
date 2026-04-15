@@ -449,6 +449,7 @@ export default class PigThrowingBox extends Entity {
             this.hitbox.y,
             this.flip,
             this.levelManager,
+            this.player
           );
           this.pushActiveBoxes();
         }

@@ -64,6 +64,13 @@
 
       <!-- Options Sidebar -->
       <div class="options-sidebar">
+        <span class="load">
+          <label for="import-file" style="cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+            <button style="pointer-events: none;">Load</button>
+          </label>
+          <input type="file" id="import-file" accept="image/png" style="display: none;" />
+        </span>
+
         <span id="save">
           <img src="../res/floppy-drive.png" alt="save" />
           <div id="save-wrapper">
