@@ -7,6 +7,7 @@ import Bomb from "../objects/Bomb.js";
 import PigWithMatch from "../entities/PigWithMatch.js";
 import PigThrowingBomb from "../entities/PigWithBomb.js";
 import Constants from "./Constants.js";
+import Door from "../objects/Door.js";
 
 let boxes = [];
 let cannons = [];
@@ -16,6 +17,7 @@ let pigs = [];
 let pigThrowingBoxes = [];
 let pigWithMatches = [];
 let pigThrowingBombs = [];
+let doors = [];
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -146,6 +148,28 @@ export function getLevelData(levelDataImg, player, levelManager) {
           )
         );
       }
+      
+      if (blueValue == 8) {
+        doors.push(
+          new Door(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            player,
+            1
+          )
+        );
+      }
+      
+      if (blueValue == 9) {
+        doors.push(
+          new Door(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            player,
+            0
+          )
+        );
+      }
 
       row.push(redValue);
     }
@@ -185,4 +209,8 @@ export async function getPigThrowingBombs() {
 
 export async function getBombs() {
   return bombs;
+}
+
+export async function getDoors() {
+  return doors;
 }

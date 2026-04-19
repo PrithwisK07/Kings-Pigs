@@ -11,6 +11,7 @@ import {
   getPigWithMatches,
   getPigThrowingBombs,
   getBombs,
+  getDoors,
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
@@ -59,6 +60,8 @@ export default class LevelManager {
     this.boxes = await getBoxes(this.levelDataImg);
     this.cannons = await getCannons(this.levelDataImg);
     this.bombs = await getBombs(this.levelDataImg);
+
+    this.door = await getDoors(this.levelDataImg);
 
     this.game.boxes = this.boxes;
     this.game.bombs = this.bombs;
