@@ -153,7 +153,7 @@ export function getLevelData(levelDataImg, player, levelManager) {
         doors.push(
           new Door(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
-            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            (i + 1) * Constants.OG_TILE_SIZE * Constants.SCALE,
             player,
             1
           )
@@ -164,7 +164,7 @@ export function getLevelData(levelDataImg, player, levelManager) {
         doors.push(
           new Door(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
-            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            (i + 1) * Constants.OG_TILE_SIZE * Constants.SCALE,
             player,
             0
           )

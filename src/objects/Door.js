@@ -24,13 +24,13 @@ export default class Door extends Object {
 
     this.initHitbox(
       x,
-      y,
+      y - Constants.Door.DOOR_HEIGHT,
       Constants.Door.DOOR_WIDTH,
       Constants.Door.DOOR_HEIGHT
     );
 
     this.hitbox.y =
-      GetEntityYPosUnderRoofOrAboveFloor(this.hitbox) + 8.35 * Constants.SCALE;
+      GetEntityYPosUnderRoofOrAboveFloor(this.hitbox) + 3 * Constants.SCALE;
 
     this.loadImg(Constants.Door.DOOR_IMG_SRC);
   }
@@ -62,6 +62,7 @@ export default class Door extends Object {
 
     if (this.doorType == 0) {
       if (this.hitbox.intersects(this.player.hitbox)) {
+        console.log("entry door");
         if (this.player.enterDoor) {
           this.opening = true;
           this.player.stopKeyPressMethod();
@@ -69,6 +70,7 @@ export default class Door extends Object {
       }
     } else {
       if (this.hitbox.intersects(this.player.hitbox)) {
+        console.log("exit door");
         if (this.player.exitDoor) {
           this.opening = true;
         }
@@ -143,9 +145,7 @@ export default class Door extends Object {
     if (this.objectImg == null) return;
 
     ctx.save();
-
-    this.drawHitbox(ctx, XlvlOffset);
-
+    
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
@@ -153,11 +153,13 @@ export default class Door extends Object {
       this.objectState * this.height,
       this.width,
       this.height,
-      this.hitbox.x - this.hitbox.width - XlvlOffset,
-      this.hitbox.y,
+      this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
+      this.hitbox.y - this.height + 3 * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
     ctx.restore();
+
+    this.drawHitbox(ctx, XlvlOffset);
   }
 }
