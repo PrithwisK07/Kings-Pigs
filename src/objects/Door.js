@@ -144,7 +144,7 @@ export default class Door extends Object {
 
     ctx.save();
 
-    // this.drawHitbox(ctx, XlvlOffset);
+    this.drawHitbox(ctx, XlvlOffset);
 
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(

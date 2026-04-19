@@ -1,4 +1,3 @@
-import Door from "../objects/Door.js";
 import Constants from "../utilities/Constants.js";
 
 export default class Levels {
@@ -8,11 +7,6 @@ export default class Levels {
   }
 
   async getLevelImgPath(levelName) {
-    const entryX = 250;
-    const entryY = 400;
-
-    const exitX = Constants.OG_TILE_SIZE * 85;
-    const exitY = Constants.OG_TILE_SIZE * 12;
 
     switch (levelName) {
       case 1:
@@ -22,11 +16,6 @@ export default class Levels {
         //   Constants.Levels.level1.levelDataImgPath;
         this.levelManager.levelDataImgPath =
           "../res/level_data_15x30.png";
-        this.levelManager.door = [
-          new Door(entryX, entryY, this.player, 1),
-          new Door(exitX, exitY, this.player, 0),
-        ];
-        break;
     }
   }
 }

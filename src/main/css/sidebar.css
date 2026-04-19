@@ -44,7 +44,7 @@
 
 .Objects {
   display: grid;
-  grid-template-columns: repeat(4, calc(52 * 1.3125px));
+  grid-template-columns: repeat(5, calc(52 * 1.3125px));
   gap: 5px;
   overflow-y: auto;
   height: fit-content;
