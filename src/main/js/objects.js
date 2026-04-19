@@ -19,7 +19,7 @@ const objectBlueValues = [4, 0, 7, 8, 9];
       tile.src = img.src;
 
       tile.dataset.id = objectBlueValues[i];
-
+      
       sidebar.appendChild(tile);
     }
   }
