@@ -11,26 +11,33 @@ export default class Door extends Object {
 
     this.doorType = doorType;
 
+    
     this.opening = false;
     this.closing = false;
     this.stopAnimation = false;
-
+    
     this.canExit = false;
     this.exitCountdown = 0;
     this.exitCountTimer = 300;
-
+    
     this.countdownTimer = Constants.Door.FRAME_SPEED;
     this.player = player;
-
+    
     this.initHitbox(
       x,
       y - Constants.Door.DOOR_HEIGHT,
       Constants.Door.DOOR_WIDTH,
       Constants.Door.DOOR_HEIGHT
     );
-
+    
     this.hitbox.y =
-      GetEntityYPosUnderRoofOrAboveFloor(this.hitbox) + 3 * Constants.SCALE;
+    GetEntityYPosUnderRoofOrAboveFloor(this.hitbox) + 3 * Constants.SCALE;
+    
+    // Making the position of the player relevant to that of the exit door.
+    if(this.doorType == 1) {
+      this.player.hitbox.x = this.hitbox.x;
+      this.player.hitbox.y = this.hitbox.y; 
+    }
 
     this.loadImg(Constants.Door.DOOR_IMG_SRC);
   }
@@ -160,6 +167,6 @@ export default class Door extends Object {
     );
     ctx.restore();
 
-    this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset);
   }
 }
