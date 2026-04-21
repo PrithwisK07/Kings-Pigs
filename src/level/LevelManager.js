@@ -154,7 +154,7 @@ export default class LevelManager {
     this.shakeIntensity = intensity;
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     ctx.imageSmoothingEnabled = false;
 
     let offsetX = 0;
@@ -172,7 +172,7 @@ export default class LevelManager {
     ctx.drawImage(
       this.altCanvas,
       XlvlOffset,
-      0,
+      YlvlOffset,
       ctx.canvas.width,
       ctx.canvas.height,
       0,
@@ -182,32 +182,32 @@ export default class LevelManager {
     );
 
     this.door.forEach((d) => {
-      d.draw(ctx, XlvlOffset);
+      d.draw(ctx, XlvlOffset, YlvlOffset);
     });
 
     if (this.boxes)
       this.boxes.forEach((box) => {
-        box.draw(ctx, XlvlOffset);
+        box.draw(ctx, XlvlOffset, YlvlOffset);
       });
 
     if (this.cannons)
       this.cannons.forEach((cannon) => {
-        cannon.draw(ctx, XlvlOffset);
+        cannon.draw(ctx, XlvlOffset, YlvlOffset);
       });
 
     if (this.bombs)
       this.bombs.forEach((bomb) => {
-        bomb.draw(ctx, XlvlOffset);
+        bomb.draw(ctx, XlvlOffset, YlvlOffset);
       });
 
     if (this.activeBombs)
       this.activeBombs.forEach((bomb) => {
-        bomb.draw(ctx, XlvlOffset);
+        bomb.draw(ctx, XlvlOffset, YlvlOffset);
       });
 
     if (this.activeBoxes)
       this.activeBoxes.forEach((box) => {
-        box.draw(ctx, XlvlOffset);
+        box.draw(ctx, XlvlOffset, YlvlOffset);
       });
 
     ctx.restore();

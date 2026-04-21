@@ -145,15 +145,15 @@ export default class Box extends Object {
     );
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (this.pause || !this.objectImg || !this.canDraw) return;
 
     if (this.explosion) {
-      this.drawExplosion(ctx, XlvlOffset);
+      this.drawExplosion(ctx, XlvlOffset, YlvlOffset);
       return;
     }
 
-    // this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
@@ -163,13 +163,13 @@ export default class Box extends Object {
       this.width,
       this.height,
       this.hitbox.x - XlvlOffset + 1,
-      this.hitbox.y + 1 * Constants.SCALE,
+      this.hitbox.y + 1 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
   }
 
-  drawExplosion(ctx, XlvlOffset) {
+  drawExplosion(ctx, XlvlOffset, YlvlOffset) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.explosionImg,
@@ -183,7 +183,7 @@ export default class Box extends Object {
         2 * Constants.SCALE,
       this.explosionPos.y -
         Constants.Projectile.EXPLOSION_HEIGHT / 2 -
-        2 * Constants.SCALE,
+        2 * Constants.SCALE - YlvlOffset,
       Constants.Projectile.EXPLOSION_WIDTH * Constants.SCALE,
       Constants.Projectile.EXPLOSION_HEIGHT * Constants.SCALE
     );

@@ -40,18 +40,18 @@ export default class Entity {
     this.gettingHit = true;
   }
 
-  drawHealthBar(ctx, XlvlOffset) {
+  drawHealthBar(ctx, XlvlOffset, YlvlOffset) {
     ctx.beginPath();
-    ctx.fillText(this.health, this.hitbox.x + this.hitbox.width / 4 - XlvlOffset, this.hitbox.y - 5);
+    ctx.fillText(this.health, this.hitbox.x + this.hitbox.width / 4 - XlvlOffset, this.hitbox.y - 5 - YlvlOffset);
     ctx.closePath();
   }
 
-  drawHitbox(ctx, XlvlOffset) {
+  drawHitbox(ctx, XlvlOffset, YlvlOffset) {
     ctx.beginPath();
     ctx.strokeStyle = "blue";
     ctx.strokeRect(
       this.hitbox.x - XlvlOffset,
-      this.hitbox.y,
+      this.hitbox.y - YlvlOffset,
       this.hitbox.width,
       this.hitbox.height
     );
@@ -59,12 +59,12 @@ export default class Entity {
     ctx.closePath();
   }
 
-  drawAttackbox(ctx, XlvlOffset) {
+  drawAttackbox(ctx, XlvlOffset, YlvlOffset) {
     ctx.beginPath();
     ctx.strokeStyle = "red";
     ctx.strokeRect(
       this.attackbox.x - XlvlOffset,
-      this.attackbox.y,
+      this.attackbox.y - YlvlOffset,
       this.attackbox.width,
       this.attackbox.height
     );

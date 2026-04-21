@@ -94,7 +94,7 @@ export default class Player extends Entity {
     }
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (!this.levelData) return;
     if (!this.playerImg) return;
 
@@ -102,9 +102,9 @@ export default class Player extends Entity {
 
     if (this.stopAnimation) return;
 
-    // this.drawHitbox(ctx, XlvlOffset);
-    // this.drawAttackbox(ctx, XlvlOffset);
-    this.drawHealthBar(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
+    // this.drawAttackbox(ctx, XlvlOffset, YlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset, YlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -118,7 +118,7 @@ export default class Player extends Entity {
       this.flip
         ? -this.hitbox.x - this.hitbox.width - 21 * Constants.SCALE + XlvlOffset
         : this.hitbox.x - this.hitbox.width - 1 * Constants.SCALE - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 2 + 1.5 * Constants.SCALE,
+      this.hitbox.y - this.hitbox.height / 2 + 1.5 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );

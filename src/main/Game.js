@@ -24,12 +24,19 @@ export default class Game {
     this.deltaFrame = 0;
     this.deltaUpdate = 0;
 
-    // Scroll offset
+    // Scroll offset - X-axis
     this.XlvlOffset = 0;
     this.rightBorder = 0.8 * this.width;
     this.leftBorder = 0.2 * this.width;
     this.totLvlTile = 50;
     this.offViewLvlWidth = this.totLvlTile * Constants.TILE_SIZE - this.width;
+    
+    // Scroll offset - Y-axis
+    this.YlvlOffset = 0;
+    this.topBorder = 0.2 * this.height;
+    this.bottomBorder = 0.8 * this.height;
+    this.totLvlTile = 50;
+    this.offViewLvlHeight = this.totLvlTile * Constants.TILE_SIZE - this.height;
 
     // Monitor FPS
     this.frameCount = 0;
@@ -101,28 +108,28 @@ export default class Game {
   render() {
     this.ctx.clearRect(0, 0, this.width, this.height);
 
-    this.levelManager.draw(this.ctx, this.XlvlOffset);
+    this.levelManager.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
 
-    if(this.player.active) this.player.draw(this.ctx, this.XlvlOffset);
+    if(this.player.active) this.player.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
 
     this.kingPigs.forEach((kp) => {
-      if(kp.active) kp.draw(this.ctx, this.XlvlOffset);
+      if(kp.active) kp.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
     });
 
     this.pigs.forEach((p) => {
-      if(p.active) p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
     });
 
     this.pigThrowingBoxes.forEach((p) => {
-      if(p.active) p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
     });
 
     this.pigWithMatches.forEach((p) => {
-      if(p.active) p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
     });
 
     this.pigThrowingBombs.forEach((p) => {
-      if(p.active) p.draw(this.ctx, this.XlvlOffset);
+      if(p.active) p.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
     });
 
     this.ctx.beginPath();
@@ -136,7 +143,7 @@ export default class Game {
     this.ctx.closePath();
   }
 
-  checkBorders() {
+  checkBordersX() {
     const playerX = this.player.hitbox.x;
     const diff = playerX - this.XlvlOffset;
 
@@ -146,6 +153,19 @@ export default class Game {
     if (this.XlvlOffset < 0) this.XlvlOffset = 0;
     if (this.XlvlOffset > this.offViewLvlWidth) {
       this.XlvlOffset = this.offViewLvlWidth;
+    }
+  }
+  
+  checkBordersY() {
+    const playerY = this.player.hitbox.y;
+    const diff = playerY - this.YlvlOffset;
+
+    if (diff > this.bottomBorder) this.YlvlOffset += diff - this.bottomBorder;
+    if (diff < this.topBorder) this.YlvlOffset += diff - this.topBorder;
+
+    if (this.YlvlOffset < 0) this.YlvlOffset = 0;
+    if (this.YlvlOffset > this.offViewLvlHeight) {
+      this.YlvlOffset = this.offViewLvlHeight;
     }
   }
 
@@ -174,7 +194,8 @@ export default class Game {
       if(p.active) p.update();
     });
 
-    this.checkBorders();
+    this.checkBordersX();
+    this.checkBordersY();
   }
 
   loop = (currentTimeStamp) => {

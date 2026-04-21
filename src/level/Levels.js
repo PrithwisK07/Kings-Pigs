@@ -15,7 +15,7 @@ export default class Levels {
         // this.levelManager.levelDataImgPath =
         //   Constants.Levels.level1.levelDataImgPath;
         this.levelManager.levelDataImgPath =
-          "../res/level_data_15x30.png";
+          "../res/level_data_25x15.png";
     }
   }
 }

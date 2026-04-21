@@ -147,15 +147,15 @@ export default class Bomb extends Object {
     );
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (this.pause || !this.objectImg || !this.canDraw) return;
 
     if (this.explosion) {
-      this.drawExplosion(ctx, XlvlOffset);
+      this.drawExplosion(ctx, XlvlOffset, YlvlOffset);
       return;
     }
 
-    // this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
     ctx.save();
 
@@ -165,7 +165,7 @@ export default class Bomb extends Object {
       this.hitbox.y +
       this.hitbox.height / 2 +
       1 * Constants.SCALE -
-      3 * Constants.SCALE;
+      3 * Constants.SCALE - YlvlOffset;
 
     ctx.translate(centerX, centerY);
     ctx.rotate(this.rotation);
@@ -203,7 +203,7 @@ export default class Bomb extends Object {
     ctx.restore();
   }
 
-  drawExplosion(ctx, XlvlOffset) {
+  drawExplosion(ctx, XlvlOffset, YlvlOffset) {
     ctx.drawImage(
       this.explosionImg,
       this.frameX * Constants.Projectile.EXPLOSION_WIDTH,
@@ -216,7 +216,7 @@ export default class Bomb extends Object {
         2 * Constants.SCALE,
       this.explosionPos.y -
         Constants.Projectile.EXPLOSION_HEIGHT / 2 -
-        2 * Constants.SCALE,
+        2 * Constants.SCALE - YlvlOffset,
       Constants.Projectile.EXPLOSION_WIDTH * Constants.SCALE,
       Constants.Projectile.EXPLOSION_HEIGHT * Constants.SCALE
     );
