@@ -148,7 +148,7 @@ export default class Door extends Object {
     }
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (this.objectImg == null) return;
 
     ctx.save();
@@ -161,12 +161,12 @@ export default class Door extends Object {
       this.width,
       this.height,
       this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
-      this.hitbox.y - this.height + 3 * Constants.SCALE,
+      this.hitbox.y - this.height + 3 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
     ctx.restore();
 
-    // this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
   }
 }

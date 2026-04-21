@@ -93,13 +93,13 @@ export default class Cannon extends Object {
     }
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (!this.objectImg) return;
     if (!this.canDraw) return;
 
-    // this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
-    if (this.projectileActive) this.projectile.draw(ctx, XlvlOffset);
+    if (this.projectileActive) this.projectile.draw(ctx, XlvlOffset, YlvlOffset);
 
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
@@ -109,7 +109,7 @@ export default class Cannon extends Object {
       this.width,
       this.height,
       this.hitbox.x - XlvlOffset + 1,
-      this.hitbox.y + 5 * Constants.SCALE,
+      this.hitbox.y + 5 * Constants.SCALE - YlvlOffset,
       this.hitbox.width,
       this.hitbox.height
     );

@@ -49,15 +49,15 @@ export default class Projectile extends Object {
     );
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (!this.objectImg || !this.levelData) return;
 
     if (this.explosion) {
-      this.drawExplosion(ctx, XlvlOffset);
+      this.drawExplosion(ctx, XlvlOffset, YlvlOffset);
       return;
     }
 
-    // this.drawHitbox(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
@@ -69,7 +69,7 @@ export default class Projectile extends Object {
       this.hitbox.x -
         Constants.Projectile.PROJECTILE_WIDTH / 0.975 -
         XlvlOffset,
-      this.hitbox.y - Constants.Projectile.PROJECTILE_HEIGHT / 1.1,
+      this.hitbox.y - Constants.Projectile.PROJECTILE_HEIGHT / 1.1 - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
@@ -233,7 +233,7 @@ export default class Projectile extends Object {
     }
   }
 
-  drawExplosion(ctx, XlvlOffset) {
+  drawExplosion(ctx, XlvlOffset, YlvlOffset) {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.explosionImg,
@@ -247,7 +247,7 @@ export default class Projectile extends Object {
         2 * Constants.SCALE,
       this.explosionPos.y -
         Constants.Projectile.EXPLOSION_HEIGHT / 2 -
-        2 * Constants.SCALE,
+        2 * Constants.SCALE - YlvlOffset,
       Constants.Projectile.EXPLOSION_WIDTH * Constants.SCALE,
       Constants.Projectile.EXPLOSION_HEIGHT * Constants.SCALE
     );

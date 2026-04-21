@@ -21,11 +21,11 @@ export default class Object {
     this.hitbox = new Rectangle2D(x, y, width, height);
   }
 
-  drawHitbox(ctx, XlvlOffset) {
+  drawHitbox(ctx, XlvlOffset, YlvlOffset) {
     ctx.strokeStyle = "blue";
     ctx.strokeRect(
       this.hitbox.x - XlvlOffset,
-      this.hitbox.y,
+      this.hitbox.y - YlvlOffset,
       this.hitbox.width,
       this.hitbox.height
     );

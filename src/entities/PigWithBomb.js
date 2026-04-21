@@ -97,14 +97,14 @@ export default class PigThrowingBomb extends Entity {
     }
   }
 
-  draw(ctx, XlvlOffset) {
+  draw(ctx, XlvlOffset, YlvlOffset) {
     if (!this.levelData) return;
     if (!this.pigBomb) return;
 
-    if (this.bomb) this.bomb.draw(ctx, XlvlOffset);
+    if (this.bomb) this.bomb.draw(ctx, XlvlOffset, YlvlOffset);
 
-    // this.drawHitbox(ctx, XlvlOffset);
-    this.drawHealthBar(ctx, XlvlOffset);
+    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
+    this.drawHealthBar(ctx, XlvlOffset, YlvlOffset);
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
@@ -119,7 +119,7 @@ export default class PigThrowingBomb extends Entity {
       this.flip
         ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
         : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 3 + 3 * Constants.SCALE,
+      this.hitbox.y - this.hitbox.height / 3 + 3 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE,
     );
