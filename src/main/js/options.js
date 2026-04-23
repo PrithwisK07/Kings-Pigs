@@ -64,3 +64,11 @@ if (grid && canvas) {
     canvas.classList.toggle("show-grid");
   });
 }
+
+const eraserBtn = document.querySelector(".eraser button");
+if (eraserBtn) {
+  eraserBtn.addEventListener("click", () => {
+    // Toggle the eraser state
+    setEraserMode(!isEraserActive);
+  });
+}

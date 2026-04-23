@@ -147,11 +147,15 @@ export function eraseFromCell(cell) {
   const objectLayer = cell.querySelector(".object-layer");
   const tileLayer = cell.querySelector(".tile-layer");
 
+  // Check if actual images exist inside the layers
+  const hasObject = objectLayer && objectLayer.querySelector("img");
+  const hasTile = tileLayer && tileLayer.querySelector("img");
+
   // Smart Erase: Erase object first. If no object, erase tile.
-  if (objectLayer && objectLayer.innerHTML !== "") {
+  if (hasObject) {
     saveState();
     objectLayer.innerHTML = "";
-  } else if (tileLayer && tileLayer.innerHTML !== "") {
+  } else if (hasTile) {
     saveState();
     tileLayer.innerHTML = "";
   }
