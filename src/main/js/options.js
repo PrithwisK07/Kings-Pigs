@@ -54,18 +54,22 @@ scrollToContent.addEventListener("click", () => {
 });
 
 // Toggle Grid Borders (Replaces the old mask trick)
-const grid = document.querySelector(".grid");
+const gridBtn = document.querySelector(".grid-btn");
 const canvas = document.querySelector(".canvas");
 
-if (grid && canvas) {
-  canvas.classList.add("show-grid"); // Make grid visible by default
+if (gridBtn && canvas) {
+  // Set initial default state (Grid is ON)
+  canvas.classList.add("show-grid"); 
+  gridBtn.classList.add("active-grid"); // Pushes the button down initially
   
-  grid.addEventListener("click", () => {
+  // Toggle both the canvas grid and the button visuals on click
+  gridBtn.addEventListener("click", () => {
     canvas.classList.toggle("show-grid");
+    gridBtn.classList.toggle("active-grid");
   });
 }
 
-const eraserBtn = document.querySelector(".eraser button");
+const eraserBtn = document.querySelector(".eraser-btn");
 if (eraserBtn) {
   eraserBtn.addEventListener("click", () => {
     // Toggle the eraser state

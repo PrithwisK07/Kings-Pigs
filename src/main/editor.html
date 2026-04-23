@@ -64,31 +64,27 @@
 
       <!-- Options Sidebar -->
       <div class="options-sidebar">
-        <span class="load">
-          <label for="import-file" style="cursor: pointer; display: flex; flex-direction: column; align-items: center;">
-            <button style="pointer-events: none;">Load</button>
-          </label>
+        <label for="import-file" class="tool-btn load">
+          Load
           <input type="file" id="import-file" accept="image/png" style="display: none;" />
-        </span>
+        </label>
 
-        <span id="save">
-          <img src="../res/floppy-drive.png" alt="save" />
-          <div id="save-wrapper">
+        <button class="tool-btn save" id="save-wrapper">
+          <img src="../res/floppy-drive.png" alt="save" class="save-icon" />
+          <span>Save</span>
+          <div id="save-svg-container">
             <svg viewBox="0 0 100 100">
               <circle class="bg" cx="50" cy="50" r="45"></circle>
               <circle class="progress" cx="50" cy="50" r="45"></circle>
             </svg>
           </div>
-        </span>
-        <span class="grid">
-          <button>grid</button>
-        </span>
-        <span class="eraser">
-          <button>eraser</button>
-        </span>
-        <span class="back">
-          <button>Scroll to content</button>
-        </span>
+        </button>
+
+        <button class="tool-btn grid-btn">Grid</button>
+
+        <button class="tool-btn eraser-btn">Erase</button>
+
+        <button class="tool-btn back">Reset<br>View</button>
       </div>
     </div>
 

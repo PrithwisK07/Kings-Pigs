@@ -129,16 +129,14 @@ canvasContainer.addEventListener("mouseleave", () => (isPanning = false));
 // ==========================================
 export function setEraserMode(state) {
   isEraserActive = state;
-  const eraserBtn = document.querySelector(".eraser button");
+  const eraserBtn = document.querySelector(".eraser-btn");
   
   if (eraserBtn) {
     if (isEraserActive) {
-      eraserBtn.style.backgroundColor = "#ef4444"; // Red to indicate delete mode
-      eraserBtn.style.color = "white";
-      setFloatingTile(null); // Drop whatever tile is currently held
+      eraserBtn.classList.add("active-tool"); // Uses the new CSS class
+      setFloatingTile(null);
     } else {
-      eraserBtn.style.backgroundColor = "";
-      eraserBtn.style.color = "";
+      eraserBtn.classList.remove("active-tool");
     }
   }
 }
