@@ -1,67 +1,137 @@
+/* ==========================================
+   OPTIONS SIDEBAR CONTAINER
+   ========================================== */
 .options-sidebar {
-  width: 80px;
+  width: 90px;
   background-color: #eef2f7;
   border-left: 1px solid #d1d5db;
+  padding: 15px 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
+  gap: 15px;
+  z-index: 100;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
 }
 
-#save {
-  position: relative;
+/* ==========================================
+   CHUNKY RETRO TOOL BUTTONS
+   ========================================== */
+.tool-btn {
+  font-family: "PressStart2P", monospace; 
+  font-size: 8px;
+  width: 100%;
+  height: 60px;
+  
+  /* ADD THIS LINE: Forces bulletproof spacing between buttons */
+  margin-bottom: 16px; 
+  
+  background-color: #ffffff;
+  border: 2px solid #9ca3af;
+  border-radius: 8px;
+  color: #374151;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  line-height: 1.4;
+  text-transform: uppercase;
+  
+  /* 3D Button Effect */
+  box-shadow: 0 4px 0 #9ca3af;
+  transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+  position: relative;
+
+  cursor: url("../../res/hand_small_point.svg"), auto;
 }
 
-#save img {
+.options-sidebar > *:last-child .tool-btn,
+.tool-btn:last-child {
+  margin-bottom: 0;
+}
+
+/* Hover State */
+.tool-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #6b7280;
+  box-shadow: 0 4px 0 #6b7280;
+}
+
+/* Pressed State */
+.tool-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 transparent;
+}
+
+/* Specific styling for the Label used as the Load button */
+label.tool-btn {
+  /* Normalize label to act exactly like the buttons */
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   ACTIVE TOOL STATES
+   ========================================== */
+.tool-btn.active-tool {
+  background-color: #ef4444 !important; /* Red for Erase */
+  color: #ffffff;
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(4px);
+}
+
+/* ADD THIS NEW BLOCK FOR THE GRID */
+.tool-btn.active-grid {
+  background-color: #3b82f6 !important; /* Blue for Grid */
+  color: #ffffff;
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(4px);
+}
+
+/* ==========================================
+   SAVE BUTTON & SVG ANIMATION
+   ========================================== */
+.save-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  image-rendering: pixelated;
+}
+
+/* Container for your circular loading animation */
+#save-svg-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 40px;
   height: 40px;
+  pointer-events: none;
 }
 
-#save-wrapper {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-  width: 48px;
-  height: 48px;
-  border-radius: 100%;
-  scale: 1.35;
-  overflow: hidden;
-  cursor: url("../../res/hand_small_point_n.svg"), auto;
-}
-
-#save-wrapper svg {
-  transform: rotate(-90deg);
+#save-svg-container svg {
   width: 100%;
   height: 100%;
+  transform: rotate(-90deg);
 }
 
-circle.bg {
+#save-svg-container circle {
   fill: none;
   stroke-width: 10;
+  stroke-linecap: round;
 }
 
-circle.progress {
-  fill: none;
-  stroke: rgba(86, 86, 86, 0.181);
-  stroke-width: 90;
+#save-svg-container .bg {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+#save-svg-container .progress {
+  stroke: #10b981; /* Green success color */
   stroke-dasharray: 283;
-  stroke-dashoffset: 283;
+  stroke-dashoffset: 283; /* Hidden by default */
   opacity: 0;
-}
-
-.option {
-  font-size: 14px;
-  padding: 8px;
-  cursor: pointer;
-  margin: 4px;
-  text-align: center;
-  border-radius: 6px;
-  background-color: #e5e7eb;
-  transition: background 0.4s;
-}
-
-.option.active {
-  background-color: #3b82f6;
-  color: white;
 }
