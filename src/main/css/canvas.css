@@ -49,35 +49,29 @@
   background-size: cover; /* ensures no gaps */
 }
 
-.grid-mask {
-  display: none;
-}
-
-.active {
-  display: block;
-  user-select: none;
-  margin-left: 16px;
-  margin-top: 9px;
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1000;
-
-  background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.5) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
-  background-size: 42px 42px; /* match cell size */
-}
-
+/* ==========================================
+   1. THE CELL & SMART GRID OVERLAY
+   ========================================== */
 .cell {
-  border: 1px solid #e5e7eb63;
   width: 42px;
   height: 42px;
   user-select: none;
   position: relative; /* stacking context */
+}
+
+/* This creates an invisible box floating ON TOP of the tile */
+.cell::after {
+  content: "";
+  position: absolute;
+  inset: 0; /* Stretches to fill the cell perfectly */
+  border: 1px solid transparent;
+  pointer-events: none; /* Lets clicks pass through to the tile */
+  z-index: 9999; /* Forces the border to render above tiles and objects */
+}
+
+/* When grid is active, color the pseudo-element's border */
+.canvas.show-grid .cell::after {
+  border-color: rgba(229, 231, 235, 0.4); /* #e5e7eb63 */
 }
 
 /* --- Layers inside a cell --- */
@@ -103,15 +97,20 @@
   border: 1px solid #e5e7eb;
 }
 
+/* ==========================================
+   2. ANTI-TEARING TILE RENDERING
+   ========================================== */
 /* Base level: The terrain */
 .placed-tile {
   box-sizing: border-box;
-  width: 42px;
-  height: 42px;
+  width: 100%; /* Dynamically fill the cell */
+  height: 100%;
   image-rendering: pixelated;
   display: block;
   position: relative; /* Allows z-index to work */
   z-index: 1;
+  /* ANTI-TEARING MAGIC: Microscopically overlaps tiles to hide sub-pixel gaps */
+  transform: scale(1.02); 
 }
 
 .placed-tile,

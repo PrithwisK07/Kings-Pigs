@@ -53,18 +53,22 @@ scrollToContent.addEventListener("click", () => {
   setZoomLevel(1);
 });
 
-// Toggle Grid Mask
-const grid_mask = document.querySelector(".grid-mask");
+// Toggle Grid Borders (Replaces the old mask trick)
 const grid = document.querySelector(".grid");
-if(grid) {
+const canvas = document.querySelector(".canvas");
+
+if (grid && canvas) {
+  canvas.classList.add("show-grid"); // Make grid visible by default
+  
   grid.addEventListener("click", () => {
-    grid_mask.classList.toggle("active");
+    canvas.classList.toggle("show-grid");
   });
 }
 
 const eraserBtn = document.querySelector(".eraser button");
 if (eraserBtn) {
   eraserBtn.addEventListener("click", () => {
+    // Toggle the eraser state
     setEraserMode(!isEraserActive);
   });
 }

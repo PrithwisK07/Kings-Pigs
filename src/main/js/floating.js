@@ -6,7 +6,7 @@ const baseTileSize = 42;
 
 export function setFloatingTile(tile) {
   if (tile === null && floatingTile) {
-    floatingTile.remove(); 
+    floatingTile.remove();
   }
   floatingTile = tile;
 }
