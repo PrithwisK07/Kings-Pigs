@@ -53,18 +53,14 @@ scrollToContent.addEventListener("click", () => {
   setZoomLevel(1);
 });
 
-// Toggle Grid Mask
-const grid_mask = document.querySelector(".grid-mask");
+// Toggle Grid Borders (Replaces the old mask trick)
 const grid = document.querySelector(".grid");
-if(grid) {
-  grid.addEventListener("click", () => {
-    grid_mask.classList.toggle("active");
-  });
-}
+const canvas = document.querySelector(".canvas");
 
-const eraserBtn = document.querySelector(".eraser button");
-if (eraserBtn) {
-  eraserBtn.addEventListener("click", () => {
-    setEraserMode(!isEraserActive);
+if (grid && canvas) {
+  canvas.classList.add("show-grid"); // Make grid visible by default
+  
+  grid.addEventListener("click", () => {
+    canvas.classList.toggle("show-grid");
   });
 }
