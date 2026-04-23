@@ -71,25 +71,41 @@ export function setOffset({ offsetX: newX, offsetY: newY }) {
 function animatePan() {
   offsetX += velocityX;
   offsetY += velocityY;
-
   velocityX *= 0.85;
   velocityY *= 0.85;
-
   panWrapper.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${zoomLevel})`;
-
   requestAnimationFrame(animatePan);
 }
 
-// FIX: Wait for all modules to finish loading before starting the loop!
-setTimeout(() => {
-  requestAnimationFrame(animatePan);
-}, 0);
+setTimeout(() => { requestAnimationFrame(animatePan); }, 0);
+
+// NEW: Track Spacebar State
+export let isSpaceHeld = false;
+
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space" && !isSpaceHeld) {
+    isSpaceHeld = true;
+    e.preventDefault();
+    canvasContainer.style.cursor = "grab";
+  }
+});
+
+window.addEventListener("keyup", (e) => {
+  if (e.code === "Space") {
+    isSpaceHeld = false;
+    isPanning = false; 
+    canvasContainer.style.cursor = 'url("../../res/pointer_a.svg"), auto';
+  }
+});
 
 canvasContainer.addEventListener("mousedown", (e) => {
-  if (e.button === 0) return;
-  isPanning = true;
-  lastX = e.clientX;
-  lastY = e.clientY;
+  // Only pan if Left-Click (0) AND Spacebar is held
+  if (e.button === 0 && isSpaceHeld) {
+    isPanning = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    canvasContainer.style.cursor = "grabbing"; // Change cursor to closed hand
+  }
 });
 
 canvasContainer.addEventListener("mousemove", (e) => {
@@ -102,7 +118,10 @@ canvasContainer.addEventListener("mousemove", (e) => {
   lastY = e.clientY;
 });
 
-canvasContainer.addEventListener("mouseup", () => (isPanning = false));
+canvasContainer.addEventListener("mouseup", () => {
+  isPanning = false;
+  if (isSpaceHeld) canvasContainer.style.cursor = "grab"; // Revert to open hand
+});
 canvasContainer.addEventListener("mouseleave", () => (isPanning = false));
 
 // ==========================================
@@ -306,18 +325,14 @@ export function placeTile(cell) {
 
 // Place tile or Erase on left-click
 canvas.addEventListener("mousedown", (e) => {
-  if (e.button !== 0) return;
+  if (e.button !== 0 || isSpaceHeld) return; 
 
   const cell = e.target.closest(".cell");
   if (!cell) return;
 
   isPlacing = true;
-  
-  if (isEraserActive) {
-    eraseFromCell(cell);
-  } else if (floatingTile) {
-    placeTile(cell);
-  }
+  if (isEraserActive) eraseFromCell(cell);
+  else if (floatingTile) placeTile(cell);
 });
 
 canvas.addEventListener("mouseup", () => (isPlacing = false));
