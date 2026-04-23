@@ -81,18 +81,12 @@
 }
 
 /* --- Layers inside a cell --- */
+/* Notice we removed z-index here so they don't trap their children! */
 .tile-layer,
 .object-layer {
   position: absolute;
   inset: 0; /* fill cell */
   pointer-events: none;
-}
-
-.tile-layer {
-  z-index: 1;
-}
-.object-layer {
-  z-index: 2;
 }
 
 .enemy-layer {
@@ -102,12 +96,6 @@
   z-index: 99999;
 }
 
-.placed-tile {
-  width: 42px;
-  height: 42px;
-  image-rendering: pixelated;
-}
-
 .num-cell {
   display: flex;
   justify-content: center;
@@ -115,12 +103,15 @@
   border: 1px solid #e5e7eb;
 }
 
+/* Base level: The terrain */
 .placed-tile {
   box-sizing: border-box;
   width: 42px;
   height: 42px;
   image-rendering: pixelated;
   display: block;
+  position: relative; /* Allows z-index to work */
+  z-index: 1;
 }
 
 .placed-tile,
@@ -136,17 +127,21 @@
   image-rendering: pixelated;
 }
 
+/* Top level: Enemies always in front */
 .pl-enemy {
   top: -5px;
   transform: scale(1.5);
   position: absolute;
-  z-index: 1000; /* ⬅ already super high */
+  z-index: 1000; 
 }
 
+/* Middle level: Objects/Doors behind enemies but in front of tiles */
 .pl-object {
   right: -12px;
   bottom: 16px;
   transform: scale(1.5);
+  position: absolute;
+  z-index: 2;
 }
 
 .floating-tile {
