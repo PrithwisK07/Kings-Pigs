@@ -16,20 +16,12 @@ options.forEach((option) => {
 const circle = document.querySelector(".progress");
 const saveWrapper = document.querySelector("#save-wrapper");
 
-saveWrapper.addEventListener("click", () => {
-  circle.style.transition = "none";
-  circle.style.strokeDashoffset = 283;
-  circle.style.opacity = "1";
-
-  setTimeout(() => {
-    circle.style.transition = "stroke-dashoffset 1.25s linear";
-    circle.style.strokeDashoffset = 0;
-
+if (saveWrapper) {
+  saveWrapper.addEventListener("click", () => {
+    // Instantly trigger the download without waiting for an animation
     downloadLevelImage();
-
-    setTimeout(() => (circle.style.opacity = "0"), 1400);
-  }, 10);
-});
+  });
+}
 
 // Load / Import Logic
 const importInput = document.querySelector("#import-file");
