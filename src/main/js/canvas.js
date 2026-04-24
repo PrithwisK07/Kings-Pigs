@@ -271,11 +271,36 @@ function getTypeFromElement(el) {
 
 export function placeTile(cell) {
   if (!floatingTile) return;
-  saveState();
+
+  const type = getTypeFromElement(floatingTile);
+  const dataId = floatingTile.getAttribute("data-id");
 
   let tileLayer = cell.querySelector(".tile-layer");
   let objectLayer = cell.querySelector(".object-layer");
 
+  // ==========================================
+  // SPAM & DUPLICATE PREVENTION
+  // ==========================================
+  if (type === "tile" && tileLayer) {
+    const existingImg = tileLayer.querySelector("img");
+    // If the tile currently in the cell has the exact same ID, ignore the click!
+    if (existingImg && existingImg.getAttribute("data-id") === dataId) {
+      return; 
+    }
+  } else if (objectLayer) {
+    // If placing an object/enemy, check if this exact object is already here
+    const existingImgs = objectLayer.querySelectorAll("img");
+    for (let img of existingImgs) {
+      if (img.getAttribute("data-id") === dataId) {
+        return; 
+      }
+    }
+  }
+
+  // If we make it past the checks above, it is a genuine new action!
+  saveState();
+
+  // Create layers if they don't exist yet
   if (!tileLayer) {
     tileLayer = document.createElement("div");
     tileLayer.className = "tile-layer";
@@ -291,11 +316,9 @@ export function placeTile(cell) {
   const newImg = document.createElement("img");
   newImg.src = floatingTile.src;
 
-  if (floatingTile.hasAttribute("data-id")) {
-    newImg.setAttribute("data-id", floatingTile.getAttribute("data-id"));
+  if (dataId) {
+    newImg.setAttribute("data-id", dataId);
   }
-
-  const type = getTypeFromElement(floatingTile);
 
   if (type === "tile") {
     newImg.classList.add("placed-tile");
@@ -303,7 +326,7 @@ export function placeTile(cell) {
     newImg.width = 42;  
     newImg.height = 42; 
 
-    tileLayer.innerHTML = "";
+    tileLayer.innerHTML = ""; // Wipes old terrain tile
     tileLayer.appendChild(newImg);
   } else {
     newImg.classList.add("placed-object");
