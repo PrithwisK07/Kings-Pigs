@@ -9,6 +9,14 @@
   cursor: url("../../res/pointer_a.svg"), auto;
 }
 
+.canvas-container.pan-hover {
+  cursor: url("../../res/hand_small_open.svg"), grab !important;
+}
+
+.canvas-container.pan-active {
+  cursor: url("../../res/hand_small_closed.svg"), grabbing !important;
+}
+
 .scroll-wrapper {
   overflow: auto;
   flex: 1;
