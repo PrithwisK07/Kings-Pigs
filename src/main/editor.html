@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -16,10 +16,10 @@
 
         <p>TileSet</p>
         <div class="tileSet"></div>
-        
+
         <p>Enemies</p>
         <div class="Enemy"></div>
-        
+
         <p>Objects</p>
         <div class="Objects"></div>
       </div>
@@ -30,7 +30,6 @@
       <!-- Grid Size Modal -->
       <div id="gridModal" class="modal">
         <div class="modal-content">
-          
           <div class="modal-controls">
             <h2 class="modal-title">Create New Grid</h2>
             <p class="modal-subtitle">Enter dimensions</p>
@@ -38,11 +37,23 @@
             <div class="modal-inputs">
               <label>
                 Rows:
-                <input type="number" id="rowsInput" min="1" max="50" value="15" />
+                <input
+                  type="number"
+                  id="rowsInput"
+                  min="1"
+                  max="50"
+                  value="15"
+                />
               </label>
               <label>
                 Columns:
-                <input type="number" id="colsInput" min="1" max="50" value="15" />
+                <input
+                  type="number"
+                  id="colsInput"
+                  min="1"
+                  max="50"
+                  value="15"
+                />
               </label>
             </div>
 
@@ -58,7 +69,6 @@
             </div>
             <!-- <p id="previewText" class="preview-text">15 x 15</p> -->
           </div>
-
         </div>
       </div>
 
@@ -77,10 +87,7 @@
 
       <!-- Options Sidebar -->
       <div class="options-sidebar">
-        <label for="import-file" class="tool-btn load">
-          Load
-          <input type="file" id="import-file" accept="image/png" style="display: none;" />
-        </label>
+        <button class="tool-btn load">Load</button>
 
         <button class="tool-btn save" id="save-wrapper">
           <img src="../res/floppy-drive.png" alt="save" class="save-icon" />
@@ -91,8 +98,49 @@
 
         <button class="tool-btn eraser-btn">Erase</button>
 
-        <button class="tool-btn back">Reset<br>View</button>
+        <button class="tool-btn back">Reset<br />View</button>
       </div>
+    </div>
+
+    <div id="loadModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-controls">
+          <h2 class="modal-title">Load Level</h2>
+          <p class="modal-subtitle">Choose a source to import your map</p>
+
+          <div class="load-options">
+            <label for="import-file" class="tool-btn load-choice">
+              <img
+                src="../res/folders_5464646.png"
+                alt="folder"
+                class="load-icon"
+              />
+              <span>Computer</span>
+            </label>
+
+            <button class="tool-btn load-choice disabled" title="Coming soon!">
+              <img
+                src="../res/folder_13951801.png"
+                alt="browser"
+                class="load-icon"
+              />
+              <span>Cloud</span>
+            </button>
+          </div>
+
+          <div class="modal-actions">
+            <button id="closeLoadModal" class="btn btn-secondary">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+      <input
+        type="file"
+        id="import-file"
+        accept="image/png"
+        style="display: none"
+      />
     </div>
 
     <!-- Scripts -->
