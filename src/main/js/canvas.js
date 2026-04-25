@@ -79,14 +79,14 @@ function animatePan() {
 
 setTimeout(() => { requestAnimationFrame(animatePan); }, 0);
 
-// NEW: Track Spacebar State
 export let isSpaceHeld = false;
 
 window.addEventListener("keydown", (e) => {
   if (e.code === "Space" && !isSpaceHeld) {
     isSpaceHeld = true;
     e.preventDefault();
-    canvasContainer.style.cursor = "grab";
+
+    canvasContainer.classList.add("pan-hover");
   }
 });
 
@@ -94,17 +94,19 @@ window.addEventListener("keyup", (e) => {
   if (e.code === "Space") {
     isSpaceHeld = false;
     isPanning = false; 
-    canvasContainer.style.cursor = 'url("../../res/pointer_a.svg"), auto';
+    
+    canvasContainer.classList.remove("pan-hover", "pan-active");
   }
 });
 
 canvasContainer.addEventListener("mousedown", (e) => {
-  // Only pan if Left-Click (0) AND Spacebar is held
   if (e.button === 0 && isSpaceHeld) {
     isPanning = true;
     lastX = e.clientX;
     lastY = e.clientY;
-    canvasContainer.style.cursor = "grabbing"; // Change cursor to closed hand
+    
+    canvasContainer.classList.remove("pan-hover");
+    canvasContainer.classList.add("pan-active");
   }
 });
 
@@ -120,9 +122,18 @@ canvasContainer.addEventListener("mousemove", (e) => {
 
 canvasContainer.addEventListener("mouseup", () => {
   isPanning = false;
-  if (isSpaceHeld) canvasContainer.style.cursor = "grab"; // Revert to open hand
+  
+  canvasContainer.classList.remove("pan-active");
+  
+  if (isSpaceHeld) {
+    canvasContainer.classList.add("pan-hover");
+  }
 });
-canvasContainer.addEventListener("mouseleave", () => (isPanning = false));
+
+canvasContainer.addEventListener("mouseleave", () => {
+  isPanning = false;
+  canvasContainer.classList.remove("pan-active");
+});
 
 // ==========================================
 // 5. ERASER LOGIC
