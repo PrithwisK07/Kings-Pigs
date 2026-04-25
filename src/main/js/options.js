@@ -1,7 +1,7 @@
 import { setOffset, setEraserMode, isEraserActive } from "./canvas.js";
 import { setZoomLevel } from "./floating.js";
 import { downloadLevelImage } from "./export.js";
-import { loadLevelImage } from "./import.js"; // Added Import
+import { loadLevelImage } from "./import.js"; 
 
 // Option buttons
 const options = document.querySelectorAll(".option");
@@ -12,29 +12,11 @@ options.forEach((option) => {
   });
 });
 
-// Save animation & Export
-const circle = document.querySelector(".progress");
+// Save Export
 const saveWrapper = document.querySelector("#save-wrapper");
-
 if (saveWrapper) {
   saveWrapper.addEventListener("click", () => {
-    // Instantly trigger the download without waiting for an animation
     downloadLevelImage();
-  });
-}
-
-// Load / Import Logic
-const importInput = document.querySelector("#import-file");
-
-if (importInput) {
-  importInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      loadLevelImage(file);
-      
-      // Reset the input value so you can upload the same file twice if needed
-      e.target.value = ""; 
-    }
   });
 }
 
@@ -45,30 +27,29 @@ scrollToContent.addEventListener("click", () => {
   setZoomLevel(1);
 });
 
-// Toggle Grid Borders (Replaces the old mask trick)
+// Toggle Grid Borders
 const gridBtn = document.querySelector(".grid-btn");
 const canvas = document.querySelector(".canvas");
 
 if (gridBtn && canvas) {
-  // Set initial default state (Grid is ON)
   canvas.classList.add("show-grid"); 
-  gridBtn.classList.add("active-grid"); // Pushes the button down initially
+  gridBtn.classList.add("active-grid"); 
   
-  // Toggle both the canvas grid and the button visuals on click
   gridBtn.addEventListener("click", () => {
     canvas.classList.toggle("show-grid");
     gridBtn.classList.toggle("active-grid");
   });
 }
 
+// Eraser Toggle
 const eraserBtn = document.querySelector(".eraser-btn");
 if (eraserBtn) {
   eraserBtn.addEventListener("click", () => {
-    // Toggle the eraser state
     setEraserMode(!isEraserActive);
   });
 }
 
+// Sidebar Collapse
 const leftSidebar = document.querySelector("#leftSidebar");
 const sidebarToggle = document.querySelector("#sidebarToggle");
 
@@ -113,13 +94,11 @@ if (fileInput) {
       
       // Step C: Reset input so the same file can be picked again later
       e.target.value = ""; 
-      
-      console.log("File loaded and modal closed.");
     }
   });
 }
 
-// 4. Click outside to close (Optional but recommended)
+// 4. Click outside to close 
 if (loadModal) {
   loadModal.addEventListener("click", (e) => {
     if (e.target === loadModal) {
