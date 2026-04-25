@@ -68,3 +68,12 @@ if (eraserBtn) {
     setEraserMode(!isEraserActive);
   });
 }
+
+const leftSidebar = document.querySelector("#leftSidebar");
+const sidebarToggle = document.querySelector("#sidebarToggle");
+
+if (leftSidebar && sidebarToggle) {
+  sidebarToggle.addEventListener("click", () => {
+    leftSidebar.classList.toggle("collapsed");
+  });
+}

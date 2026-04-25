@@ -47,16 +47,18 @@ img {
    ========================================== */
 .modal-content {
   background-color: #ffffff;
-  border: 4px solid #cbd5e1; /* Chunky outer border */
-  border-radius: 8px; /* Slightly sharp corners */
+  border: 4px solid #cbd5e1;
+  border-radius: 8px;
   padding: 32px 40px;
-  width: 360px;
-  text-align: center;
   
-  /* Hard, non-blurred drop shadow for that retro pop-out effect */
+  /* NEW: Side-by-side flexbox */
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: fit-content; 
+  text-align: left; /* Fix text alignment for inputs */
+  
   box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.15); 
-  
-  /* Pop-in animation */
   animation: modalPop 0.2s ease-out forwards;
 }
 
@@ -179,4 +181,49 @@ img {
 .btn-secondary:active {
   transform: translateY(4px);
   box-shadow: 0 0 0 transparent; /* Pushes the button down */
+}
+
+/* Ensure the title stays cleanly formatted */
+.modal-controls {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================
+   DYNAMIC PREVIEW PANEL
+   ========================================== */
+.modal-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  color: #475569;
+  border-left: 2px dashed #e2e8f0; /* Nice divider line */
+  padding-left: 40px;
+}
+
+.preview-box {
+  width: 250px;
+  height: 250px;
+  background-color: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* The actual mini grid */
+#miniGrid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.mini-cell {
+  border: 1px solid #f1f5f9; /* Super faint grid lines */
 }
