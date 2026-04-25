@@ -77,3 +77,53 @@ if (leftSidebar && sidebarToggle) {
     leftSidebar.classList.toggle("collapsed");
   });
 }
+
+// ==========================================
+// UNIFIED LOAD & AUTO-CLOSE LOGIC
+// ==========================================
+const loadBtn = document.querySelector(".load"); 
+const loadModal = document.querySelector("#loadModal");
+const closeLoadBtn = document.querySelector("#closeLoadModal");
+const fileInput = document.querySelector("#import-file");
+
+// 1. Open the themed modal
+if (loadBtn) {
+  loadBtn.addEventListener("click", (e) => {
+    loadModal.style.display = "flex";
+  });
+}
+
+// 2. Close modal if 'Cancel' is clicked
+if (closeLoadBtn) {
+  closeLoadBtn.addEventListener("click", () => {
+    loadModal.style.display = "none";
+  });
+}
+
+// 3. Handle File Selection & Instant Close
+if (fileInput) {
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Step A: Immediately hide the modal UI
+      if (loadModal) loadModal.style.display = "none";
+
+      // Step B: Fire the import function
+      loadLevelImage(file);
+      
+      // Step C: Reset input so the same file can be picked again later
+      e.target.value = ""; 
+      
+      console.log("File loaded and modal closed.");
+    }
+  });
+}
+
+// 4. Click outside to close (Optional but recommended)
+if (loadModal) {
+  loadModal.addEventListener("click", (e) => {
+    if (e.target === loadModal) {
+      loadModal.style.display = "none";
+    }
+  });
+}

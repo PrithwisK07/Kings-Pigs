@@ -101,3 +101,29 @@ label.tool-btn {
   margin-bottom: 4px;
   image-rendering: pixelated;
 }
+
+.load-options {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.load-choice {
+  width: 120px !important; /* Slightly wider for the modal */
+  height: 100px !important;
+  text-decoration: none;
+}
+
+.load-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+  image-rendering: pixelated;
+}
+
+.tool-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
