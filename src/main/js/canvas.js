@@ -372,3 +372,45 @@ canvas.addEventListener("mousedown", (e) => {
 });
 
 canvas.addEventListener("mouseup", () => (isPlacing = false));
+
+// Grid preview on modal open
+// Grab the elements
+const rowsInput = document.querySelector("#rowsInput");
+const colsInput = document.querySelector("#colsInput");
+const miniGrid = document.querySelector("#miniGrid");
+const previewText = document.querySelector("#previewText");
+
+// Function to draw the mini grid
+function updatePreview() {
+  const r = parseInt(rowsInput.value) || 1;
+  const c = parseInt(colsInput.value) || 1;
+
+  // Cap the preview so it doesn't crash the browser if they type 9999
+  const displayRows = Math.min(r, 50);
+  const displayCols = Math.min(c, 50);
+
+  // Update text label
+  // previewText.textContent = `${r} x ${c}`;
+
+  // Use '1fr' to automatically scale the cells to fit perfectly inside the 160px box!
+  miniGrid.style.gridTemplateRows = `repeat(${displayRows}, 1fr)`;
+  miniGrid.style.gridTemplateColumns = `repeat(${displayCols}, 1fr)`;
+
+  // Clear old preview and draw new cells
+  miniGrid.innerHTML = "";
+  const totalCells = displayRows * displayCols;
+  for (let i = 0; i < totalCells; i++) {
+    const cell = document.createElement("div");
+    cell.className = "mini-cell";
+    miniGrid.appendChild(cell);
+  }
+}
+
+// Listen for typing/clicking arrows in the inputs
+if (rowsInput && colsInput) {
+  rowsInput.addEventListener("input", updatePreview);
+  colsInput.addEventListener("input", updatePreview);
+  
+  // Draw the initial 15x15 preview as soon as the page loads
+  updatePreview(); 
+}

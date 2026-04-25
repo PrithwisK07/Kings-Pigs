@@ -2,19 +2,65 @@
    LEFT SIDEBAR CONTAINER
    ========================================== */
 .left-sidebar {
-  width: max-content; /* Ensures the sidebar hugs the widest tray perfectly */
+  box-sizing: border-box;
+  width: 440px; 
+  flex-shrink: 0; 
   background-color: #eef2f7;
   border-right: 1px solid #d1d5db;
-  
-  /* ADDED MASSIVE TOP PADDING FOR BREATHING ROOM */
   padding: 32px 24px 24px 24px; 
-  
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   z-index: 100;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-  overflow-y: auto; /* Allows scrolling on small laptop screens */
+  position: relative; 
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dynamically pulls the sidebar off-screen by its exact width! */
+.left-sidebar.collapsed {
+  margin-left: -400px; 
+}
+
+/* ==========================================
+   SIDEBAR TOGGLE BUTTON
+   ========================================== */
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: -24px; /* Sticks out perfectly past the right edge */
+  transform: translateY(-50%);
+  width: 24px;
+  height: 64px;
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-left: none; /* Seamlessly blends into the sidebar */
+  border-radius: 0 6px 6px 0; /* Rounded right corners */
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 4px 0 6px rgba(0, 0, 0, 0.05);
+  z-index: 101; /* Keeps it above the canvas */
+  cursor: url("../../res/hand_small_point.svg"), auto;
+}
+
+.sidebar-toggle:hover {
+  background-color: #f8fafc;
+}
+
+/* The Arrow Icon */
+.sidebar-toggle::after {
+  content: "◀";
+  font-family: sans-serif;
+  font-size: 10px;
+  color: #64748b;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Flips the arrow around when collapsed */
+.left-sidebar.collapsed .sidebar-toggle::after {
+  transform: rotate(180deg); 
 }
 
 /* ==========================================

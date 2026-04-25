@@ -11,8 +11,9 @@
   </head>
   <body>
     <div class="container">
-      <!-- Left Sidebar -->
-      <div class="left-sidebar">
+      <div class="left-sidebar" id="leftSidebar">
+        <button id="sidebarToggle" class="sidebar-toggle"></button>
+
         <p>TileSet</p>
         <div class="tileSet"></div>
         
@@ -27,27 +28,37 @@
       <div class="left-sidebar-options"></div>
 
       <!-- Grid Size Modal -->
-      <!-- Modal -->
       <div id="gridModal" class="modal">
         <div class="modal-content">
-          <h2 class="modal-title">Create New Grid</h2>
-          <p class="modal-subtitle">Enter the number of rows and columns</p>
+          
+          <div class="modal-controls">
+            <h2 class="modal-title">Create New Grid</h2>
+            <p class="modal-subtitle">Enter dimensions</p>
 
-          <div class="modal-inputs">
-            <label>
-              Rows:
-              <input type="number" id="rowsInput" min="1" value="15" />
-            </label>
-            <label>
-              Columns:
-              <input type="number" id="colsInput" min="1" value="15" />
-            </label>
+            <div class="modal-inputs">
+              <label>
+                Rows:
+                <input type="number" id="rowsInput" min="1" max="50" value="15" />
+              </label>
+              <label>
+                Columns:
+                <input type="number" id="colsInput" min="1" max="50" value="15" />
+              </label>
+            </div>
+
+            <div class="modal-actions">
+              <button id="confirmGrid" class="btn btn-primary">Confirm</button>
+              <button id="cancelGrid" class="btn btn-secondary">Cancel</button>
+            </div>
           </div>
 
-          <div class="modal-actions">
-            <button id="confirmGrid" class="btn btn-primary">Confirm</button>
-            <button id="cancelGrid" class="btn btn-secondary">Cancel</button>
+          <div class="modal-preview">
+            <div class="preview-box">
+              <div id="miniGrid"></div>
+            </div>
+            <!-- <p id="previewText" class="preview-text">15 x 15</p> -->
           </div>
+
         </div>
       </div>
 
