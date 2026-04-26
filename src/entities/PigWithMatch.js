@@ -4,7 +4,7 @@ import { getSpriteAtlas, getCannons } from "../utilities/LoadSave.js";
 import { GetEntityYPosUnderRoofOrAboveFloor } from "../utilities/HelperMethods.js";
 
 export default class PigWithMatch extends Entity {
-  constructor(x, y, player) {
+  constructor(x, y, player, isFlipped) {
     super(
       x + Constants.PigWithMatch.PIG_WITH_MATCH_WIDTH / 1.4,
       y,
@@ -25,6 +25,8 @@ export default class PigWithMatch extends Entity {
     this.hasMatch = false;
     this.lightMatch = false;
     this.fireCannon = false;
+
+    this.flip = isFlipped;
 
     this.attackCooldown = 0;
 
@@ -64,12 +66,22 @@ export default class PigWithMatch extends Entity {
     if (!this.levelData) return;
     if (!this.pigWithMatch) return;
 
-    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
     this.drawHealthBar(ctx, XlvlOffset, YlvlOffset);
 
     ctx.save();
-    this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
     ctx.imageSmoothingEnabled = false;
+
+    const drawX = this.hitbox.x - this.hitbox.width / 3 - XlvlOffset;
+    const drawY = this.hitbox.y - this.hitbox.height / 6 + 2 * Constants.SCALE - YlvlOffset;
+    const drawW = this.width * Constants.SCALE;
+    const drawH = this.height * Constants.SCALE;
+
+    if (this.flip) {
+      const centerX = this.hitbox.x - XlvlOffset + this.hitbox.width / 2;
+      ctx.translate(centerX, 0);
+      ctx.scale(-1, 1);
+      ctx.translate(-centerX, 0);
+    }
 
     ctx.drawImage(
       this.pigWithMatch,
@@ -77,21 +89,34 @@ export default class PigWithMatch extends Entity {
       this.entityState * this.height,
       this.width,
       this.height,
-      this.flip
-        ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
-        : this.hitbox.x - this.hitbox.width / 3 - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 6 + 2 * Constants.SCALE - YlvlOffset,
-      this.width * Constants.SCALE,
-      this.height * Constants.SCALE
+      drawX,
+      drawY,
+      drawW,
+      drawH
     );
+    
     ctx.restore();
 
     this.getConcernedCannon();
   }
 
   getConcernedCannon() {
+    // FIX: Expand the search area slightly! When flipped, their hitboxes
+    // sometimes drift apart. This guarantees the Pig finds its Cannon!
+    const searchBox = {
+      x: this.hitbox.x - 30 * Constants.SCALE,
+      y: this.hitbox.y - 10 * Constants.SCALE,
+      width: this.hitbox.width + 60 * Constants.SCALE,
+      height: this.hitbox.height + 20 * Constants.SCALE
+    };
+
     this.cannons.forEach((cannon) => {
-      if (this.hitbox.intersects(cannon.hitbox)) {
+      if (
+        searchBox.x < cannon.hitbox.x + cannon.hitbox.width &&
+        searchBox.x + searchBox.width > cannon.hitbox.x &&
+        searchBox.y < cannon.hitbox.y + cannon.hitbox.height &&
+        searchBox.y + searchBox.height > cannon.hitbox.y
+      ) {
         this.cannon = cannon;
       }
     });
@@ -110,26 +135,30 @@ export default class PigWithMatch extends Entity {
 
   detectTheCannon() {
     if (!this.cannon) return;
-    if (!this.hasMatch) return;
     if(this.player.isDead) return;
+
+    // FIX: The Paradox is solved. If the animation told us to fire, fire instantly!
+    if (this.fireCannon) {
+      this.cannon.shoot();
+      this.fireCannon = false;
+      return; // Stop here so it actually shoots
+    }
+
+    // Only start the attack animation if the Pig actually has a match
+    if (!this.hasMatch) return;
 
     const playerY = this.player.hitbox.y;
     const pigY = this.hitbox.y;
     const VERTICAL_TOLERANCE_RANGE = 120 * Constants.SCALE;
 
-    if (this.hasMatch)
-      if (
-        playerY + this.player.hitbox.height / 5 + 4 >= pigY &&
-        playerY - pigY <= VERTICAL_TOLERANCE_RANGE
-      ) {
-        if (!this.cannon.projectileActive) {
-          this.attack = true;
-          if (this.fireCannon) {
-            this.cannon.shoot();
-            this.fireCannon = false;
-          }
-        }
+    if (
+      playerY + this.player.hitbox.height / 5 + 4 >= pigY &&
+      playerY - pigY <= VERTICAL_TOLERANCE_RANGE
+    ) {
+      if (!this.cannon.projectileActive && !this.attack) {
+        this.attack = true;
       }
+    }
   }
 
   detectPlayer() {
@@ -142,18 +171,22 @@ export default class PigWithMatch extends Entity {
     const distanceX = Math.abs(deltaX);
 
     const TOLERANCE_RANGE = 180 * Constants.SCALE;
+    let canSeePlayer = false;
 
-    const canSeePlayer =
-      distanceX < TOLERANCE_RANGE &&
-      pigCenterX > playerCenterX + this.player.hitbox.width; // Detect Player first and then shoot.
+    if (distanceX < TOLERANCE_RANGE) {
+      if (this.flip) {
+        if (playerCenterX > pigCenterX) canSeePlayer = true;
+      } else {
+        if (playerCenterX < pigCenterX) canSeePlayer = true;
+      }
+    }
 
-    // const canSeePlayer = true; // Always shoot.
-
-    if (canSeePlayer)
+    if (canSeePlayer) {
       if (this.attackCooldown === 0) {
         this.lightMatch = true;
         this.attackCooldown = 150;
       }
+    }
   }
 
   setAnimation() {
@@ -184,7 +217,6 @@ export default class PigWithMatch extends Entity {
 
     if (this.countdown >= this.countdownTimer) {
       this.countdown = 0;
-
       this.frameX++;
 
       if (

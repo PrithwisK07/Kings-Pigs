@@ -13,7 +13,7 @@ import Rectangle2D from "../custom/Rectangle2D.js";
 import Bomb from "../objects/Bomb.js";
 
 export default class PigThrowingBomb extends Entity {
-  constructor(x, y, player, levelManager) {
+  constructor(x, y, player, isFlipped, levelManager) {
     super(
       x + Constants.PigThrowingBomb.PIG_THROWING_BOMB_WIDTH / 1.4,
       y,
@@ -35,7 +35,7 @@ export default class PigThrowingBomb extends Entity {
     this.right = false;
     this.onGround = true;
     this.jumping = false;
-    this.flip = false;
+    this.flip = isFlipped;
     this.inAir = true;
 
     this.hasBomb = true;

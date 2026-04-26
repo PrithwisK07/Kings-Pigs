@@ -299,8 +299,6 @@
   transform: scaleX(-1) scale(1.02) !important;
 }
 
-/* Visually recolor Entry Doors so you know which is which! */
-.placed-object[data-id="9"],
-.floating-tile[data-id="9"] {
+.entry-door-visual {
   filter: hue-rotate(160deg) brightness(1.2); 
 }

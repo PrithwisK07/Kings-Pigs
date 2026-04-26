@@ -9,13 +9,10 @@ export function loadLevelImage(file) {
     
     img.onload = () => {
       // 1. UPDATE THE GRID DYNAMICALLY
-      // Image height = Rows, Image width = Columns
       setGridDimensions(img.height, img.width);
       
       // 2. REBUILD THE GRID VISUALLY
       makeGrid();
-
-      // Save this new blank state for Undo functionality
       saveState();
 
       // 3. Draw the loaded image to an offscreen canvas to read its pixels
@@ -29,10 +26,8 @@ export function loadLevelImage(file) {
 
       // 4. Loop through the freshly built grid and reconstruct the level
       cells.forEach((cell, index) => {
-        // Wipe the cell clean
         cell.innerHTML = ""; 
 
-        // Recreate the standard layers
         let tileLayer = document.createElement("div");
         tileLayer.className = "tile-layer";
         
@@ -42,25 +37,20 @@ export function loadLevelImage(file) {
         cell.appendChild(tileLayer);
         cell.appendChild(objectLayer);
 
-        // Get the specific pixel colors for this cell
         const dataIndex = index * 4;
         const r = imgData[dataIndex];
         const g = imgData[dataIndex + 1];
         const b = imgData[dataIndex + 2];
 
         // --- RESTORE TERRAIN ---
-        // If Green is 255, we know it's a valid tile (and not empty air)
-        if (g === 255) {
-          // Find the matching image in the left sidebar
+        // FIX: Check if Red is not 255 (since Green is now used for metadata!)
+        if (r !== 255) {
           const sidebarTile = document.querySelector(`.tileSet .tile[data-id="${r}"]`);
           
           if (sidebarTile) {
             const newImg = sidebarTile.cloneNode(true);
             newImg.className = "placed-tile"; 
-            
-            // Explicitly set the data-id so it can be exported again later!
             newImg.setAttribute("data-id", r);
-            
             newImg.width = 42;
             newImg.height = 42;
             tileLayer.appendChild(newImg);
@@ -68,7 +58,6 @@ export function loadLevelImage(file) {
         }
 
         // --- RESTORE OBJECTS & ENEMIES ---
-        // If Blue is not 255, we know an entity exists here
         if (b !== 255) {
           const sidebarObj = document.querySelector(`.Enemy .enemy[data-id="${b}"]`) || 
                              document.querySelector(`.Objects .object[data-id="${b}"]`);
@@ -76,14 +65,26 @@ export function loadLevelImage(file) {
           if (sidebarObj) {
             const newImg = sidebarObj.cloneNode(true);
             newImg.className = "placed-object";
-            
-            // Explicitly set the data-id so it can be exported again later!
             newImg.setAttribute("data-id", b);
             
             if (sidebarObj.classList.contains("enemy")) {
               newImg.classList.add("pl-enemy");
             } else {
               newImg.classList.add("pl-object");
+            }
+
+            // --- RESTORE METADATA (FLIP & DOOR TYPE) ---
+            if (g === 1) {
+              newImg.dataset.flipped = "true";
+              if (b === 8) { 
+                // If it's a door, add the blue visual tint for Exit Doors
+                newImg.classList.add("entry-door-visual");
+              } else { 
+                // Everything else gets physically flipped
+                newImg.classList.add("flipped");
+              }
+            } else {
+              newImg.dataset.flipped = "false";
             }
 
             const natW = sidebarObj.naturalWidth || sidebarObj.width || 42;

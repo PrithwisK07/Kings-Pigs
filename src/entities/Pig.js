@@ -10,7 +10,7 @@ import {
 } from "../utilities/HelperMethods.js";
 
 export default class Pig extends Entity {
-  constructor(x, y, player) {
+  constructor(x, y, player, isFlipped) {
     super(x, y, Constants.Pig.PIG_WIDTH, Constants.Pig.PIG_HEIGHT);
 
     this.player = player;
@@ -24,7 +24,7 @@ export default class Pig extends Entity {
     this.right = false;
     this.onGround = true;
     this.jumping = false;
-    this.flip = false;
+    this.flip = isFlipped;
     this.inAir = true;
 
     this.ySpeed = 0;

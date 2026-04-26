@@ -51,7 +51,7 @@ export function getLevelData(levelDataImg, player, levelManager) {
     0,
     0,
     levelDataImg.width,
-    levelDataImg.height
+    levelDataImg.height,
   );
 
   const levelData = [];
@@ -66,14 +66,17 @@ export function getLevelData(levelDataImg, player, levelManager) {
 
       if (greenValue == 0 && redValue == 0) redValue = 12;
 
+      const isFlipped = greenValue === 1;
+      const isExitDoor = greenValue === 1;
+
       if (blueValue == 0) {
         boxes.push(
           new Box(
             j * Constants.OG_TILE_SIZE * Constants.SCALE +
               Constants.Box.BOX_WIDTH * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE +
-              Constants.Box.BOX_HEIGHT * Constants.SCALE
-          )
+              Constants.Box.BOX_HEIGHT * Constants.SCALE,
+          ),
         );
       }
 
@@ -82,8 +85,9 @@ export function getLevelData(levelDataImg, player, levelManager) {
           new KingPig(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE,
-            player
-          )
+            player,
+            isFlipped,
+          ),
         );
       }
 
@@ -92,8 +96,9 @@ export function getLevelData(levelDataImg, player, levelManager) {
           new Pig(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE,
-            player
-          )
+            player,
+            isFlipped,
+          ),
         );
       }
 
@@ -103,20 +108,22 @@ export function getLevelData(levelDataImg, player, levelManager) {
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE,
             player,
-            levelManager
-          )
+            isFlipped,
+            levelManager,
+          ),
         );
       }
 
       if (blueValue == 4) {
-        cannons.push(
-          new Cannon(
-            j * Constants.OG_TILE_SIZE * Constants.SCALE,
-            i * Constants.OG_TILE_SIZE * Constants.SCALE,
-            levelManager,
-            player
-          )
+        const cannon = new Cannon(
+          j * Constants.OG_TILE_SIZE * Constants.SCALE,
+          i * Constants.OG_TILE_SIZE * Constants.SCALE,
+          levelManager,
+          player
         );
+        
+        if (isFlipped) cannon.left = false;
+        cannons.push(cannon);
       }
 
       if (blueValue == 5) {
@@ -124,8 +131,9 @@ export function getLevelData(levelDataImg, player, levelManager) {
           new PigWithMatch(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE,
-            player
-          )
+            player,
+            isFlipped,
+          ),
         );
       }
 
@@ -135,8 +143,9 @@ export function getLevelData(levelDataImg, player, levelManager) {
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             i * Constants.OG_TILE_SIZE * Constants.SCALE,
             player,
-            levelManager
-          )
+            isFlipped,
+            levelManager,
+          ),
         );
       }
 
@@ -144,30 +153,20 @@ export function getLevelData(levelDataImg, player, levelManager) {
         bombs.push(
           new Bomb(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
-            i * Constants.OG_TILE_SIZE * Constants.SCALE
-          )
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+          ),
         );
       }
-      
+
       if (blueValue == 8) {
+        const doorType = !isExitDoor ? 1 : 0;
         doors.push(
           new Door(
             j * Constants.OG_TILE_SIZE * Constants.SCALE,
             (i + 1) * Constants.OG_TILE_SIZE * Constants.SCALE,
             player,
-            1
-          )
-        );
-      }
-      
-      if (blueValue == 9) {
-        doors.push(
-          new Door(
-            j * Constants.OG_TILE_SIZE * Constants.SCALE,
-            (i + 1) * Constants.OG_TILE_SIZE * Constants.SCALE,
-            player,
-            0
-          )
+            doorType,
+          ),
         );
       }
 
