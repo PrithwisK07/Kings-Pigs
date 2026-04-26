@@ -40,6 +40,10 @@ export function downloadLevelImage() {
         const parsedId = parseInt(objectImg.getAttribute("data-id"));
         if (!isNaN(parsedId)) {
           b = parsedId;
+
+          if (objectImg.classList.contains("flipped") || objectImg.dataset.flipped === "true") {
+            g = 1;
+          }
         }
       }
 

@@ -15,7 +15,7 @@ export default class Cannon extends Object {
     this.levelManager = levelManager;
     this.player = player;
 
-    this.left = true;
+    this.left = true; 
 
     this.canDraw = true;
 
@@ -82,8 +82,14 @@ export default class Cannon extends Object {
   shoot() {
     if (!this.projectileActive) {
       this.attack = true;
+      
+      let spawnX = this.hitbox.x;
+      if (!this.left) {
+         spawnX = this.hitbox.x + this.hitbox.width;
+      }
+
       this.projectile = new Projectile(
-        this.hitbox.x,
+        spawnX,
         this.hitbox.y,
         this.levelData,
         this.levelManager,
@@ -98,21 +104,33 @@ export default class Cannon extends Object {
     if (!this.canDraw) return;
 
     // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
-
+    
     if (this.projectileActive) this.projectile.draw(ctx, XlvlOffset, YlvlOffset);
 
+    ctx.save(); 
     ctx.imageSmoothingEnabled = false;
+
+    let drawX = this.hitbox.x - XlvlOffset + 1;
+    let drawY = this.hitbox.y + 5 * Constants.SCALE - YlvlOffset;
+
+    if (!this.left) {
+      ctx.scale(-1, 1);
+      drawX = -drawX - this.hitbox.width;
+    }
+
     ctx.drawImage(
       this.objectImg,
       this.frameX * this.width,
       this.objectState * this.height,
       this.width,
       this.height,
-      this.hitbox.x - XlvlOffset + 1,
-      this.hitbox.y + 5 * Constants.SCALE - YlvlOffset,
+      drawX,
+      drawY,
       this.hitbox.width,
       this.hitbox.height
     );
+
+    ctx.restore(); 
   }
 
   loadLevelData(levelData) {

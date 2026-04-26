@@ -488,7 +488,10 @@ document.getElementById("cm-door-entry")?.addEventListener("click", () => {
   if (contextMenu) contextMenu.style.display = "none";
   if (!window.targetImgForMenu) return;
   saveState();
-  window.targetImgForMenu.setAttribute("data-id", "9"); 
+  
+  window.targetImgForMenu.dataset.flipped = "false"; 
+  
+  window.targetImgForMenu.classList.remove("entry-door-visual");
 });
 
 // 4. Make Exit Door Option (ID 8)
@@ -496,7 +499,10 @@ document.getElementById("cm-door-exit")?.addEventListener("click", () => {
   if (contextMenu) contextMenu.style.display = "none";
   if (!window.targetImgForMenu) return;
   saveState();
-  window.targetImgForMenu.setAttribute("data-id", "8"); 
+  
+  window.targetImgForMenu.dataset.flipped = "true"; 
+  
+  window.targetImgForMenu.classList.add("entry-door-visual");
 });
 
 // 5. Delete Option

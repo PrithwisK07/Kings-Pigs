@@ -10,7 +10,7 @@ import {
 } from "../utilities/HelperMethods.js";
 
 export default class KingPig extends Entity {
-  constructor(x, y, player) {
+  constructor(x, y, player, isFlipped) {
     super(
       x,
       y,
@@ -29,7 +29,7 @@ export default class KingPig extends Entity {
     this.right = false;
     this.onGround = true;
     this.jumping = false;
-    this.flip = false;
+    this.flip = isFlipped;
     this.inAir = true;
 
     this.ySpeed = 0;
