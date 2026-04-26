@@ -206,7 +206,7 @@
 
 .Objects {
   display: grid;
-  grid-template-columns: repeat(5, calc(52 * 1.3125px));
+  grid-template-columns: repeat(4, calc(52 * 1.3125px));
   gap: 5px;
   overflow-y: auto;
   height: fit-content;
@@ -251,4 +251,56 @@
 .enemy:hover {
   border: 3px solid #3b82f6;
   border-radius: 3px;
+}
+
+/* ==========================================
+   CUSTOM CONTEXT MENU
+   ========================================== */
+.context-menu {
+  position: fixed;
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  z-index: 999999;
+  min-width: 160px;
+}
+
+.context-menu button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 12px 10px;
+  font-family: "PressStart2P", monospace;
+  font-size: 8px;
+  color: #334155;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.1s;
+}
+
+.context-menu button:hover {
+  background-color: #f1f5f9;
+  color: #3b82f6;
+}
+
+/* ==========================================
+   FLIPPED & MODIFIED STATES
+   ========================================== */
+.pl-object.flipped,
+.pl-enemy.flipped {
+  transform: scaleX(-1) scale(1.5) !important;
+}
+
+.placed-tile.flipped {
+  transform: scaleX(-1) scale(1.02) !important;
+}
+
+/* Visually recolor Entry Doors so you know which is which! */
+.placed-object[data-id="9"],
+.floating-tile[data-id="9"] {
+  filter: hue-rotate(160deg) brightness(1.2); 
 }

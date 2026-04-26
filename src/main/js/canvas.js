@@ -144,7 +144,7 @@ export function setEraserMode(state) {
   
   if (eraserBtn) {
     if (isEraserActive) {
-      eraserBtn.classList.add("active-tool"); // Uses the new CSS class
+      eraserBtn.classList.add("active-tool"); 
       setFloatingTile(null);
     } else {
       eraserBtn.classList.remove("active-tool");
@@ -226,44 +226,42 @@ export function makeGrid() {
       }
     });
 
-    // Right-click to pick up a topmost object OR tile
+    // Right-click to open Context Menu
     cell.addEventListener("contextmenu", (e) => {
       e.preventDefault();
-      
-      setEraserMode(false); // Turn off eraser if picking up a tile
+      setEraserMode(false); 
 
       const objectImg = cell.querySelector(".object-layer img:last-child");
       const tileImg = cell.querySelector(".tile-layer img");
       const placedImg = objectImg || tileImg || cell.querySelector("img");
 
       if (!placedImg) return;
-      if (floatingTile) floatingTile.remove();
+      
+      window.targetImgForMenu = placedImg;
+      window.targetCellForMenu = cell;
+      
+      window.lastRightClickX = e.clientX; 
+      window.lastRightClickY = e.clientY;
 
-      const newFloating = placedImg.cloneNode(true);
-      if (newFloating.classList.contains("placed-object")) return;
+      const menu = document.getElementById("canvasContextMenu");
+      if (menu) {
+        menu.style.display = "flex";
+        menu.style.left = `${e.clientX}px`;
+        menu.style.top = `${e.clientY}px`;
 
-      newFloating.classList.remove("placed-tile");
-      newFloating.classList.add("floating-tile");
-
-      const type = getTypeFromElement(placedImg);
-      newFloating.dataset.type = type;
-      if (type === "tile") newFloating.classList.add("tile"); 
-
-      const targetBox = placedImg.getBoundingClientRect();
-      const natW = placedImg.naturalWidth || placedImg.width || CELL_SIZE;
-      const natH = placedImg.naturalHeight || placedImg.height || CELL_SIZE;
-
-      newFloating.style.left = targetBox.left + (targetBox.width / 2) * zoomLevel + "px";
-      newFloating.style.top = targetBox.top + (targetBox.height / 2) * zoomLevel + "px";
-      newFloating.style.position = "fixed";
-      newFloating.style.pointerEvents = "none";
-      newFloating.style.zIndex = "1000";
-      newFloating.style.border = "none";
-      newFloating.style.width = natW * zoomLevel + "px";
-      newFloating.style.height = natH * zoomLevel + "px";
-
-      document.body.appendChild(newFloating);
-      setFloatingTile(newFloating);
+        const dataId = placedImg.getAttribute("data-id");
+        const type = getTypeFromElement(placedImg); 
+        
+        const isDoor = (dataId === "8" || dataId === "9");
+        document.querySelectorAll(".door-opt").forEach(btn => {
+          btn.style.display = isDoor ? "block" : "none";
+        });
+        
+        const flipBtn = document.getElementById("cm-flip");
+        if (flipBtn) {
+          flipBtn.style.display = (type === "tile" || isDoor) ? "none" : "block";
+        }
+      }
     });
   });
 }
@@ -373,7 +371,9 @@ canvas.addEventListener("mousedown", (e) => {
 
 canvas.addEventListener("mouseup", () => (isPlacing = false));
 
-// Grid preview on modal open
+// ==========================================
+// 7. MODAL MINI GRID PREVIEW
+// ==========================================
 // Grab the elements
 const rowsInput = document.querySelector("#rowsInput");
 const colsInput = document.querySelector("#colsInput");
@@ -389,20 +389,19 @@ function updatePreview() {
   const displayRows = Math.min(r, 50);
   const displayCols = Math.min(c, 50);
 
-  // Update text label
-  // previewText.textContent = `${r} x ${c}`;
-
   // Use '1fr' to automatically scale the cells to fit perfectly inside the 160px box!
-  miniGrid.style.gridTemplateRows = `repeat(${displayRows}, 1fr)`;
-  miniGrid.style.gridTemplateColumns = `repeat(${displayCols}, 1fr)`;
+  if (miniGrid) {
+    miniGrid.style.gridTemplateRows = `repeat(${displayRows}, 1fr)`;
+    miniGrid.style.gridTemplateColumns = `repeat(${displayCols}, 1fr)`;
 
-  // Clear old preview and draw new cells
-  miniGrid.innerHTML = "";
-  const totalCells = displayRows * displayCols;
-  for (let i = 0; i < totalCells; i++) {
-    const cell = document.createElement("div");
-    cell.className = "mini-cell";
-    miniGrid.appendChild(cell);
+    // Clear old preview and draw new cells
+    miniGrid.innerHTML = "";
+    const totalCells = displayRows * displayCols;
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement("div");
+      cell.className = "mini-cell";
+      miniGrid.appendChild(cell);
+    }
   }
 }
 
@@ -414,3 +413,96 @@ if (rowsInput && colsInput) {
   // Draw the initial 15x15 preview as soon as the page loads
   updatePreview(); 
 }
+
+// ==========================================
+// 8. CONTEXT MENU ACTION LOGIC
+// ==========================================
+const contextMenu = document.getElementById("canvasContextMenu");
+
+// Hide menu if user left-clicks anywhere else
+document.addEventListener("click", (e) => {
+  if (contextMenu && !contextMenu.contains(e.target)) {
+    contextMenu.style.display = "none";
+  }
+});
+
+// 1. Pick Up Option (Acts as COPY)
+document.getElementById("cm-pickup")?.addEventListener("click", (e) => {
+  e.stopPropagation(); 
+  if (contextMenu) contextMenu.style.display = "none";
+  if (!window.targetImgForMenu) return;
+
+  if (floatingTile) floatingTile.remove();
+
+  const original = window.targetImgForMenu;
+  const newFloating = original.cloneNode(true);
+  
+  newFloating.className = "floating-tile"; 
+
+  const type = getTypeFromElement(original);
+  newFloating.dataset.type = type;
+  
+  if (type === "tile") {
+    newFloating.classList.add("tile");
+  } else if (original.classList.contains("pl-enemy")) {
+    newFloating.classList.add("enemy");
+  } else {
+    newFloating.classList.add("object");
+  }
+
+  if (original.classList.contains("flipped")) {
+    newFloating.classList.add("flipped");
+  }
+
+  const natW = original.naturalWidth || original.width || 42;
+  const natH = original.naturalHeight || original.height || 42;
+
+  newFloating.style.position = "fixed";
+  newFloating.style.pointerEvents = "none";
+  newFloating.style.zIndex = "999999"; 
+  newFloating.style.border = "none";
+  newFloating.style.width = (natW * zoomLevel) + "px";
+  newFloating.style.height = (natH * zoomLevel) + "px";
+  
+  newFloating.style.left = e.clientX + "px";
+  newFloating.style.top = e.clientY + "px";
+
+  document.body.appendChild(newFloating);
+  setFloatingTile(newFloating);
+});
+
+// 2. Flip Horizontally Option
+document.getElementById("cm-flip")?.addEventListener("click", () => {
+  if (contextMenu) contextMenu.style.display = "none";
+  if (!window.targetImgForMenu) return;
+  
+  saveState();
+  window.targetImgForMenu.classList.toggle("flipped");
+  
+  const isFlipped = window.targetImgForMenu.classList.contains("flipped");
+  window.targetImgForMenu.dataset.flipped = isFlipped ? "true" : "false";
+});
+
+// 3. Make Entry Door Option (ID 9)
+document.getElementById("cm-door-entry")?.addEventListener("click", () => {
+  if (contextMenu) contextMenu.style.display = "none";
+  if (!window.targetImgForMenu) return;
+  saveState();
+  window.targetImgForMenu.setAttribute("data-id", "9"); 
+});
+
+// 4. Make Exit Door Option (ID 8)
+document.getElementById("cm-door-exit")?.addEventListener("click", () => {
+  if (contextMenu) contextMenu.style.display = "none";
+  if (!window.targetImgForMenu) return;
+  saveState();
+  window.targetImgForMenu.setAttribute("data-id", "8"); 
+});
+
+// 5. Delete Option
+document.getElementById("cm-delete")?.addEventListener("click", () => {
+  if (contextMenu) contextMenu.style.display = "none";
+  if (window.targetCellForMenu) {
+    eraseFromCell(window.targetCellForMenu);
+  }
+});
