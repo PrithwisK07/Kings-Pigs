@@ -1,12 +1,12 @@
 import { getSpriteAtlas, cropImage } from "./utils.js";
 
 const sidebar = document.querySelector(".Objects");
-const rows = 5;
+const rows = 4;
 const cols = 1;
 const enemyWidth = 52;
 const enemyHeight = 56;
 
-const objectBlueValues = [4, 0, 7, 8, 9]; 
+const objectBlueValues = [4, 0, 7, 8]; 
 
 (async function loadTiles() {
   const image = await getSpriteAtlas("../res/objects.png");

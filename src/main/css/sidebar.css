@@ -19,7 +19,7 @@
 
 /* Dynamically pulls the sidebar off-screen by its exact width! */
 .left-sidebar.collapsed {
-  margin-left: -400px; 
+  margin-left: -365px; 
 }
 
 /* ==========================================
@@ -125,7 +125,7 @@
 
 .Objects {
   display: grid;
-  grid-template-columns: repeat(5, calc(52 * 1.3125px));
+  grid-template-columns: repeat(4, calc(52 * 1.3125px));
   gap: 6px;
   max-height: 20vh;
 }

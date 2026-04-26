@@ -396,6 +396,13 @@ export default class Player extends Entity {
     this.enterDoor = false;
   }
 
+  takeDamage(damage) {
+    if(this.entityState === Constants.Player.DOOR_IN) return;
+    if(this.entityState === Constants.Player.DOOR_OUT) return;
+
+    super.takeDamage(damage);
+  }
+
   stopKeyPressMethod() {
     this.stopKeyPress = true;
     this.left = false;
