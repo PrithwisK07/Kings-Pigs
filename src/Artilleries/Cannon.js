@@ -84,9 +84,6 @@ export default class Cannon extends Object {
       this.attack = true;
       
       let spawnX = this.hitbox.x;
-      if (!this.left) {
-         spawnX = this.hitbox.x + this.hitbox.width;
-      }
 
       this.projectile = new Projectile(
         spawnX,
