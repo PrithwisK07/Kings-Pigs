@@ -60,15 +60,15 @@ export function downloadLevelImage() {
     level2DArray.push(currentRow);
   }
 
-  console.log(`--- Level Data (${ROWS}x${COLS}) ---`);
-  console.log(level2DArray);
-  console.log("JSON Output:");
-  console.log(JSON.stringify(level2DArray));
-
   ctx.putImageData(imgData, 0, 0);
+  
+  const dataURL = canvas.toDataURL("image/png");
+
+  localStorage.setItem("test_level_data", dataURL);
+
   const link = document.createElement("a");
   link.download = `level_data_${ROWS}x${COLS}.png`;
-  link.href = canvas.toDataURL("image/png");
+  link.href = dataURL; 
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
