@@ -1,4 +1,4 @@
-# Kings and Pigs
+![Kings & Pigs Title](src/res/Kings and Pigs (3).png)
 
 A browser-based 2D platformer and level editor built with HTML5 Canvas and modular JavaScript.
 
