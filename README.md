@@ -1,6 +1,7 @@
 # Kings and Pigs
 
 ![Kings & Pigs Title](src/res/Kings%20and%20Pigs%20(3).png)
+
 A browser-based 2D platformer and level editor built with HTML5 Canvas and modular JavaScript.
 
 ## Overview
@@ -153,7 +154,7 @@ This project does not require a build tool. It can be run as a static website.
 - The project is structured for extension: new levels, enemy types, and game mechanics can be added by expanding the PNG map data and section constants
 
 ## Author
-- Project structure and game logic implemented in modular JavaScript
+- Project structure and game logic implemented in modular JavaScript - by PrithwisK07
 
 ---
 
