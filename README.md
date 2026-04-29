@@ -10,16 +10,6 @@ The codebase is divided into two main parts:
 - `src/main/` – game UI, menu, level select screen, game canvas, and editor interface
 - `src/` – core game engine, level loading, entities, objects, inputs, and utilities
 
-## Demo Preview
-The project includes static screenshot previews for reliable GitHub rendering.
-
-- `src/res/menu_ss.png` — menu screen preview
-- `src/res/level_selector_ss.png` — level selector preview
-- `src/res/gameplay_ss.png` — gameplay preview
-- `src/res/Screenshot 2026-04-30 010322.png` — tile editor screenshot 1
-- `src/res/Screenshot 2026-04-30 010331.png` — tile editor screenshot 2
-- `src/res/Screenshot 2026-04-30 010402.png` — tile editor screenshot 3
-
 ### Static Screen Previews
 
 ![Menu Preview](src/res/menu_ss.png)
@@ -30,11 +20,11 @@ The project includes static screenshot previews for reliable GitHub rendering.
 
 ### Tile Editor Preview
 
-![Editor Preview 1](src/res/Screenshot 2026-04-30 010322.png)
+![Editor Preview 1](src/res/Screenshot%202026-04-30%20010322.png)
 
-![Editor Preview 2](src/res/Screenshot 2026-04-30 010331.png)
+![Editor Preview 2](src/res/Screenshot%202026-04-30%20010331.png)
 
-![Editor Preview 3](src/res/Screenshot 2026-04-30 010402.png)
+![Editor Preview 3](src/res/Screenshot%202026-04-30%20010402.png)
 
 ## How to Play
 
