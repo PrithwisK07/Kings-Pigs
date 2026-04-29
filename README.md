@@ -1,4 +1,4 @@
-![Kings & Pigs Title](src/res/Kings and Pigs (3).png)
+# Kings & Pigs
 
 ![Kings & Pigs Title](src/res/Kings%20and%20Pigs%20(3).png)
 
