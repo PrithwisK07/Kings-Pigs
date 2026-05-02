@@ -15,7 +15,7 @@ import {
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
-  constructor(player, game) {
+  constructor(player, game, currentLevel) {
     this.tileSetImgPath = null;
     this.levelDataImgPath = null;
 
@@ -23,7 +23,9 @@ export default class LevelManager {
     this.player = player;
     this.levelData = null;
 
-    this.levelName = 1;
+    // 2. FIX: Use the parameter instead of hardcoding 1!
+    this.levelName = currentLevel || 1; 
+    
     this.door = [];
 
     this.shakeTime = 0;
@@ -33,6 +35,8 @@ export default class LevelManager {
     this.activeBombs = [];
 
     this.levels = new Levels(this, this.player);
+    
+    // Now this will properly pass 2, 3, etc. to Levels.js
     this.levels.getLevelImgPath(this.levelName);
 
     this.tileSetImg = null;
