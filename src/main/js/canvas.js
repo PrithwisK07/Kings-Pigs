@@ -50,7 +50,7 @@ modal.addEventListener("click", (e) => {
   }
 
   if (e.target === cancelBtn) {
-    window.location.href = "./index.html";
+    window.location.href = "../../../index.html";
   }
 });
 
