@@ -98,9 +98,14 @@ export default class Game {
     this.width = this.canvas.width = window.innerWidth;
     this.height = this.canvas.height = window.innerHeight;
 
+    const urlParams = new URLSearchParams(window.location.search);
+
+    this.currentLevel = parseInt(urlParams.get("level")) || 1;
+    console.log(`🎮 Initializing Game with Level ${this.currentLevel}`);
+
     // Other Game objects.
     this.player = new Player(230, 300, this);
-    this.levelManager = new LevelManager(this.player, this);
+    this.levelManager = new LevelManager(this.player, this, this.currentLevel);
     this.keyBoardInputs = new KeyBoardInputs(this.player);
     this.mouseInputs = new MouseInput(this.player);
   }

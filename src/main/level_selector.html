@@ -330,6 +330,7 @@
         <div class="level-grid" id="levelGrid"></div>
 
         <div class="preview-panel" id="previewPanel">
+          <!-- PREVIEW IMAGE TEMPORARILY DISABLED
           <div class="preview-img-container">
             <img
               id="pvImage"
@@ -337,6 +338,7 @@
               alt="Level Preview"
             />
           </div>
+          -->
 
           <div class="preview-stats">
             <div class="stat-row">
@@ -445,9 +447,6 @@
               .forEach((b) => b.classList.remove("selected"));
             btn.classList.add("selected");
 
-            // UI Sound (Simulated)
-            // new Audio('../res/click.mp3').play();
-
             // Update Data
             pvScore.innerText = String(levelData.score).padStart(4, "0");
             pvTime.innerText = levelData.time || "--:--";
@@ -468,7 +467,6 @@
 
       startLevelBtn.addEventListener("click", () => {
         if (selectedLevel) {
-          // Fade out effect could be added here
           window.location.href = `./game.html?level=${selectedLevel}`;
         }
       });
