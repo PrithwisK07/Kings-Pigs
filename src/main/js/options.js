@@ -1,7 +1,7 @@
 import { setOffset, setEraserMode, isEraserActive } from "./canvas.js";
 import { setZoomLevel } from "./floating.js";
-import { downloadLevelImage } from "./export.js";
-import { loadLevelImage, loadLevelFromMemory } from "./import.js"; // Added memory import
+import { loadLevelImage, loadLevelFromMemory } from "./import.js"; 
+import { showToast, downloadLevelImage } from "./export.js";
 
 // ==========================================
 // UI TOGGLES & OPTIONS
@@ -64,42 +64,57 @@ const loadBtn = document.querySelector(".load");
 const loadModal = document.querySelector("#loadModal");
 const closeLoadBtn = document.querySelector("#closeLoadModal");
 const fileInput = document.querySelector("#import-file");
-const cloudBtn = document.querySelector(".load-choice.disabled"); // The "Cloud" button
+const cloudBtn = document.querySelector(".load-choice.disabled"); 
+
+// ==========================================
+// NEW: Track the currently active level!
+// ==========================================
+let currentEditingSlot = "";
 
 // --- 1. SAVE MODAL LOGIC ---
+const saveModal = document.getElementById("saveModal");
+const saveSlotInput = document.getElementById("saveSlotInput");
+
 if (saveBtn) {
   saveBtn.addEventListener("click", () => {
-    const slot = prompt("Enter Level Number to save to (e.g., 1, 2, 3), or leave blank to just download the PNG:");
-    // If they clicked cancel, slot is null. If they typed nothing, slot is "".
-    if (slot !== null) {
-      downloadLevelImage(slot.trim()); 
-    }
+    saveModal.style.display = "flex";
+    // Auto-fill the input with the level we are currently editing!
+    saveSlotInput.value = currentEditingSlot; 
+    saveSlotInput.focus();
   });
 }
+
+document.getElementById("confirmSave")?.addEventListener("click", () => {
+  const slot = saveSlotInput.value.trim();
+  saveModal.style.display = "none";
+  
+  if (slot) {
+    currentEditingSlot = slot; // Remember this slot for the next time we hit Save!
+  } else {
+    showToast("Downloading PNG only (No slot specified)", "success");
+  }
+  
+  downloadLevelImage(slot); 
+});
+
+document.getElementById("cancelSave")?.addEventListener("click", () => {
+  saveModal.style.display = "none";
+});
 
 // --- 2. LOAD MODAL LOGIC ---
 if (loadBtn) {
   loadBtn.addEventListener("click", () => {
-    if (loadModal) loadModal.style.display = "flex";
+    loadModal.style.display = "flex";
   });
 }
 
 if (closeLoadBtn) {
   closeLoadBtn.addEventListener("click", () => {
-    if (loadModal) loadModal.style.display = "none";
+    loadModal.style.display = "none";
   });
 }
 
-// Click outside to close the modal
-if (loadModal) {
-  loadModal.addEventListener("click", (e) => {
-    if (e.target === loadModal) {
-      loadModal.style.display = "none";
-    }
-  });
-}
-
-// --- 3. HANDLE FILE SELECTION (PC IMPORT) ---
+// 2A. Load from PC
 if (fileInput) {
   fileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -111,24 +126,42 @@ if (fileInput) {
   });
 }
 
-// --- 4. HANDLE BROWSER MEMORY (REPLACING CLOUD) ---
+// 2B. LOAD FROM MEMORY MODAL LOGIC
+const loadMemoryModal = document.getElementById("loadMemoryModal");
+const loadSlotInput = document.getElementById("loadSlotInput");
+
 if (cloudBtn) {
-  cloudBtn.classList.remove("disabled"); // Enable the button!
+  cloudBtn.classList.remove("disabled"); 
   cloudBtn.title = "Load from Browser Memory";
-  const cloudText = cloudBtn.querySelector("span");
-  if (cloudText) cloudText.innerText = "Game Memory";
+  cloudBtn.querySelector("span").innerText = "Game Memory";
 
   cloudBtn.addEventListener("click", () => {
-    const slot = prompt("Enter the Level Number you want to edit (e.g., 1, 2, 3):");
-    if (slot) {
-      const customLevels = JSON.parse(localStorage.getItem("kings_pigs_custom_levels")) || {};
-      
-      if (customLevels[slot]) {
-        if (loadModal) loadModal.style.display = "none";
-        loadLevelFromMemory(customLevels[slot]);
-      } else {
-        alert(`Level ${slot} does not exist in browser memory yet!`);
-      }
-    }
+    loadModal.style.display = "none"; 
+    loadMemoryModal.style.display = "flex"; 
+    loadSlotInput.value = "";
+    loadSlotInput.focus();
   });
 }
+
+document.getElementById("confirmLoadMemory")?.addEventListener("click", () => {
+  const slot = loadSlotInput.value.trim();
+  loadMemoryModal.style.display = "none";
+  
+  if (slot) {
+    const customLevels = JSON.parse(localStorage.getItem("kings_pigs_custom_levels")) || {};
+    
+    if (customLevels[slot]) {
+      loadLevelFromMemory(customLevels[slot]);
+      showToast(`Loaded Level ${slot} from Memory!`, "success");
+      
+      // REMEMBER THIS LEVEL FOR QUICK SAVING LATER!
+      currentEditingSlot = slot; 
+    } else {
+      showToast(`Level ${slot} is empty!`, "error");
+    }
+  }
+});
+
+document.getElementById("cancelLoadMemory")?.addEventListener("click", () => {
+  loadMemoryModal.style.display = "none";
+});

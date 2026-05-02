@@ -104,6 +104,7 @@
       </div>
     </div>
 
+    <!-- MAIN LOAD MODAL -->
     <div id="loadModal" class="modal" style="display: none">
       <div class="modal-content">
         <div class="modal-controls">
@@ -145,6 +146,41 @@
       />
     </div>
 
+    <!-- NEW: SAVE LEVEL MODAL -->
+    <div id="saveModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-controls">
+          <h2 class="modal-title">Save Level</h2>
+          <p class="modal-subtitle">Enter a slot (1-8) to save to game memory, or leave blank to download the PNG only.</p>
+          <div class="modal-inputs" style="justify-content: center; margin: 1rem 0;">
+            <input type="number" id="saveSlotInput" min="1" max="8" placeholder="Slot #" style="width: 120px; text-align: center; padding: 10px; font-family: inherit;">
+          </div>
+          <div class="modal-actions">
+            <button id="confirmSave" class="btn btn-primary">Save Level</button>
+            <button id="cancelSave" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: LOAD MEMORY MODAL -->
+    <div id="loadMemoryModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-controls">
+          <h2 class="modal-title">Load Custom Level</h2>
+          <p class="modal-subtitle">Enter the memory slot (1-8) you want to edit.</p>
+          <div class="modal-inputs" style="justify-content: center; margin: 1rem 0;">
+            <input type="number" id="loadSlotInput" min="1" max="8" placeholder="Slot #" style="width: 120px; text-align: center; padding: 10px; font-family: inherit;">
+          </div>
+          <div class="modal-actions">
+            <button id="confirmLoadMemory" class="btn btn-primary">Load Level</button>
+            <button id="cancelLoadMemory" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT CLICK CONTEXT MENU -->
     <div id="canvasContextMenu" class="context-menu" style="display: none;">
       <button id="cm-pickup">Pick Up Object</button>
       <button id="cm-flip">Flip Horizontally</button>
@@ -152,6 +188,9 @@
       <button id="cm-door-exit" class="door-opt">Make Exit Door</button>
       <button id="cm-delete" style="color: #ef4444;">Delete</button>
     </div>
+
+    <!-- NEW: TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="toast hidden">Message here</div>
 
     <!-- Scripts -->
     <script src="./js/utils.js" type="module"></script>
