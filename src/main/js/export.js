@@ -1,8 +1,17 @@
 import { cells, ROWS, COLS } from "./canvas.js";
 
+// NEW: Helper function for clean UI alerts
+export function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `toast ${type}`; 
+  setTimeout(() => toast.classList.add("hidden"), 3000);
+}
+
 export function downloadLevelImage(levelSlot = null) {
   if (!ROWS || !COLS) {
-    alert("Please create a grid first!");
+    showToast("Please create a grid first!", "error"); // CHANGED
     return;
   }
 
@@ -48,19 +57,12 @@ export function downloadLevelImage(levelSlot = null) {
   ctx.putImageData(imgData, 0, 0);
   const dataURL = canvas.toDataURL("image/png");
 
-  // ==========================================
-  // NEW: Save to Central Dictionary & UNLOCK
-  // ==========================================
   if (levelSlot) {
-    // 1. Save the image data
     const customLevels = JSON.parse(localStorage.getItem("kings_pigs_custom_levels")) || {};
     customLevels[levelSlot] = dataURL; 
     localStorage.setItem("kings_pigs_custom_levels", JSON.stringify(customLevels));
     
-    // 2. Automatically unlock this level in the Level Selector!
     let progress = JSON.parse(localStorage.getItem("kings_pigs_progress"));
-    
-    // If progress is completely empty, give them the default baseline first
     if (!progress) {
       progress = {
         1: { unlocked: true, stars: 3, score: 4500, time: "01:14", goal: "ESCAPE" },
@@ -69,19 +71,18 @@ export function downloadLevelImage(levelSlot = null) {
       };
     }
     
-    // If they saved to a totally new or locked slot (e.g., Level 4), unlock it
     if (!progress[levelSlot]) {
       progress[levelSlot] = { unlocked: true, stars: 0, score: 0, time: "--:--", goal: "CUSTOM LEVEL" };
     } else {
-      progress[levelSlot].unlocked = true; // Force unlock if it existed but was locked
+      progress[levelSlot].unlocked = true; 
     }
-    
     localStorage.setItem("kings_pigs_progress", JSON.stringify(progress));
 
-    alert(`Successfully saved and unlocked Level ${levelSlot} inside the game!`);
+    showToast(`Level ${levelSlot} Saved to Memory!`, "success"); // CHANGED
+  } else {
+    showToast(`Level Downloaded!`, "success"); // CHANGED
   }
 
-  // Backup Physical Download
   const link = document.createElement("a");
   link.download = `level_${levelSlot || 'data'}_${ROWS}x${COLS}.png`;
   link.href = dataURL; 
