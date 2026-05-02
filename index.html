@@ -21,7 +21,7 @@
         width: 100vw;
         height: 100vh;
         background-color: #242234;
-        cursor: url("../res/pointer_a.svg"), auto;
+        cursor: url("./src/res/pointer_a.svg"), auto;
       }
 
       .overlay {
@@ -108,7 +108,7 @@
           0 8px 0px 0px rgba(0, 0, 0, 0.2);
 
         padding: 16px 32px;
-        cursor: url("../res/hand_small_point.svg"), auto;
+        cursor: url("./src/res/hand_small_point.svg"), auto;
         text-transform: uppercase;
         width: 250px;
         transition:
@@ -144,7 +144,7 @@
   <body>
     <div>
       <video
-        src="../res/Screen Recording 2025-08-12 232001.mp4"
+        src="./src/res/Screen Recording 2025-08-12 232001.mp4"
         autoplay
         muted
         loop
@@ -152,12 +152,12 @@
       <div class="overlay">
         <div class="overlay-inner">
           <img
-            src="../res/menu_background.png"
+            src="./src/res/menu_background.png"
             alt="Menu_GB"
             class="menu-board-img"
           />
           <img
-            src="../res/Kings and Pigs (3).png"
+            src="./src/res/Kings and Pigs (3).png"
             alt="kingstitle"
             class="menu-title-img"
           />
@@ -176,7 +176,7 @@
               "
             >
               GitHub
-              <img style="width: 30px" src="../res/GitHub.svg" alt="github" />
+              <img style="width: 30px" src="./src/res/GitHub.svg" alt="github" />
             </button>
           </div>
         </div>
@@ -185,11 +185,11 @@
 
     <script>
       document.getElementById("btn-play").addEventListener("click", () => {
-        window.location.href = "./level_selector.html";
+        window.location.href = "./src/main/level_selector.html";
       });
 
       document.getElementById("btn-editor").addEventListener("click", () => {
-        window.location.href = "./editor.html";
+        window.location.href = "./src/main/editor.html";
       });
 
       document.getElementById("btn-quit").addEventListener("click", () => {
