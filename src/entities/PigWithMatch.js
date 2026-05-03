@@ -1,5 +1,5 @@
 import Constants from "../utilities/Constants.js";
-import Entity from "./entity.js";
+import Entity from "./Entity.js";
 import { getSpriteAtlas, getCannons } from "../utilities/LoadSave.js";
 import { GetEntityYPosUnderRoofOrAboveFloor } from "../utilities/HelperMethods.js";
 
