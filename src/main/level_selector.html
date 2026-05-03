@@ -420,9 +420,23 @@
         JSON.parse(localStorage.getItem("kings_pigs_progress")) ||
         defaultProgress;
 
+      // NEW: Fetch the custom levels to see which ones actually exist!
+      const customLevels = 
+        JSON.parse(localStorage.getItem("kings_pigs_custom_levels")) || {};
+
       for (let i = 1; i <= TOTAL_LEVELS; i++) {
         const levelData = playerProgress[i];
-        const isUnlocked = levelData && levelData.unlocked;
+        let isUnlocked = levelData && levelData.unlocked;
+
+        // ==========================================
+        // BUG FIX: Prevent 404 Crashes
+        // If it's not Level 1, and there is no custom map saved in memory, 
+        // force the level to be LOCKED so the player can't click it!
+        // ==========================================
+        if (i !== 1 && !customLevels[i]) {
+          isUnlocked = false; 
+        }
+
         const stars = levelData ? levelData.stars : 0;
 
         const btn = document.createElement("div");
