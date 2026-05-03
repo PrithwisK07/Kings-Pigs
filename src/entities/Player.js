@@ -1,4 +1,4 @@
-import Entity from "./entity.js";
+import Entity from "./Entity.js";
 import { getSpriteAtlas } from "../utilities/LoadSave.js";
 import Constants from "../utilities/Constants.js";
 import {
