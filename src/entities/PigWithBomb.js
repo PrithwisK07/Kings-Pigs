@@ -74,7 +74,8 @@ export default class PigThrowingBomb extends Entity {
 
   pushActiveBombs() {
     const pigY = this.hitbox.y;
-    const playerY = this.player.hitbox.y;
+    
+    const playerY = (this.player && this.player.hitbox) ? this.player.hitbox.y : pigY;
 
     if (pigY - playerY >= 20 * Constants.SCALE) this.bomb.setProps(1.25, -3);
     else this.bomb.setProps(1, -2.5);

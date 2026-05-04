@@ -196,14 +196,18 @@ export default class LevelManager {
         cannon.update();
       });
 
-    if (this.activeBombs)
+    if (this.activeBombs) {
       this.activeBombs.forEach((bomb) => {
         bomb.update();
       });
+      this.activeBombs = this.activeBombs.filter(bomb => bomb.active);
+    }
 
-    if (this.activeBoxes)
+    if (this.activeBoxes) {
       this.activeBoxes.forEach((box) => {
         box.update();
       });
+      this.activeBoxes = this.activeBoxes.filter(box => box.active);
+    }
   }
 }
