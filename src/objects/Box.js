@@ -44,6 +44,7 @@ export default class Box extends Object {
 
     this.gravity = 0.05;
   }
+  
   async loadExplosionImg() {
     this.explosionImg = await getSpriteAtlas(
       Constants.Projectile.EXPLOSION_SRC
@@ -51,6 +52,9 @@ export default class Box extends Object {
   }
 
   checkCollisionPlayer() {
+    // FIX: Ensure the player actually exists and isn't already dead
+    if (!this.player || this.player.isDead || !this.player.hitbox) return;
+
     if(this.player.hitbox.intersects(this.hitbox) && !this.explosion) {
       this.player.takeDamage(this.damage);
 
@@ -63,7 +67,6 @@ export default class Box extends Object {
       }
     }
   }
-
 
   setProps(vx, vy) {
     this.active = true;
@@ -131,18 +134,15 @@ export default class Box extends Object {
       if (this.frameX >= Constants.Projectile.getSpriteAmount()) {
         this.frameX = 0;
         this.explosion = false;
-        this.active = false;
-        this.popActiveBombs();
+        this.active = false; // Flags it for LevelManager cleanup
+        this.popActiveBombs(); // Keeping the original method name so it doesn't break
       }
     }
   }
 
   popActiveBombs() {
     this.canDraw = false;
-    this.levelManager.activeBombs.splice(
-      this.levelManager.activeBombs.indexOf(this),
-      1
-    );
+    // FIX: Removed buggy splice method. LevelManager's `.filter()` handles it now!
   }
 
   draw(ctx, XlvlOffset, YlvlOffset) {
@@ -152,8 +152,6 @@ export default class Box extends Object {
       this.drawExplosion(ctx, XlvlOffset, YlvlOffset);
       return;
     }
-
-    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(

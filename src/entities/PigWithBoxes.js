@@ -73,7 +73,8 @@ export default class PigThrowingBox extends Entity {
 
   pushActiveBoxes() {
     const pigY = this.hitbox.y;
-    const playerY = this.player.hitbox.y;
+    
+    const playerY = (this.player && this.player.hitbox) ? this.player.hitbox.y : pigY;
 
     if (pigY - playerY >= 20 * Constants.SCALE) this.box.setProps(2.75, -4);
     else this.box.setProps(1.5, -2.5);
@@ -102,7 +103,6 @@ export default class PigThrowingBox extends Entity {
 
     if (this.box) this.box.draw(ctx, XlvlOffset, YlvlOffset);
 
-    // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
     this.drawHealthBar(ctx, XlvlOffset, YlvlOffset);
 
     ctx.save();
