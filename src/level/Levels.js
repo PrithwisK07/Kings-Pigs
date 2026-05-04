@@ -21,16 +21,10 @@ export default class Levels {
       switch (levelInt) {
         case 1:
           // FIX: Use Absolute Paths!
-          this.levelManager.levelDataImgPath = "../res/level_data_25x15.png";
-          break;
-        case 2:
-          this.levelManager.levelDataImgPath = "/res/level_2_default.png";
-          break;
-        case 3:
-          this.levelManager.levelDataImgPath = "/res/level_3_default.png";
+          this.levelManager.levelDataImgPath = "../res/level_1_15x30.png";
           break;
         default:
-          this.levelManager.levelDataImgPath = "/res/level_data_25x15.png";
+          this.levelManager.levelDataImgPath = "../res/level_data_25x15.png";
           console.warn(`⚠️ Default map missing! Falling back to Level 1.`);
           break;
       }
