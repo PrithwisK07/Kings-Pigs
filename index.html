@@ -185,6 +185,27 @@
     </div>
 
     <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const customLevels = JSON.parse(localStorage.getItem("kings_pigs_custom_levels")) || {};
+
+        if (!customLevels["1"]) {
+          const img = new Image();
+          img.crossOrigin = "Anonymous"; 
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            
+            customLevels["1"] = canvas.toDataURL("image/png");
+            localStorage.setItem("kings_pigs_custom_levels", JSON.stringify(customLevels));
+            console.log("💾 Default Level 1 primed into memory for the Editor!");
+          };
+          img.src = "./src/res/level_data_15x30.png"; 
+        }
+      });
+
       document.getElementById("btn-play").addEventListener("click", () => {
         window.location.href = "./src/main/level_selector.html";
       });

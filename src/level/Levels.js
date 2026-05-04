@@ -21,7 +21,7 @@ export default class Levels {
       switch (levelInt) {
         case 1:
           // FIX: Use Absolute Paths!
-          this.levelManager.levelDataImgPath = "/res/level_data_25x15.png";
+          this.levelManager.levelDataImgPath = "../res/level_data_25x15.png";
           break;
         case 2:
           this.levelManager.levelDataImgPath = "/res/level_2_default.png";
