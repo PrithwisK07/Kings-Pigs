@@ -1,99 +1,67 @@
 import Constants from "../utilities/Constants.js";
 import Levels from "./Levels.js";
 import {
-  getSpriteAtlas,
-  getLevelData,
-  getBoxes,
-  getKingPigs,
-  getPigThrowingBoxes,
-  getPigs,
-  getCannons,
-  getPigWithMatches,
-  getPigThrowingBombs,
-  getBombs,
-  getDoors,
+  getSpriteAtlas, getLevelData, getBoxes, getKingPigs,
+  getPigThrowingBoxes, getPigs, getCannons, getPigWithMatches,
+  getPigThrowingBombs, getBombs, getDoors,
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
   constructor(player, game, currentLevel) {
     this.tileSetImgPath = null;
     this.levelDataImgPath = null;
-
     this.game = game;
     this.player = player;
     this.levelData = null;
-
-    // 2. FIX: Use the parameter instead of hardcoding 1!
     this.levelName = currentLevel || 1; 
-    
     this.door = [];
-
     this.shakeTime = 0;
     this.shakeIntensity = 0;
-
     this.activeBoxes = [];
     this.activeBombs = [];
 
     this.levels = new Levels(this, this.player);
-    
-    // Now this will properly pass 2, 3, etc. to Levels.js
-    this.levels.getLevelImgPath(this.levelName);
-
     this.tileSetImg = null;
     this.levelDataImg = null;
-
     this.levelSprite = [];
-
     this.altCanvas = document.createElement("canvas");
-
-    this.init();
   }
 
-  async init() {
+  async init(onProgress) { 
+    if(onProgress) onProgress(10, "Mapping the terrain...");
+    await this.levels.getLevelImgPath(this.levelName);
+
+    if(onProgress) onProgress(30, "Painting the tiles...");
     await this.loadTileMap();
     this.loadLevel();
 
+    if(onProgress) onProgress(50, "Summoning enemies...");
     this.game.kingPigs = await getKingPigs(this.levelDataImg);
     this.game.pigs = await getPigs(this.levelDataImg);
     this.game.pigThrowingBoxes = await getPigThrowingBoxes(this.levelDataImg);
     this.game.pigWithMatches = await getPigWithMatches(this.levelDataImg);
     this.game.pigThrowingBombs = await getPigThrowingBombs(this.levelDataImg);
 
+    if(onProgress) onProgress(70, "Placing cannons and objects...");
     this.player.loadLevelData(this.levelData);
-
     this.boxes = await getBoxes(this.levelDataImg);
     this.cannons = await getCannons(this.levelDataImg);
     this.bombs = await getBombs(this.levelDataImg);
-
     this.door = await getDoors(this.levelDataImg);
 
+    if(onProgress) onProgress(90, "Waking up the King Pig...");
     this.game.boxes = this.boxes;
     this.game.bombs = this.bombs;
     this.game.cannons = this.cannons;
 
-    this.game.kingPigs.forEach((kp) => {
-      kp.loadLevelData(this.levelData);
-    });
+    this.game.kingPigs.forEach((kp) => kp.loadLevelData(this.levelData));
+    this.game.pigs.forEach((p) => p.loadLevelData(this.levelData));
+    this.game.pigThrowingBoxes.forEach((p) => p.loadLevelData(this.levelData, this.boxes));
+    this.game.pigWithMatches.forEach((p) => p.loadLevelData(this.levelData));
+    this.game.pigThrowingBombs.forEach((p) => p.loadLevelData(this.levelData));
+    this.cannons.forEach((cannon) => cannon.loadLevelData(this.levelData));
 
-    this.game.pigs.forEach((p) => {
-      p.loadLevelData(this.levelData);
-    });
-
-    this.game.pigThrowingBoxes.forEach((p) => {
-      p.loadLevelData(this.levelData, this.boxes);
-    });
-
-    this.game.pigWithMatches.forEach((p) => {
-      p.loadLevelData(this.levelData);
-    });
-
-    this.game.pigThrowingBombs.forEach((p) => {
-      p.loadLevelData(this.levelData);
-    });
-
-    this.cannons.forEach((cannon) => {
-      cannon.loadLevelData(this.levelData);
-    });
+    if(onProgress) onProgress(100, "Ready!");
   }
 
   async loadTileMap() {

@@ -57,10 +57,46 @@ export default class Game {
     this.cannons = [];
     this.boxes = [];
     this.bombs = [];
-
+    
     this.loop(0);
   }
+  
+  async init() {
+    // Canvas size
+    this.width = this.canvas.width = window.innerWidth;
+    this.height = this.canvas.height = window.innerHeight;
 
+    const urlParams = new URLSearchParams(window.location.search);
+
+    this.currentLevel = parseInt(urlParams.get("level")) || 1;
+    console.log(`🎮 Initializing Game with Level ${this.currentLevel}`);
+
+    this.player = new Player(230, 300, this);
+    this.levelManager = new LevelManager(this.player, this, this.currentLevel);
+
+    const fillBar = document.getElementById("load-fill");
+    const statusText = document.getElementById("load-status");
+
+    const updateProgress = (percent, text) => {
+      if (fillBar) fillBar.style.width = `${percent}%`;
+      if (statusText) statusText.innerText = text;
+    };
+
+    await this.levelManager.init(updateProgress); 
+
+    setTimeout(() => {
+      const loader = document.getElementById("loading-screen");
+      if (loader) {
+        loader.style.opacity = "0"; 
+        setTimeout(() => loader.style.display = "none", 400); 
+      }
+      
+      this.keyBoardInputs = new KeyBoardInputs(this.player);
+      this.mouseInputs = new MouseInput(this.player);
+      
+    }, 500);
+  }
+  
   getPlayer() {
     return this.player;
   }
@@ -93,22 +129,6 @@ export default class Game {
     return this.cannons;
   }
 
-  init() {
-    // Canvas size
-    this.width = this.canvas.width = window.innerWidth;
-    this.height = this.canvas.height = window.innerHeight;
-
-    const urlParams = new URLSearchParams(window.location.search);
-
-    this.currentLevel = parseInt(urlParams.get("level")) || 1;
-    console.log(`🎮 Initializing Game with Level ${this.currentLevel}`);
-
-    // Other Game objects.
-    this.player = new Player(230, 300, this);
-    this.levelManager = new LevelManager(this.player, this, this.currentLevel);
-    this.keyBoardInputs = new KeyBoardInputs(this.player);
-    this.mouseInputs = new MouseInput(this.player);
-  }
 
   render() {
     this.ctx.clearRect(0, 0, this.width, this.height);
