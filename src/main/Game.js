@@ -95,6 +95,63 @@ export default class Game {
       this.mouseInputs = new MouseInput(this.player);
       
     }, 500);
+
+    this.levelComplete = false; 
+    this.gameOver = false;
+    this.levelStartTime = Date.now(); 
+    this.gemsCollected = 0; 
+
+    document.getElementById("btn-continue")?.addEventListener("click", () => {
+      window.location.href = "./level_selector.html";
+    });
+
+    document.getElementById("btn-retry")?.addEventListener("click", () => {
+      window.location.reload(); 
+    });
+
+    document.getElementById("btn-menu")?.addEventListener("click", () => {
+      window.location.href = "./index.html"; 
+    });
+  }
+
+  triggerLevelComplete() {
+    if (this.levelComplete) return; 
+    this.levelComplete = true;
+
+    const timeElapsed = Math.floor((Date.now() - this.levelStartTime) / 1000);
+    const minutes = String(Math.floor(timeElapsed / 60)).padStart(2, "0");
+    const seconds = String(timeElapsed % 60).padStart(2, "0");
+    const formattedTime = `${minutes}:${seconds}`;
+
+    let progress = JSON.parse(localStorage.getItem("kings_pigs_progress")) || {};
+    
+    if (!progress[this.currentLevel]) {
+      progress[this.currentLevel] = { unlocked: true };
+    }
+
+    progress[this.currentLevel].time = formattedTime;
+    progress[this.currentLevel].score = this.gemsCollected * 100; 
+    progress[this.currentLevel].stars = 3; 
+
+    const nextLevel = this.currentLevel + 1;
+    if (!progress[nextLevel]) {
+      progress[nextLevel] = { unlocked: true, stars: 0, score: 0, time: "--:--", goal: "SURVIVE" };
+    } else {
+      progress[nextLevel].unlocked = true;
+    }
+
+    localStorage.setItem("kings_pigs_progress", JSON.stringify(progress));
+
+    document.getElementById("clear-time").innerText = formattedTime;
+    document.getElementById("clear-gems").innerText = this.gemsCollected;
+    document.getElementById("level-cleared-screen").style.display = "flex";
+  }
+
+  triggerGameOver() {
+    const gameOverScreen = document.getElementById("game-over-screen");
+    if (gameOverScreen) {
+      gameOverScreen.style.display = "flex";
+    }
   }
   
   getPlayer() {

@@ -362,6 +362,13 @@ export default class Player extends Entity {
         if(this.entityState === Constants.Player.AFTER_DEATH) {
           this.afterDeath = false;
           this.active = false;
+
+          this.game.gameOver = true; 
+          
+          setTimeout(() => {
+            this.triggerGameOver();
+          }, 1200);
+          
           return;
         }
 
@@ -372,6 +379,11 @@ export default class Player extends Entity {
 
         if (this.entityState === Constants.Player.DOOR_IN) {
           this.stopAnimation = true;
+          
+          setTimeout(() => {
+            this.game.triggerLevelComplete();
+          }, 3000);
+
           return;
         }
 
