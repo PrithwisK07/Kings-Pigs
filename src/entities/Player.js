@@ -366,7 +366,7 @@ export default class Player extends Entity {
           this.game.gameOver = true; 
           
           setTimeout(() => {
-            this.triggerGameOver();
+            this.game.triggerGameOver();
           }, 1200);
           
           return;

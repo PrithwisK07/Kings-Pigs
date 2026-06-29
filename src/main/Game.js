@@ -110,7 +110,7 @@ export default class Game {
     });
 
     document.getElementById("btn-menu")?.addEventListener("click", () => {
-      window.location.href = "./index.html"; 
+      window.location.href = "../../index.html"; 
     });
   }
 
