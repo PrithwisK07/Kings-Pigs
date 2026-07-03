@@ -3,6 +3,7 @@ import KeyBoardInputs from "../inputs/KeyBoardInputs.js";
 import MouseInput from "../inputs/MouseInput.js";
 import LevelManager from "../level/LevelManager.js";
 import Constants from "../utilities/Constants.js";
+import { getSpriteAtlas } from "../utilities/LoadSave.js";
 
 export default class Game {
   constructor() {
@@ -57,6 +58,10 @@ export default class Game {
     this.cannons = [];
     this.boxes = [];
     this.bombs = [];
+
+    // Death animation
+    this.deathImg = null;
+    this.imagePath = "../res/Dead.png";
     
     this.loop(0);
   }
@@ -100,6 +105,7 @@ export default class Game {
     this.gameOver = false;
     this.levelStartTime = Date.now(); 
     this.gemsCollected = 0; 
+    this.loadImage();
 
     document.getElementById("btn-continue")?.addEventListener("click", () => {
       window.location.href = "./level_selector.html";
@@ -113,7 +119,15 @@ export default class Game {
       window.location.href = "../../index.html"; 
     });
   }
-
+  
+  async loadImage() {
+    try {
+      this.deathImg = await getSpriteAtlas(this.imagePath);
+      console.log("image: ", this.deathImg);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
   triggerLevelComplete() {
     if (this.levelComplete) return; 
     this.levelComplete = true;
@@ -158,48 +172,39 @@ export default class Game {
     
     const ctx = canvas.getContext("2d");
     
-    // Set canvas to full window size
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
     const drops = [];
-    const maxDrops = 250; // Increase this number for a heavier storm!
+    const maxDrops = 250; 
 
-    // 1. Generate the Raindrops
     for (let i = 0; i < maxDrops; i++) {
-      // The 'z' value simulates depth (0.3 is far background, 1.0 is foreground)
       const z = Math.random() * 0.7 + 0.3; 
       
       drops.push({
-        x: Math.random() * width * 1.5, // Spread wider than the screen to account for wind
-        y: Math.random() * height,      // Start randomly scattered across the screen
+        x: Math.random() * width * 1.5, 
+        y: Math.random() * height,      
         z: z,
-        length: (Math.random() * 15 + 10) * z, // Drops further away look shorter
-        speed: (Math.random() * 15 + 15) * z,  // Drops further away fall slower
-        angle: 0.35                            // The wind angle (in radians)
+        length: (Math.random() * 15 + 10) * z,
+        speed: (Math.random() * 15 + 15) * z, 
+        angle: 0.35                    
       });
     }
 
-    // 2. The Animation Loop
     const drawRain = () => {
-      // Safety check: stop animating if the game isn't actually over
       if (!this.gameOver) return;
 
-      // Clear the previous frame
       ctx.clearRect(0, 0, width, height);
       ctx.lineCap = "round";
 
-      // Draw and update every drop
       for (let i = 0; i < drops.length; i++) {
         let drop = drops[i];
 
         ctx.beginPath();
         
-        // Drops further away are more transparent and thinner
         ctx.strokeStyle = `rgba(150, 180, 255, ${0.45 * drop.z})`; 
-        ctx.lineWidth = 1.5 * drop.z; 
+        ctx.lineWidth = 1.75 * drop.z; 
 
-        // Draw the streak
         ctx.moveTo(drop.x, drop.y);
         ctx.lineTo(
           drop.x - Math.sin(drop.angle) * drop.length,
@@ -207,14 +212,12 @@ export default class Game {
         );
         ctx.stroke();
 
-        // Move the drop based on its speed and wind angle
         drop.x -= Math.sin(drop.angle) * drop.speed;
         drop.y += Math.cos(drop.angle) * drop.speed;
 
-        // 3. Recycle drops that fall off screen
         if (drop.y > height || drop.x < 0) {
-          drop.x = Math.random() * width * 1.5; // Random X position above screen
-          drop.y = -20;                         // Start slightly above the viewport
+          drop.x = Math.random() * width * 1.5;
+          drop.y = -20;                        
         }
       }
 
@@ -227,6 +230,53 @@ export default class Game {
     });
 
     drawRain();
+
+    // Skull animation on Game over.
+    const skull = document.getElementById("death-sprite-canvas");
+    const deadCtx = skull.getContext("2d");
+    let frameX = 0;
+    
+    let lastTime = 0;
+    const fps = 8;
+    const frameInterval = 1000 / fps; 
+    let timer = 0;
+    
+    const skullAnimation = (timestamp) => {
+      if (!lastTime) lastTime = timestamp; 
+      const deltaTime = timestamp - lastTime;
+      lastTime = timestamp;
+
+      timer += deltaTime;
+
+      if (timer > frameInterval) {
+        const width = 128;
+        const height = 128;
+
+        deadCtx.clearRect(0, 0, width, height);
+
+        deadCtx.imageSmoothingEnabled = false;
+        deadCtx.drawImage(
+          this.deathImg, 
+          frameX * width, 
+          0, 
+          width, 
+          height,
+          0,
+          0,
+          width,
+          height
+        );
+
+        frameX++;
+        if (frameX >= 8) frameX = 0;
+        
+        timer -= frameInterval; 
+      }
+
+      requestAnimationFrame(skullAnimation);
+    }
+
+    requestAnimationFrame(skullAnimation);
   }
   
   getPlayer() {
