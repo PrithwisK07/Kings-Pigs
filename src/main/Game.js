@@ -7,7 +7,7 @@ import Constants from "../utilities/Constants.js";
 export default class Game {
   constructor() {
     // Canvas and context
-    this.canvas = document.querySelector("canvas");
+    this.canvas = document.getElementById("game-canvas");
     this.ctx = this.canvas.getContext("2d");
 
     this.init();
@@ -149,9 +149,84 @@ export default class Game {
 
   triggerGameOver() {
     const gameOverScreen = document.getElementById("game-over-screen");
-    if (gameOverScreen) {
-      gameOverScreen.style.display = "flex";
+    if (!gameOverScreen) return;
+    
+    gameOverScreen.style.display = "flex";
+
+    const canvas = document.getElementById("rain-canvas");
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext("2d");
+    
+    // Set canvas to full window size
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    const drops = [];
+    const maxDrops = 250; // Increase this number for a heavier storm!
+
+    // 1. Generate the Raindrops
+    for (let i = 0; i < maxDrops; i++) {
+      // The 'z' value simulates depth (0.3 is far background, 1.0 is foreground)
+      const z = Math.random() * 0.7 + 0.3; 
+      
+      drops.push({
+        x: Math.random() * width * 1.5, // Spread wider than the screen to account for wind
+        y: Math.random() * height,      // Start randomly scattered across the screen
+        z: z,
+        length: (Math.random() * 15 + 10) * z, // Drops further away look shorter
+        speed: (Math.random() * 15 + 15) * z,  // Drops further away fall slower
+        angle: 0.35                            // The wind angle (in radians)
+      });
     }
+
+    // 2. The Animation Loop
+    const drawRain = () => {
+      // Safety check: stop animating if the game isn't actually over
+      if (!this.gameOver) return;
+
+      // Clear the previous frame
+      ctx.clearRect(0, 0, width, height);
+      ctx.lineCap = "round";
+
+      // Draw and update every drop
+      for (let i = 0; i < drops.length; i++) {
+        let drop = drops[i];
+
+        ctx.beginPath();
+        
+        // Drops further away are more transparent and thinner
+        ctx.strokeStyle = `rgba(150, 180, 255, ${0.45 * drop.z})`; 
+        ctx.lineWidth = 1.5 * drop.z; 
+
+        // Draw the streak
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(
+          drop.x - Math.sin(drop.angle) * drop.length,
+          drop.y + Math.cos(drop.angle) * drop.length
+        );
+        ctx.stroke();
+
+        // Move the drop based on its speed and wind angle
+        drop.x -= Math.sin(drop.angle) * drop.speed;
+        drop.y += Math.cos(drop.angle) * drop.speed;
+
+        // 3. Recycle drops that fall off screen
+        if (drop.y > height || drop.x < 0) {
+          drop.x = Math.random() * width * 1.5; // Random X position above screen
+          drop.y = -20;                         // Start slightly above the viewport
+        }
+      }
+
+      requestAnimationFrame(drawRain);
+    };
+
+    window.addEventListener("resize", () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    drawRain();
   }
   
   getPlayer() {
