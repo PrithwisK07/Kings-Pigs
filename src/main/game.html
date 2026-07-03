@@ -39,13 +39,43 @@
     </div>
 
     <div id="level-cleared-screen" style="display: none">
+      <div class="victory-glow"></div>
+
       <div class="cleared-board">
-        <h1 class="cleared-title">LEVEL CLEARED!</h1>
-        <div class="cleared-stats">
-          <div class="stat-row"><span>TIME:</span><span class="stat-value" id="clear-time">00:00</span></div>
-          <div class="stat-row"><span>GEMS:</span><span class="stat-value" id="clear-gems">0</span></div>
+        <div class="cleared-header">
+          <h1 class="cleared-title">VICTORY!</h1>
         </div>
-        <button class="continue-btn" id="btn-continue">CONTINUE</button>
+        
+        <p class="level-subtitle">World 1 - Piggy Pastures</p>
+
+        <div class="victory-stars">
+          <span class="star" style="--delay: 0.2s">★</span>
+          <span class="star center-star" style="--delay: 0.4s">★</span>
+          <span class="star" style="--delay: 0.6s">★</span>
+        </div>
+
+        <div class="cleared-content-split">
+          
+          <div class="cleared-stats">
+            <div class="stat-row"><span>TIME:</span><span class="stat-value" id="clear-time">01:24</span></div>
+            <div class="stat-row"><span>GEMS:</span><span class="stat-value" id="clear-gems">15/20</span></div>
+            <div class="stat-row"><span>PIGS:</span><span class="stat-value" id="clear-kills">8</span></div>
+            <hr class="stat-divider">
+            <div class="stat-row total-score"><span>SCORE:</span><span class="stat-value text-gold" id="clear-score">4500</span></div>
+          </div>
+
+          <div class="rank-box">
+            <span class="rank-label">RANK</span>
+            <span class="rank-value s-rank">S</span>
+          </div>
+
+        </div>
+
+        <div class="game-over-actions">
+          <button class="action-btn menu-btn" id="btn-map">MENU</button>
+          <button class="action-btn retry-btn" id="btn-replay">REPLAY</button>
+          <button class="action-btn continue-btn" id="btn-next">NEXT</button>
+        </div>
       </div>
     </div>
 

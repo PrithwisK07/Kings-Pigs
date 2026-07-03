@@ -107,8 +107,12 @@ export default class Game {
     this.gemsCollected = 0; 
     this.loadImage();
 
-    document.getElementById("btn-continue")?.addEventListener("click", () => {
+    document.getElementById("btn-map")?.addEventListener("click", () => {
       window.location.href = "./level_selector.html";
+    });
+    
+    document.getElementById("btn-replay")?.addEventListener("click", () => {
+      window.location.reload(); 
     });
 
     document.getElementById("btn-retry")?.addEventListener("click", () => {
