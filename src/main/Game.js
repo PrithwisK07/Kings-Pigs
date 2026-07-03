@@ -242,9 +242,14 @@ export default class Game {
     let timer = 0;
     
     const skullAnimation = (timestamp) => {
-      if (!lastTime) lastTime = timestamp; 
-      const deltaTime = timestamp - lastTime;
+      if (!lastTime) lastTime = timestamp;
+      
+      let deltaTime = timestamp - lastTime;
       lastTime = timestamp;
+
+      if (deltaTime > 100) {
+        deltaTime = frameInterval; 
+      }
 
       timer += deltaTime;
 
@@ -253,8 +258,8 @@ export default class Game {
         const height = 128;
 
         deadCtx.clearRect(0, 0, width, height);
-
         deadCtx.imageSmoothingEnabled = false;
+        
         deadCtx.drawImage(
           this.deathImg, 
           frameX * width, 
@@ -270,7 +275,7 @@ export default class Game {
         frameX++;
         if (frameX >= 8) frameX = 0;
         
-        timer -= frameInterval; 
+        timer = timer % frameInterval; 
       }
 
       requestAnimationFrame(skullAnimation);
