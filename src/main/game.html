@@ -99,15 +99,56 @@
       </div>
     </div>
 
+    <!-- ==========================================
+            IN-GAME HUD
+       ========================================== -->
+    <div id="hud-container">
+      <div class="hud-left">
+        <div class="health-container">
+          <!-- Heart Icon -->
+          <svg class="hud-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11" shape-rendering="crispEdges">
+            <path fill="#ef4444" d="M1,3 h2 v-1 h2 v1 h1 v-1 h2 v1 h2 v2 h-1 v2 h-1 v2 h-1 v1 h-2 v-1 h-1 v-2 h-1 v-2 h-1 v-2 z" />
+            <path fill="#2f242c" d="M1,2 h2 v1 h-2 z M4,1 h2 v1 h-2 z M7,2 h2 v1 h-2 z M0,3 h1 v2 h-1 z M1,5 h1 v2 h-1 z M2,7 h1 v2 h-1 z M3,9 h2 v1 h-2 z M5,10 h1 v1 h-1 z M6,9 h2 v1 h-2 z M8,7 h1 v2 h-1 z M9,5 h1 v2 h-1 z M10,3 h1 v2 h-1 z" />
+            <path fill="#fce7df" d="M2,3 h1 v1 h-1 z M3,2 h1 v1 h-1 z"/>
+          </svg>
+          <div class="health-bar-bg">
+            <div class="health-bar-fill" id="hud-health"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="score-container">
+          <span class="hud-text" id="hud-score">000</span>
+          <!-- Gem Icon -->
+          <svg class="hud-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11" shape-rendering="crispEdges">
+            <path fill="#4ade80" d="M3,1 h5 v1 h1 v2 h-1 v2 h-1 v2 h-1 v2 h-1 v-2 h-1 v-2 h-1 v-2 h-1 v-2 h1 z" />
+            <path fill="#bbf7d0" d="M4,1 h3 v1 h-3 z M3,2 h1 v2 h-1 z" />
+          </svg>
+        </div>
+        <button id="btn-pause" class="hud-btn">II</button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+            PAUSE MENU
+       ========================================== -->
+    <div id="pause-screen" style="display: none;">
+      <div class="pause-board">
+        <div class="pause-header">
+          <h1 class="pause-title">PAUSED</h1>
+        </div>
+        <p class="pause-subtitle">Take a breath...</p>
+        
+        <div class="pause-actions">
+          <button class="action-btn resume-btn" id="btn-resume">RESUME</button>
+          <button class="action-btn menu-btn" id="btn-pause-menu">MENU</button>
+        </div>
+      </div>
+    </div>
+
     <canvas id="game-canvas"></canvas>
     
-    <script>
-      document.addEventListener("keydown", (e) => {
-        if (e.key == "Escape") {
-          window.location.href = "../../index.html";
-        }
-      });
-    </script>
     <script type="module" src="./Main.js"></script>
     <script src="./js/deathAnimation.js"></script>
   </body>
