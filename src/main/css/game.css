@@ -533,121 +533,64 @@ body {
 }
 
 /* ==========================================
-        IN-GAME HUD
+        MINIMAL HUD
    ========================================== */
 #hud-container {
   position: fixed;
   top: 20px; 
-  left: 20px; 
-  right: 20px;
+  right: 20px; /* Pinned exactly to the top right */
   display: flex; 
-  justify-content: space-between; 
-  align-items: flex-start;
+  justify-content: flex-end; 
   z-index: 999990; 
   pointer-events: none; 
-  /* Smooth slide-down when the game starts */
-  animation: hudSlideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: hudPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-@keyframes hudSlideDown {
-  0% { transform: translateY(-100px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+@keyframes hudPopIn {
+  0% { transform: scale(0) rotate(15deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 
-.hud-left, .hud-right {
-  display: flex; 
-  align-items: center; 
-  gap: 15px;
-}
-
-.health-container, .score-container {
-  display: flex; 
-  align-items: center; 
-  gap: 12px;
-  background: rgba(36, 34, 52, 0.85);
-  padding: 10px 15px; 
-  border-radius: 4px;
-  border: 4px solid #1a1423;
-  box-shadow: 0 6px 0px rgba(0,0,0,0.3);
-  backdrop-filter: blur(4px);
-}
-
-.hud-icon {
-  width: 28px; 
-  height: 28px;
-  filter: drop-shadow(2px 2px 0px #1a1423);
-}
-
-.health-bar-bg {
-  width: 180px; 
-  height: 20px;
-  background-color: #3d2936;
-  border: 4px solid #1a1423;
-  box-shadow: inset 3px 3px 0px #22171f;
-  position: relative; 
-  overflow: hidden;
-}
-
-.health-bar-fill {
-  width: 100%; 
-  height: 100%;
-  background-color: #ef4444;
-  box-shadow: inset 4px 4px 0px #f87171, inset -4px -4px 0px #dc2626;
-  transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Added dynamically via JS when health is below 25% */
-.health-danger {
-  animation: dangerPulse 0.5s infinite alternate;
-}
-
-@keyframes dangerPulse {
-  0% { filter: brightness(1); }
-  100% { filter: brightness(1.5); background-color: #ff0000; }
-}
-
-.hud-text {
-  color: #fce7df; 
-  font-family: 'Press Start 2P', monospace;
-  font-size: 20px; 
-  text-shadow: 2px 2px 0px #1a1423;
-}
-
+/* Chunky Pause Button */
 .hud-btn {
   background-color: #c08852; 
-  border: 4px solid #1a1423;
+  border: 6px solid #2f242c;
   color: #fce7df; 
-  font-family: 'Press Start 2P', monospace; 
-  font-size: 16px;
-  width: 54px; 
-  height: 54px; 
+  font-family: "Press Start 2P", monospace !important;
+  font-size: 12px;
+  width: 60px; 
+  height: 50px; 
   cursor: pointer; 
   pointer-events: auto;
-  box-shadow: 0 6px 0px #1a1423, inset 4px 4px 0px #ddb27c;
+  box-shadow: 0 8px 0px #2f242c, inset 4px 4px 0px #ddb27c;
   transition: all 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hud-btn:hover {
   filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 8px 0px #1a1423, inset 4px 4px 0px #ddb27c;
+  box-shadow: 0 10px 0px #2f242c, inset 4px 4px 0px #ddb27c;
 }
 
 .hud-btn:active {
-  transform: translateY(4px); 
-  box-shadow: 0 2px 0px #1a1423, inset 4px 4px 0px rgba(255, 255, 255, 0.2);
+  transform: translateY(6px); 
+  box-shadow: 0 2px 0px #2f242c, inset 4px 4px 0px rgba(255, 255, 255, 0.2);
 }
 
 /* ==========================================
-        PAUSE MENU
+        POLISHED PAUSE MENU
    ========================================== */
 #pause-screen {
   position: fixed; 
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background-color: rgba(15, 12, 20, 0.7);
+  background-color: rgba(15, 12, 20, 0.6); 
   display: flex; justify-content: center; align-items: center;
   z-index: 999998; 
-  backdrop-filter: blur(8px); 
+  backdrop-filter: blur(6px); 
+  font-family: "Press Start 2P", monospace !important;
 }
 
 .pause-board {
@@ -655,10 +598,16 @@ body {
   background-color: #3d2936;
   border: 6px solid #1a1423;
   border-radius: 4px;
-  min-width: 400px;
-  padding: 3.5rem 3rem 2.5rem 3rem;
-  box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8), inset 6px 6px 0px #5c3c4f, inset -6px -6px 0px #22171f;
-  display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+  min-width: 450px; /* Widened slightly to accommodate the row of buttons */
+  padding: 3.5rem 3rem 2.5rem 3rem; 
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.6), 
+    inset 6px 6px 0px #5c3c4f, 
+    inset -6px -6px 0px #22171f;
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 1.5rem;
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -669,39 +618,82 @@ body {
 
 .pause-header {
   position: absolute;
-  top: -30px;
-  background: #9a6038;
-  border: 4px solid #1a1423;
-  padding: 10px 30px;
+  top: -25px; 
+  background: #cd683d;
+  border: 6px solid #1a1423;
+  padding: 10px 25px;
   box-shadow: 0 6px 0 #1a1423;
 }
 
 .pause-title {
   color: #fce7df;
-  font-size: 24px;
+  font-size: 24px; /* Bumped back up slightly */
   text-shadow: 3px 3px 0px #1a1423;
   margin: 0;
 }
 
-.pause-subtitle {
+/* ==========================================
+        NEW: Status Box (The Filler)
+   ========================================== */
+.pause-status-box {
+  width: 100%;
+  background-color: #22171f; /* Dark inset background */
+  border: 4px solid #1a1423;
+  box-shadow: inset 4px 4px 0px rgba(0,0,0,0.8); /* Deep inner shadow */
+  padding: 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.status-label {
+  position: absolute;
+  top: -10px;
+  background-color: #5c3c4f;
+  color: #fce7df;
+  font-size: 10px;
+  padding: 4px 8px;
+  border: 2px solid #1a1423;
+}
+
+.status-text {
   color: #fce7df;
   font-size: 14px;
   opacity: 0.8;
   margin-top: 10px;
-  margin-bottom: 10px;
+  text-shadow: 2px 2px 0px #1a1423;
 }
 
+.zzz-animation {
+  color: #4ade80; /* Green floating text */
+  font-size: 20px;
+  margin-top: 15px;
+  text-shadow: 2px 2px 0px #1a1423;
+  animation: floatZzz 2s ease-in-out infinite;
+}
+
+@keyframes floatZzz {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(5px, -10px) scale(1.1); opacity: 1; }
+}
+
+/* ==========================================
+        Buttons in a Row
+   ========================================== */
 .pause-actions {
-  display: flex; gap: 1.5rem; width: 100%; justify-content: center;
+  display: flex; 
+  flex-direction: row; /* Back to a horizontal row */
+  gap: 1.5rem; 
+  width: 100%; 
 }
 
-.resume-btn {
-  background-color: #4ade80;
-  color: #fff;
-  border-color: #1a1423;
-  box-shadow: 0 6px 0px #1a1423, inset 4px 4px 0px #bbf7d0;
-}
-.resume-btn:hover {
-  filter: brightness(1.1); transform: translateY(-2px);
-  box-shadow: 0 8px 0px #1a1423, inset 4px 4px 0px #bbf7d0;
+/* Make both buttons stretch equally to fill the row perfectly */
+.pause-actions .action-btn {
+  flex: 1; 
+  padding: 15px 10px;
+  font-size: 16px;
+  text-align: center;
 }
