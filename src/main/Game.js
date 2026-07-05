@@ -103,6 +103,7 @@ export default class Game {
 
     this.levelComplete = false; 
     this.gameOver = false;
+    this.isPaused = false;
     this.levelStartTime = Date.now(); 
     this.gemsCollected = 0; 
     this.loadImage();
@@ -121,6 +122,18 @@ export default class Game {
 
     document.getElementById("btn-menu")?.addEventListener("click", () => {
       window.location.href = "../../index.html"; 
+    });
+
+    document.getElementById("btn-pause")?.addEventListener("click", () => this.togglePause());
+    document.getElementById("btn-resume")?.addEventListener("click", () => this.togglePause());
+    document.getElementById("btn-pause-menu")?.addEventListener("click", () => {
+      window.location.href = "./index.html"; 
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if ((e.key === "Escape" || e.key.toLowerCase() === "p") && !this.gameOver && !this.levelComplete) {
+        this.togglePause();
+      }
     });
   }
   
@@ -287,6 +300,42 @@ export default class Game {
 
     requestAnimationFrame(skullAnimation);
   }
+
+  togglePause() {
+    if (this.gameOver || this.levelComplete) return;
+
+    this.isPaused = !this.isPaused;
+    const pauseScreen = document.getElementById("pause-screen");
+
+    if (this.isPaused) {
+      pauseScreen.style.display = "flex";
+    } else {
+      pauseScreen.style.display = "none";
+      // Prevent massive deltaTime buildup
+      this.lastCheckTime = performance.now(); 
+      this.loop(performance.now()); 
+    }
+  }
+
+  updateHUD() {
+    // Dynamically update the visual health bar
+    if (this.player && this.player.health !== undefined) {
+      const healthFill = document.getElementById("hud-health");
+      const maxHealth = 100; 
+      const healthPercent = Math.max(0, (this.player.health / maxHealth) * 100);
+      
+      if (healthFill) {
+        healthFill.style.width = `${healthPercent}%`;
+        
+        // NEW: Add a danger pulse if health is low (< 25%)
+        if (healthPercent <= 25) {
+          healthFill.classList.add("health-danger");
+        } else {
+          healthFill.classList.remove("health-danger");
+        }
+      }
+    }
+  }
   
   getPlayer() {
     return this.player;
@@ -415,6 +464,8 @@ export default class Game {
   }
 
   loop = (currentTimeStamp) => {
+    if (this.isPaused) return;
+
     const deltatime = currentTimeStamp - this.lastCheckTime;
     this.lastCheckTime = currentTimeStamp;
 
@@ -431,6 +482,7 @@ export default class Game {
       this.deltaUpdate -= this.timePerUpdate;
       this.updateCount++;
       this.update();
+      this.updateHUD();
     }
 
     if (currentTimeStamp - this.lastFpsCheck >= 1000) {
