@@ -593,21 +593,15 @@ body {
   font-family: "Press Start 2P", monospace !important;
 }
 
+/* 1. Scale up the board and clear out the padding */
 .pause-board {
   position: relative;
-  background-color: #3d2936;
-  border: 6px solid #1a1423;
-  border-radius: 4px;
-  min-width: 450px; /* Widened slightly to accommodate the row of buttons */
-  padding: 3.5rem 3rem 2.5rem 3rem; 
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.6), 
-    inset 6px 6px 0px #5c3c4f, 
-    inset -6px -6px 0px #22171f;
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  gap: 1.5rem;
+  background: url("../../res/pause_menu.png") no-repeat center center;
+  background-size: 100% 100%; 
+  width: 400px; 
+  height: 550px; 
+  box-sizing: border-box; 
+  padding: 0; 
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -616,83 +610,30 @@ body {
   100% { transform: scale(1); opacity: 1; }
 }
 
-.pause-header {
-  position: absolute;
-  top: -25px; 
-  background: #cd683d;
-  border: 6px solid #1a1423;
-  padding: 10px 25px;
-  box-shadow: 0 6px 0 #1a1423;
-}
-
-.pause-title {
-  color: #fce7df;
-  font-size: 24px; /* Bumped back up slightly */
-  text-shadow: 3px 3px 0px #1a1423;
-  margin: 0;
-}
-
 /* ==========================================
-        NEW: Status Box (The Filler)
-   ========================================== */
-.pause-status-box {
-  width: 100%;
-  background-color: #22171f; /* Dark inset background */
-  border: 4px solid #1a1423;
-  box-shadow: inset 4px 4px 0px rgba(0,0,0,0.8); /* Deep inner shadow */
-  padding: 2rem;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-}
-
-.status-label {
-  position: absolute;
-  top: -10px;
-  background-color: #5c3c4f;
-  color: #fce7df;
-  font-size: 10px;
-  padding: 4px 8px;
-  border: 2px solid #1a1423;
-}
-
-.status-text {
-  color: #fce7df;
-  font-size: 14px;
-  opacity: 0.8;
-  margin-top: 10px;
-  text-shadow: 2px 2px 0px #1a1423;
-}
-
-.zzz-animation {
-  color: #4ade80; /* Green floating text */
-  font-size: 20px;
-  margin-top: 15px;
-  text-shadow: 2px 2px 0px #1a1423;
-  animation: floatZzz 2s ease-in-out infinite;
-}
-
-@keyframes floatZzz {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-  50% { transform: translate(5px, -10px) scale(1.1); opacity: 1; }
-}
-
-/* ==========================================
-        Buttons in a Row
+        Buttons in a Column (Stacked)
    ========================================== */
 .pause-actions {
+  position: absolute;
+  bottom: 50px; 
+  
+  /* 1. Center the absolute container horizontally */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%; 
+  
   display: flex; 
-  flex-direction: row; /* Back to a horizontal row */
+  flex-direction: column;
+  justify-content: center;
+  
+  /* 2. Forces the buttons to stretch full width of the 70% container */
+  align-items: stretch;   
   gap: 1.5rem; 
-  width: 100%; 
 }
 
-/* Make both buttons stretch equally to fill the row perfectly */
 .pause-actions .action-btn {
-  flex: 1; 
+  /* Removed flex: 1; it handles height in a column, not width. 
+     align-items: stretch (above) handles the width now. */
   padding: 15px 10px;
   font-size: 16px;
   text-align: center;
