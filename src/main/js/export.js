@@ -11,7 +11,7 @@ export function showToast(message, type = "success") {
 
 export function downloadLevelImage(levelSlot = null) {
   if (!ROWS || !COLS) {
-    showToast("Please create a grid first!", "error"); // CHANGED
+    showToast("Please create a grid first!", "error");
     return;
   }
 
@@ -21,7 +21,12 @@ export function downloadLevelImage(levelSlot = null) {
   const ctx = canvas.getContext("2d");
   const imgData = ctx.createImageData(COLS, ROWS);
 
+  // NEW: Create an array to hold the debug data
+  const debugGrid = [];
+
   for (let row = 0; row < ROWS; row++) {
+    const rowLog = []; // NEW: Array for the current row
+
     for (let col = 0; col < COLS; col++) {
       const flatIndex = row * COLS + col;
       const cell = cells[flatIndex];
@@ -29,7 +34,7 @@ export function downloadLevelImage(levelSlot = null) {
       const tileImg = cell.querySelector(".placed-tile");
       const objectImg = cell.querySelector(".placed-object");
 
-      let r = 0; let g = 0; let b = 255; 
+      let r = 255; let g = 0; let b = 255; 
 
       if (tileImg && tileImg.hasAttribute("data-id")) {
         const parsedId = parseInt(tileImg.getAttribute("data-id"));
@@ -46,13 +51,23 @@ export function downloadLevelImage(levelSlot = null) {
         }
       }
 
+      // NEW: Push the calculated cell values as a formatted string
+      rowLog.push(`[${r}, ${g}, ${b}]`);
+
       const dataIndex = flatIndex * 4;
       imgData.data[dataIndex] = r;
       imgData.data[dataIndex + 1] = g;
       imgData.data[dataIndex + 2] = b;
       imgData.data[dataIndex + 3] = 255;
     }
+    
+    // NEW: Push the completed row into the main grid
+    debugGrid.push(rowLog);
   }
+
+  // NEW: Output the data as a highly readable table in the console
+  console.log(`--- Level ${levelSlot || 'Data'} Output ---`);
+  console.table(debugGrid);
 
   ctx.putImageData(imgData, 0, 0);
   const dataURL = canvas.toDataURL("image/png");
@@ -76,9 +91,9 @@ export function downloadLevelImage(levelSlot = null) {
     }
     localStorage.setItem("kings_pigs_progress", JSON.stringify(progress));
 
-    showToast(`Level ${levelSlot} Saved to Memory!`, "success"); // CHANGED
+    showToast(`Level ${levelSlot} Saved to Memory!`, "success");
   } else {
-    showToast(`Level Downloaded!`, "success"); // CHANGED
+    showToast(`Level Downloaded!`, "success");
   }
 
   const link = document.createElement("a");

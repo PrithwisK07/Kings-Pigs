@@ -29,14 +29,14 @@ export default class Game {
     this.XlvlOffset = 0;
     this.rightBorder = 0.8 * this.width;
     this.leftBorder = 0.2 * this.width;
-    this.totLvlTile = 50;
+    this.totLvlTile = 40;
     this.offViewLvlWidth = this.totLvlTile * Constants.TILE_SIZE - this.width;
     
     // Scroll offset - Y-axis
     this.YlvlOffset = 0;
     this.topBorder = 0.2 * this.height;
     this.bottomBorder = 0.8 * this.height;
-    this.totLvlTile = 50;
+    this.totLvlTile = 15;
     this.offViewLvlHeight = this.totLvlTile * Constants.TILE_SIZE - this.height;
 
     // Monitor FPS
@@ -58,6 +58,8 @@ export default class Game {
     this.cannons = [];
     this.boxes = [];
     this.bombs = [];
+    this.palmTreeStanding = [];    
+    this.palmTreeZ = [];    
 
     // Death animation
     this.deathImg = null;

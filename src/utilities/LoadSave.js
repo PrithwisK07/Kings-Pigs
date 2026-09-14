@@ -8,6 +8,8 @@ import PigWithMatch from "../entities/PigWithMatch.js";
 import PigThrowingBomb from "../entities/PigWithBomb.js";
 import Constants from "./Constants.js";
 import Door from "../objects/Door.js";
+import PalmTree from "../objects/PalmTree.js";
+import PalmTreeZ from "../objects/PalmTreeZ.js";
 
 let boxes = [];
 let cannons = [];
@@ -18,6 +20,8 @@ let pigThrowingBoxes = [];
 let pigWithMatches = [];
 let pigThrowingBombs = [];
 let doors = [];
+let palmTreeStanding = [];
+let palmTreeZ = [];
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -64,7 +68,9 @@ export function getLevelData(levelDataImg, player, levelManager) {
       let greenValue = data[index + 1];
       let blueValue = data[index + 2];
 
-      if (greenValue == 0 && redValue == 0) redValue = 12;
+      if (redValue === 255 || (greenValue == 0 && redValue == 0)) {
+         redValue = 255;
+      }
 
       const isFlipped = greenValue === 1;
       const isExitDoor = greenValue === 1;
@@ -170,6 +176,30 @@ export function getLevelData(levelDataImg, player, levelManager) {
         );
       }
 
+      if (blueValue == 12) {
+        palmTreeStanding.push(
+          new PalmTree(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            isFlipped,
+            levelManager,
+            player
+          )
+        );
+      }
+      
+      if (blueValue == 13) {
+        palmTreeZ.push(
+          new PalmTreeZ(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            isFlipped,
+            levelManager,
+            player
+          )
+        );
+      }
+
       row.push(redValue);
     }
     levelData.push(row);
@@ -212,4 +242,12 @@ export async function getBombs() {
 
 export async function getDoors() {
   return doors;
+}
+
+export async function getPalmTreeStanding() {
+  return palmTreeStanding;
+}
+
+export async function getPalmTreeZ() {
+  return palmTreeZ;
 }

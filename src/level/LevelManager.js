@@ -4,6 +4,7 @@ import {
   getSpriteAtlas, getLevelData, getBoxes, getKingPigs,
   getPigThrowingBoxes, getPigs, getCannons, getPigWithMatches,
   getPigThrowingBombs, getBombs, getDoors,
+  getPalmTreeStanding, getPalmTreeZ
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
@@ -19,6 +20,8 @@ export default class LevelManager {
     this.shakeIntensity = 0;
     this.activeBoxes = [];
     this.activeBombs = [];
+    this.palmTreeStanding = [];
+    this.palmTreeZ = [];
 
     this.levels = new Levels(this, this.player);
     this.tileSetImg = null;
@@ -44,15 +47,19 @@ export default class LevelManager {
 
     if(onProgress) onProgress(70, "Placing cannons and objects...");
     this.player.loadLevelData(this.levelData);
-    this.boxes = await getBoxes(this.levelDataImg);
-    this.cannons = await getCannons(this.levelDataImg);
-    this.bombs = await getBombs(this.levelDataImg);
-    this.door = await getDoors(this.levelDataImg);
+    this.boxes = await getBoxes();
+    this.cannons = await getCannons();
+    this.bombs = await getBombs();
+    this.door = await getDoors();
+    this.palmTreeStanding = await getPalmTreeStanding();
+    this.palmTreeZ = await getPalmTreeZ();
 
     if(onProgress) onProgress(90, "Waking up the King Pig...");
     this.game.boxes = this.boxes;
     this.game.bombs = this.bombs;
     this.game.cannons = this.cannons;
+    this.game.palmTreeStanding = this.palmTreeStanding;
+    this.game.palmTreeZ = this.palmTreeZ;
 
     this.game.kingPigs.forEach((kp) => kp.loadLevelData(this.levelData));
     this.game.pigs.forEach((p) => p.loadLevelData(this.levelData));
@@ -75,7 +82,7 @@ export default class LevelManager {
 
     this.levelData = getLevelData(this.levelDataImg, this.player, this);
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 19; j++) {
         const index = i * 19 + j;
 
@@ -109,14 +116,18 @@ export default class LevelManager {
 
     for (let i = 0; i < this.levelDataImg.height; i++) {
       for (let j = 0; j < this.levelDataImg.width; j++) {
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(
-          this.levelSprite[this.levelData[i][j]],
-          Math.floor(j * Constants.TILE_SIZE),
-          Math.floor(i * Constants.TILE_SIZE),
-          Constants.TILE_SIZE,
-          Constants.TILE_SIZE
-        );
+        const tileID = this.levelData[i][j];
+
+        if (tileID !== 255) {
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(
+            this.levelSprite[tileID],
+            Math.floor(j * Constants.TILE_SIZE),
+            Math.floor(i * Constants.TILE_SIZE),
+            Constants.TILE_SIZE,
+            Constants.TILE_SIZE
+          );
+        }
       }
     }
   }
@@ -172,6 +183,16 @@ export default class LevelManager {
         bomb.draw(ctx, XlvlOffset, YlvlOffset);
       });
 
+    if(this.palmTreeStanding)
+      this.palmTreeStanding.forEach((palmTree) => {
+        palmTree.draw(ctx, XlvlOffset, YlvlOffset);
+      })
+
+    if(this.palmTreeZ)
+      this.palmTreeZ.forEach((palmTree) => {
+        palmTree.draw(ctx, XlvlOffset, YlvlOffset);
+      }) 
+
     if (this.activeBombs)
       this.activeBombs.forEach((bomb) => {
         bomb.draw(ctx, XlvlOffset, YlvlOffset);
@@ -195,6 +216,16 @@ export default class LevelManager {
       this.cannons.forEach((cannon) => {
         cannon.update();
       });
+
+    if(this.palmTreeStanding)
+      this.palmTreeStanding.forEach((palmTree) => {
+        palmTree.update();
+      }) 
+
+    if(this.palmTreeZ)
+      this.palmTreeZ.forEach((palmTree) => {
+        palmTree.update();
+      }) 
 
     if (this.activeBombs) {
       this.activeBombs.forEach((bomb) => {

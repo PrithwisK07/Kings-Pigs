@@ -1,0 +1,96 @@
+Date : 2026-07-21 00:42:34
+Directory : d:\TinySwordJS
+Total : 54 files,  7308 codes, 281 comments, 1470 blanks, all 9059 lines
+
+Languages
++----------------------+------------+------------+------------+------------+------------+
+| language             | files      | code       | comment    | blank      | total      |
++----------------------+------------+------------+------------+------------+------------+
+| JavaScript           |         36 |      5,028 |        130 |      1,131 |      6,289 |
+| PostCSS              |          5 |      1,225 |        131 |        173 |      1,529 |
+| HTML                 |          4 |        885 |         20 |        124 |      1,029 |
+| source.markdown.math |          1 |        120 |          0 |         42 |        162 |
+| XML                  |          8 |         50 |          0 |          0 |         50 |
++----------------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------+------------+------------+------------+------------+------------+
+| path                                          | files      | code       | comment    | blank      | total      |
++-----------------------------------------------+------------+------------+------------+------------+------------+
+| .                                             |         54 |      7,308 |        281 |      1,470 |      9,059 |
+| . (Files)                                     |          2 |        320 |          0 |         65 |        385 |
+| src                                           |         52 |      6,988 |        281 |      1,405 |      8,674 |
+| src\Artilleries                               |          2 |        318 |          4 |         70 |        392 |
+| src\custom                                    |          1 |         24 |          0 |          3 |         27 |
+| src\entities                                  |          7 |      1,993 |         16 |        460 |      2,469 |
+| src\inputs                                    |          2 |         32 |          0 |          6 |         38 |
+| src\level                                     |          2 |        204 |          1 |         43 |        248 |
+| src\main                                      |         23 |      3,179 |        251 |        623 |      4,053 |
+| src\main (Files)                              |          5 |      1,059 |         33 |        221 |      1,313 |
+| src\main\css                                  |          5 |      1,225 |        131 |        173 |      1,529 |
+| src\main\js                                   |         13 |        895 |         87 |        229 |      1,211 |
+| src\objects                                   |          4 |        513 |          8 |        109 |        630 |
+| src\res                                       |          8 |         50 |          0 |          0 |         50 |
+| src\utilities                                 |          3 |        675 |          1 |         91 |        767 |
++-----------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------+----------------------+------------+------------+------------+------------+
+| filename                                      | language             | code       | comment    | blank      | total      |
++-----------------------------------------------+----------------------+------------+------------+------------+------------+
+| d:\TinySwordJS\README.md                      | source.markdown.math |        120 |          0 |         42 |        162 |
+| d:\TinySwordJS\index.html                     | HTML                 |        200 |          0 |         23 |        223 |
+| d:\TinySwordJS\src\Artilleries\Cannon.js      | JavaScript           |        101 |          1 |         34 |        136 |
+| d:\TinySwordJS\src\Artilleries\Projectile.js  | JavaScript           |        217 |          3 |         36 |        256 |
+| d:\TinySwordJS\src\custom\Rectangle2D.js      | JavaScript           |         24 |          0 |          3 |         27 |
+| d:\TinySwordJS\src\entities\Entity.js         | JavaScript           |         64 |          0 |         11 |         75 |
+| d:\TinySwordJS\src\entities\KingPig.js        | JavaScript           |        288 |          1 |         68 |        357 |
+| d:\TinySwordJS\src\entities\Pig.js            | JavaScript           |        267 |          1 |         64 |        332 |
+| d:\TinySwordJS\src\entities\PigWithBomb.js    | JavaScript           |        399 |          2 |         88 |        489 |
+| d:\TinySwordJS\src\entities\PigWithBoxes.js   | JavaScript           |        396 |          1 |         85 |        482 |
+| d:\TinySwordJS\src\entities\PigWithMatch.js   | JavaScript           |        195 |          4 |         50 |        249 |
+| d:\TinySwordJS\src\entities\Player.js         | JavaScript           |        384 |          7 |         94 |        485 |
+| d:\TinySwordJS\src\inputs\KeyBoardInputs.js   | JavaScript           |         15 |          0 |          3 |         18 |
+| d:\TinySwordJS\src\inputs\MouseInput.js       | JavaScript           |         17 |          0 |          3 |         20 |
+| d:\TinySwordJS\src\level\LevelManager.js      | JavaScript           |        176 |          0 |         38 |        214 |
+| d:\TinySwordJS\src\level\Levels.js            | JavaScript           |         28 |          1 |          5 |         34 |
+| d:\TinySwordJS\src\main\Game.js               | JavaScript           |        369 |         13 |        117 |        499 |
+| d:\TinySwordJS\src\main\Main.js               | JavaScript           |          5 |          0 |          3 |          8 |
+| d:\TinySwordJS\src\main\css\base.css          | PostCSS              |        210 |         22 |         32 |        264 |
+| d:\TinySwordJS\src\main\css\canvas.css        | PostCSS              |        247 |         21 |         36 |        304 |
+| d:\TinySwordJS\src\main\css\game.css          | PostCSS              |        550 |         46 |         67 |        663 |
+| d:\TinySwordJS\src\main\css\optn.css          | PostCSS              |         94 |         19 |         16 |        129 |
+| d:\TinySwordJS\src\main\css\sidebar.css       | PostCSS              |        124 |         23 |         22 |        169 |
+| d:\TinySwordJS\src\main\editor.html           | HTML                 |        173 |         11 |         24 |        208 |
+| d:\TinySwordJS\src\main\game.html             | HTML                 |         98 |          0 |         24 |        122 |
+| d:\TinySwordJS\src\main\js\canvas.js          | JavaScript           |        363 |         53 |         98 |        514 |
+| d:\TinySwordJS\src\main\js\deathAnimation.js  | JavaScript           |          0 |          0 |          1 |          1 |
+| d:\TinySwordJS\src\main\js\enemies.js         | JavaScript           |         20 |          0 |          7 |         27 |
+| d:\TinySwordJS\src\main\js\export.js          | JavaScript           |         74 |          1 |         15 |         90 |
+| d:\TinySwordJS\src\main\js\floating.js        | JavaScript           |         68 |          5 |         18 |         91 |
+| d:\TinySwordJS\src\main\js\history.js         | JavaScript           |         78 |          2 |         12 |         92 |
+| d:\TinySwordJS\src\main\js\import.js          | JavaScript           |         78 |          5 |         18 |        101 |
+| d:\TinySwordJS\src\main\js\mainEditor.js      | JavaScript           |          5 |          1 |          1 |          7 |
+| d:\TinySwordJS\src\main\js\objects.js         | JavaScript           |         20 |          0 |          7 |         27 |
+| d:\TinySwordJS\src\main\js\options.js         | JavaScript           |        120 |         19 |         28 |        167 |
+| d:\TinySwordJS\src\main\js\tiles.js           | JavaScript           |         20 |          0 |          7 |         27 |
+| d:\TinySwordJS\src\main\js\utils.js           | JavaScript           |         19 |          0 |          6 |         25 |
+| d:\TinySwordJS\src\main\js\zoom.js            | JavaScript           |         30 |          1 |         11 |         42 |
+| d:\TinySwordJS\src\main\level_selector.html   | HTML                 |        414 |          9 |         53 |        476 |
+| d:\TinySwordJS\src\objects\Bomb.js            | JavaScript           |        189 |          2 |         35 |        226 |
+| d:\TinySwordJS\src\objects\Box.js             | JavaScript           |        161 |          2 |         30 |        193 |
+| d:\TinySwordJS\src\objects\Door.js            | JavaScript           |        133 |          4 |         36 |        173 |
+| d:\TinySwordJS\src\objects\Object.js          | JavaScript           |         30 |          0 |          8 |         38 |
+| d:\TinySwordJS\src\res\GitHub.svg             | XML                  |          1 |          0 |          0 |          1 |
+| d:\TinySwordJS\src\res\disabled.svg           | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\res\hand_point.svg         | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\res\hand_small_closed.svg  | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\res\hand_small_open.svg    | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\res\hand_small_point.svg   | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\res\hand_small_point_n.svg | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\res\pointer_a.svg          | XML                  |          7 |          0 |          0 |          7 |
+| d:\TinySwordJS\src\utilities\Constants.js     | JavaScript           |        403 |          0 |         33 |        436 |
+| d:\TinySwordJS\src\utilities\HelperMethods.js | JavaScript           |         89 |          1 |         25 |        115 |
+| d:\TinySwordJS\src\utilities\LoadSave.js      | JavaScript           |        183 |          0 |         33 |        216 |
+| Total                                         |                      |      7,308 |        281 |      1,470 |      9,059 |
++-----------------------------------------------+----------------------+------------+------------+------------+------------+

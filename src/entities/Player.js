@@ -66,6 +66,8 @@ export default class Player extends Entity {
     this.cannons = [];
     this.bombs = [];
     this.boxes = [];
+    this.palmTreeStanding = [];
+    this.palmTreeZ = [];
     
     this.initHitbox(
       x,
@@ -144,6 +146,8 @@ export default class Player extends Entity {
     this.boxes = this.game.boxes;
     this.bombs = this.game.bombs;
     this.cannons = this.game.cannons;
+    this.palmTreeStanding = this.game.palmTreeStanding;
+    this.palmTreeZ = this.game.palmTreeZ;
   }
 
   enterTheDoor() {
@@ -285,7 +289,8 @@ export default class Player extends Entity {
     if (!this.left && !this.right && !this.inAir && !this.gettingHit) return;
 
     if (!this.inAir)
-      if (!isEntityOnFloor(this.hitbox, this.levelData)) this.inAir = true;
+      if (!isEntityOnFloor(this.hitbox, this.levelData, this.palmTreeStanding, this.palmTreeZ)) 
+        this.inAir = true;
 
     if (this.inAir) {
       if (
@@ -294,7 +299,9 @@ export default class Player extends Entity {
           this.hitbox.y + this.ySpeed,
           this.hitbox.width,
           this.hitbox.height,
-          this.levelData
+          this.levelData,
+          this.palmTreeStanding,
+          this.palmTreeZ
         )
       ) {
         this.hitbox.y += this.ySpeed;
@@ -302,7 +309,9 @@ export default class Player extends Entity {
       } else {
         this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(
           this.hitbox,
-          this.ySpeed
+          this.ySpeed,
+          this.palmTreeStanding,
+          this.palmTreeZ
         );
 
         if (this.ySpeed > 0 && !this.attack) {
@@ -331,12 +340,14 @@ export default class Player extends Entity {
         this.hitbox.y,
         this.hitbox.width,
         this.hitbox.height,
-        this.levelData
+        this.levelData,
+        this.palmTreeStanding,
+        this.palmTreeZ
       )
     ) {
       this.hitbox.x += xSpeed2;
     } else {
-      this.hitbox.x = GetEntityXPosNextToWall(this.hitbox, xSpeed2);
+      this.hitbox.x = GetEntityXPosNextToWall(this.hitbox, xSpeed2, this.palmTreeStanding, this.palmTreeZ);
     }
   }
 

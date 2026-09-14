@@ -1,10 +1,48 @@
 import Constants from "./Constants.js";
 
-export function canMoveHere(x, y, width, height, levelData) {
+function getCollidingObject(hitbox, xSpeed, ySpeed, palmTreeStanding, palmTreeZ) {
+  if (palmTreeStanding) {
+    for (const palmTree of palmTreeStanding) {
+      if (
+        hitbox.x + xSpeed < palmTree.hitbox.x + palmTree.hitbox.width &&
+        hitbox.x + hitbox.width + xSpeed > palmTree.hitbox.x &&
+        hitbox.y + ySpeed < palmTree.hitbox.y + palmTree.hitbox.height &&
+        hitbox.y + hitbox.height + ySpeed > palmTree.hitbox.y
+      ) {
+        return palmTree;
+      }
+    }
+  }
+
+  if (palmTreeZ) {
+    for (const palmTree of palmTreeZ) {
+      if (
+        hitbox.x + xSpeed < palmTree.hitbox.x + palmTree.hitbox.width &&
+        hitbox.x + hitbox.width + xSpeed > palmTree.hitbox.x &&
+        hitbox.y + ySpeed < palmTree.hitbox.y + palmTree.hitbox.height &&
+        hitbox.y + hitbox.height + ySpeed > palmTree.hitbox.y
+      ) {
+        return palmTree;
+      }
+    }
+  }
+
+  return null;
+}
+
+export function canMoveHere(x, y, width, height, levelData, palmTreeStanding, palmTreeZ) {
+  // Exact boundary check for objects (stops you BEFORE you get inside)
+  const dummyHitbox = { x, y, width, height };
+  if (getCollidingObject(dummyHitbox, 0, 0, palmTreeStanding, palmTreeZ)) {
+    return false;
+  }
+
+  // Corner checks for tiles
   if (!isSolid(x, y, levelData))
     if (!isSolid(x + width, y + height, levelData))
       if (!isSolid(x + width, y, levelData))
         if (!isSolid(x, y + height, levelData)) return true;
+
   return false;
 }
 
@@ -17,32 +55,28 @@ function isSolid(x, y, levelData) {
 
   const XIndex = Math.floor(x / Constants.TILE_SIZE);
   const YIndex = Math.floor(y / Constants.TILE_SIZE);
-
+  
   const value = levelData[YIndex][XIndex];
+  
+  if (value === 12 || value === 255) return false;
 
-  if (value >= 45 && value <= 95) return false;
+  if ((value >= 0 && value <= 46) || (value >= 94 && value <= 140)) {
+    return true; 
+  }
 
-  if (value >= 95 || value < 0 || value != 12) return true;
+  if (value >= 141 || value < 0) return true;
+
   return false;
 }
 
-export function GetEntityXPosNextToWall(hitbox, xSpeed) {
-  if (xSpeed > 0) {
-    // moving right → right side collision
-    const XIndex = Math.floor(
-      (hitbox.x + hitbox.width + xSpeed) / Constants.TILE_SIZE
-    );
-    const tileXPOS = XIndex * Constants.TILE_SIZE;
-    return tileXPOS - hitbox.width - 1;
-  } else {
-    const XIndex = Math.floor(hitbox.x / Constants.TILE_SIZE);
-    const tileXPOS = XIndex * Constants.TILE_SIZE;
-
-    return Math.floor(tileXPOS);
+export function GetEntityYPosUnderRoofOrAboveFloor(hitbox, ySpeed, palmTreeStanding, palmTreeZ) {
+  const obj = getCollidingObject(hitbox, 0, ySpeed, palmTreeStanding, palmTreeZ);
+  
+  if (obj) {
+    if (ySpeed > 0) return obj.hitbox.y - hitbox.height - 1; 
+    else return obj.hitbox.y + obj.hitbox.height + 1; 
   }
-}
 
-export function GetEntityYPosUnderRoofOrAboveFloor(hitbox, ySpeed) {
   const YIndex = Math.floor(hitbox.y / Constants.TILE_SIZE);
   const tileYPOS = YIndex * Constants.TILE_SIZE;
 
@@ -54,12 +88,38 @@ export function GetEntityYPosUnderRoofOrAboveFloor(hitbox, ySpeed) {
   }
 }
 
-export function isEntityOnFloor(hitbox, levelData) {
-  if (!isSolid(hitbox.x, hitbox.y + hitbox.height + 2, levelData))
-    if (
-      !isSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, levelData)
-    )
-      return false;
+export function GetEntityXPosNextToWall(hitbox, xSpeed, palmTreeStanding, palmTreeZ) {
+  const obj = getCollidingObject(hitbox, xSpeed, 0, palmTreeStanding, palmTreeZ);
+  
+  if (obj) {
+    if (xSpeed > 0) return obj.hitbox.x - hitbox.width - 1;
+    else return obj.hitbox.x + obj.hitbox.width + 1; 
+  }
+
+  if (xSpeed > 0) {
+    const XIndex = Math.floor((hitbox.x + hitbox.width + xSpeed) / Constants.TILE_SIZE);
+    const tileXPOS = XIndex * Constants.TILE_SIZE;
+    return tileXPOS - hitbox.width - 1;
+  } else {
+    const XIndex = Math.floor(hitbox.x / Constants.TILE_SIZE);
+    const tileXPOS = XIndex * Constants.TILE_SIZE;
+    return Math.floor(tileXPOS);
+  }
+}
+
+export function isEntityOnFloor(hitbox, levelData, palmTreeStanding, palmTreeZ) {
+  // AABB floor check for objects (projected 2 pixels downwards)
+  if (getCollidingObject(hitbox, 0, 2, palmTreeStanding, palmTreeZ)) {
+    return true;
+  }
+
+  // Tile checks
+  const bottomLeftTile = isSolid(hitbox.x, hitbox.y + hitbox.height + 2, levelData);
+  const bottomRightTile = isSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, levelData);
+
+  if (!bottomLeftTile && !bottomRightTile) {
+    return false;
+  }
 
   return true;
 }

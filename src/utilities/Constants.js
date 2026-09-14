@@ -2,8 +2,6 @@ const Constants = {
   SCALE: 1.94,
   OG_TILE_SIZE: 32,
   TILE_SIZE: Math.floor(32 * 1.94),
-  TILE_IN_ROW: 30,
-  TILE_IN_COLUMN: 20,
 
   Player: {
     DOOR_OUT: 0,
@@ -364,8 +362,8 @@ const Constants = {
     IDLE: 0,
     HIT: 1,
 
-    getSpriteAmount(entityState) {
-      switch (entityState) {
+    getSpriteAmount(objectState) {
+      switch (objectState) {
         case Constants.Box.HIT:
           return 1;
         case Constants.Box.IDLE:
@@ -384,8 +382,8 @@ const Constants = {
     ATTACK: 0,
     IDLE: 1,
 
-    getSpriteAmount(entityState) {
-      switch (entityState) {
+    getSpriteAmount(objectState) {
+      switch (objectState) {
         case Constants.Cannon.ATTACK:
           return 4;
         case Constants.Cannon.IDLE:
@@ -419,8 +417,8 @@ const Constants = {
     EXPLODE: 0,
     IDLE: 1,
 
-    getSpriteAmount(entityState) {
-      switch (entityState) {
+    getSpriteAmount(objectState) {
+      switch (objectState) {
         case Constants.Bomb.EXPLODE:
           return 6;
         case Constants.Bomb.IDLE:
@@ -430,6 +428,30 @@ const Constants = {
       }
     },
   },
+
+  PalmTree: {
+    PALM_TREE_WIDTH: 96,
+    PALM_TREE_HEIGHT: 96,
+    PALM_TREE_SRC: "../res/PalmTreeStanding.png",
+
+    FRAME_SPEED: 35,
+
+    getSpriteAmount() {
+      return 4;
+    }
+  },
+  
+  PalmTreeZ: {
+    PALM_TREEZ_WIDTH: 96,
+    PALM_TREEZ_HEIGHT: 96,
+    PALM_TREEZ_SRC: "../res/PalmTreeZ.png",
+
+    FRAME_SPEED: 35,
+
+    getSpriteAmount() {
+      return 4;
+    }
+  }
 };
 
 export default Constants;

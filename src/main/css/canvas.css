@@ -177,27 +177,10 @@
 
 .tileSet {
   display: grid;
-  grid-template-columns: repeat(7, 42px);
+  grid-template-columns: repeat(9, 42px);
   gap: 5px;
   overflow-y: auto;
-  max-height: 50vh;
-  overflow: auto;
-  scrollbar-width: none;
-  cursor: url("../../res/hand_small_point.svg"), auto;
-  margin-top: 0.25rem;
-}
-
-.Enemy {
-  display: grid;
-  grid-template-columns: repeat(5, calc(38 * 1.3125px));
-  gap: 5px;
-  overflow-y: auto;
-  height: 8vh;
-  border-radius: 0.4rem;
-  align-items: end;
-  padding: 0.5rem;
-  max-height: 20vh;
-  background-color: #fff;
+  max-height: 40vh;
   overflow: auto;
   scrollbar-width: none;
   cursor: url("../../res/hand_small_point.svg"), auto;
@@ -206,7 +189,7 @@
 
 .Objects {
   display: grid;
-  grid-template-columns: repeat(4, calc(52 * 1.3125px));
+  grid-template-columns: repeat(6, calc(52 * 1.3125px));
   gap: 5px;
   overflow-y: auto;
   height: fit-content;
@@ -236,14 +219,9 @@
   image-rendering: crisp-edges;
 }
 
-.enemy {
-  width: calc(38 * 1.5px);
-  height: calc(30 * 1.5px);
-}
-
 .object {
   width: calc(52 * 1.5px);
-  height: calc(56 * 1.5px);
+  height: calc(96 * 1.5px);
 }
 
 .tile:hover,
