@@ -1,7 +1,7 @@
 import { getSpriteAtlas, cropImage } from "./utils.js";
 
 const sidebar = document.querySelector(".tileSet");
-const rows = 5;
+const rows = 8;
 const cols = 19;
 const tileSize = 32;
 
@@ -10,8 +10,6 @@ const tileSize = 32;
 
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      if (j * rows + i === 94) continue; 
-
       const img = cropImage(image, j * tileSize, i * tileSize, tileSize, tileSize);
       const tile = document.createElement("img");
       tile.classList.add("tile");

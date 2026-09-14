@@ -8,7 +8,10 @@ body {
   overflow: hidden;
   width: 100vw;
   height: 100vh;
-  background-color: #3e3750;
+  background-image: url("../../res/playing_bg_img.png");
+  background-size: cover;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 /* ==========================================

@@ -99,6 +99,15 @@ window.addEventListener("keyup", (e) => {
   }
 });
 
+canvasContainer.addEventListener("wheel", (e) => {
+  if (e.ctrlKey) return;
+
+  e.preventDefault(); // Prevents the whole browser page from scrolling
+
+  offsetX -= e.deltaX;
+  offsetY -= e.deltaY;
+});
+
 canvasContainer.addEventListener("mousedown", (e) => {
   if (e.button === 0 && isSpaceHeld) {
     isPanning = true;
