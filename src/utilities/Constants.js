@@ -16,7 +16,7 @@ const Constants = {
     FALL: 9,
     JUMP: 10,
     IDLE: 11,
-    FRAME_SPEED: 20,
+    FRAME_SPEED: 15,
 
     PLAYER_IMG_SRC: "../res/KingSprite.png",
     PLAYER_SPEED: 1.5,
@@ -451,6 +451,24 @@ const Constants = {
     getSpriteAmount() {
       return 4;
     }
+  }, 
+
+  Water: {
+    WATER_WIDTH: 96,
+    WATER_HEIGHT: 36,
+    WATER_SRC: "../res/water.png",
+
+    FRAME_SPEED: 30,
+
+    getSpriteAmount() {
+      return 6;
+    }
+  },
+
+  Spikes: {
+    SPIKES_WIDTH: 32,
+    SPIKES_HEIGHT: 32,
+    SPIKES_SRC: "../res/Spikes.png",
   }
 };
 

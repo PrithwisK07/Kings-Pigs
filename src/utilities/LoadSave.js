@@ -10,6 +10,8 @@ import Constants from "./Constants.js";
 import Door from "../objects/Door.js";
 import PalmTree from "../objects/PalmTree.js";
 import PalmTreeZ from "../objects/PalmTreeZ.js";
+import Water from "../objects/Water.js";
+import Spikes from "../objects/Spikes.js";
 
 let boxes = [];
 let cannons = [];
@@ -22,6 +24,8 @@ let pigThrowingBombs = [];
 let doors = [];
 let palmTreeStanding = [];
 let palmTreeZ = [];
+let water = [];
+let spikes = [];
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -43,6 +47,21 @@ export async function getSpriteAtlas(src) {
 }
 
 export function getLevelData(levelDataImg, player, levelManager) {
+
+  boxes = [];
+  cannons = [];
+  bombs = [];
+  kingPigs = [];
+  pigs = [];
+  pigThrowingBoxes = [];
+  pigWithMatches = [];
+  pigThrowingBombs = [];
+  doors = [];
+  palmTreeStanding = [];
+  palmTreeZ = [];
+  water = [];
+  spikes = [];
+  
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -199,6 +218,28 @@ export function getLevelData(levelDataImg, player, levelManager) {
           )
         );
       }
+      
+      if (blueValue == 14) {
+        water.push(
+          new Water(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            levelManager,
+            player
+          )
+        );
+      }
+      
+      if (blueValue == 15) {
+        spikes.push(
+          new Spikes(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            levelManager,
+            player
+          )
+        );
+      }
 
       row.push(redValue);
     }
@@ -250,4 +291,12 @@ export async function getPalmTreeStanding() {
 
 export async function getPalmTreeZ() {
   return palmTreeZ;
+}
+
+export async function getWater() {
+  return water;
+}
+
+export async function getSpikes() {
+  return spikes;
 }

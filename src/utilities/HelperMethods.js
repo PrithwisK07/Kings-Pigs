@@ -58,13 +58,13 @@ function isSolid(x, y, levelData) {
   
   const value = levelData[YIndex][XIndex];
   
-  if (value === 12 || value === 255) return false;
+  if (value === 12 || value === 141 || value === 255) return false;
 
   if ((value >= 0 && value <= 46) || (value >= 94 && value <= 140)) {
     return true; 
   }
 
-  if (value >= 141 || value < 0) return true;
+  if (value >= 142 || value < 0) return true;
 
   return false;
 }

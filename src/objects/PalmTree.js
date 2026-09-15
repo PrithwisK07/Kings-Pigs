@@ -12,7 +12,7 @@ export default class PalmTree extends Object {
         this.initHitbox(
             x + 10 * Constants.SCALE,
             y - 35 * Constants.SCALE,
-            Constants.PalmTree.PALM_TREE_WIDTH * Constants.SCALE / 3,
+            Constants.PalmTree.PALM_TREE_WIDTH * Constants.SCALE / 3 - 8 * Constants.SCALE,
             Constants.PalmTree.PALM_TREE_HEIGHT * Constants.SCALE / 4
         );
 
@@ -43,8 +43,9 @@ export default class PalmTree extends Object {
         
         // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
         
-        let drawX = this.hitbox.x - XlvlOffset - this.hitbox.width;
+        let drawX = this.hitbox.x - XlvlOffset - this.hitbox.width - 13 * Constants.SCALE;
 
+        ctx.save();
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
             this.objectImg,
@@ -57,5 +58,6 @@ export default class PalmTree extends Object {
             this.width * Constants.SCALE,
             this.height * Constants.SCALE
         );
+        ctx.restore();
     }
 }
