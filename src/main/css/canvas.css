@@ -177,7 +177,7 @@
 
 .tileSet {
   display: grid;
-  grid-template-columns: repeat(9, 42px);
+  grid-template-columns: repeat(8, 42px);
   gap: 5px;
   overflow-y: auto;
   max-height: 40vh;
@@ -189,8 +189,9 @@
 
 .Objects {
   display: grid;
-  grid-template-columns: repeat(6, calc(52 * 1.3125px));
-  gap: 5px;
+  grid-template-columns: repeat(5, calc(52 * 1.3125px));
+  row-gap: 5px;
+  column-gap: 6px;
   overflow-y: auto;
   height: fit-content;
   border-radius: 0.4rem;
@@ -217,11 +218,6 @@
 .object {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-}
-
-.object {
-  width: calc(52 * 1.5px);
-  height: calc(96 * 1.5px);
 }
 
 .tile:hover,

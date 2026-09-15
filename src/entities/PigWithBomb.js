@@ -49,6 +49,7 @@ export default class PigThrowingBomb extends Entity {
     this.attackCooldown = 0;
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 1800;
+    this.blockedFrames = 0;
 
     this.damage = 10;
 
@@ -170,11 +171,11 @@ export default class PigThrowingBomb extends Entity {
     if (this.player.isDead) return;
     if (this.isDead || this.afterDeath || this.dyingWait) return;
 
+    this.isFrustrated = false;
+
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
-    
-    // Shoot the raycast perfectly horizontally from the pig's center
-    // This prevents the height difference between King and Pig from breaking the tile grid check
+  
     const pigCenterY = this.hitbox.y + this.hitbox.height / 2;
 
     const deltaX = playerCenterX - pigCenterX;
@@ -192,7 +193,6 @@ export default class PigThrowingBomb extends Entity {
       return;
     }
 
-    // Pass pigCenterY for BOTH Y-coordinates to guarantee a straight line of sight
     const canSeePlayer = this.hasBomb
       ? distanceX < 120 * Constants.SCALE
       : this.hasLineOfSight(pigCenterX, pigCenterY, playerCenterX, pigCenterY);
@@ -200,10 +200,13 @@ export default class PigThrowingBomb extends Entity {
     if (canSeePlayer) {
       this.chaseTimeout = this.MAX_CHASE_TIMEOUT;
       this.flip = deltaX > 0;
+    }
+
+    if (canSeePlayer || this.chaseTimeout > 0) {
+      let wantsToMove = false; 
 
       if (distanceX < ATTACK_RANGE && !this.inAir) {
         if (!this.hasBomb) {
-          // Melee Mode: Must physically touch to attack
           if (this.hitbox.intersects(this.player.hitbox)) {
             if (this.attackCooldown === 0) {
               this.stopMoving();
@@ -211,12 +214,9 @@ export default class PigThrowingBomb extends Entity {
               this.attackCooldown = 75;
             }
           } else {
-            // FIX: If we are close, but not touching yet, keep walking!
-            this.left = deltaX < 0;
-            this.right = deltaX > 0;
+            wantsToMove = true; 
           }
         } else {
-          // Bomb Throwing Mode
           if (this.attackCooldown === 0) {
             this.stopMoving();
             this.attack = true;
@@ -224,15 +224,41 @@ export default class PigThrowingBomb extends Entity {
           }
         }
       } else {
-        // Outside of attack range, keep chasing
-        this.left = deltaX < 0;
-        this.right = deltaX > 0;
+        wantsToMove = true; 
+      }
+
+      if (wantsToMove) {
+        const moveDirection = deltaX > 0 ? Constants.PigThrowingBomb.SPEED : -Constants.PigThrowingBomb.SPEED;
+        
+        const isBlocked = !canMoveHere(
+          this.hitbox.x + moveDirection,
+          this.hitbox.y,
+          this.hitbox.width,
+          this.hitbox.height,
+          this.levelData,
+          this.palmTreeStanding,
+          this.palmTreeZ
+        );
+
+        if (isBlocked) {
+          this.blockedFrames++;
+          
+          if (this.blockedFrames > 30) {
+            this.stopMoving();
+            this.isFrustrated = true;
+          } else {
+            this.left = deltaX < 0;
+            this.right = deltaX > 0;
+          }
+        } else {
+          this.blockedFrames = 0;
+          this.left = deltaX < 0;
+          this.right = deltaX > 0;
+        }
       }
     } else {
-      // Player is hidden behind an object/wall
-      if (this.chaseTimeout <= 0) {
-        this.stopMoving();
-      }
+      this.stopMoving();
+      this.blockedFrames = 0; 
     }
   }
 
