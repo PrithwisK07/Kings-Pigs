@@ -59,6 +59,7 @@ export default class Projectile extends Object {
 
     // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
+    ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
@@ -73,6 +74,7 @@ export default class Projectile extends Object {
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
+    ctx.restore();
   }
 
   checkCollisionPlayer() {

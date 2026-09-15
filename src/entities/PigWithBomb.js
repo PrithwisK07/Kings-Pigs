@@ -228,32 +228,43 @@ export default class PigThrowingBomb extends Entity {
       }
 
       if (wantsToMove) {
-        const moveDirection = deltaX > 0 ? Constants.PigThrowingBomb.SPEED : -Constants.PigThrowingBomb.SPEED;
-        
-        const isBlocked = !canMoveHere(
-          this.hitbox.x + moveDirection,
-          this.hitbox.y,
-          this.hitbox.width,
-          this.hitbox.height,
-          this.levelData,
-          this.palmTreeStanding,
-          this.palmTreeZ
-        );
-
-        if (isBlocked) {
+        if (distanceX < 5 * Constants.SCALE) {
           this.blockedFrames++;
           
           if (this.blockedFrames > 30) {
             this.stopMoving();
             this.isFrustrated = true;
           } else {
+            this.stopMoving(); 
+          }
+        } else {
+          const moveDirection = deltaX > 0 ? Constants.PigThrowingBomb.SPEED : -Constants.PigThrowingBomb.SPEED;
+          
+          const isBlocked = !canMoveHere(
+            this.hitbox.x + moveDirection,
+            this.hitbox.y,
+            this.hitbox.width,
+            this.hitbox.height,
+            this.levelData,
+            this.palmTreeStanding,
+            this.palmTreeZ
+          );
+
+          if (isBlocked) {
+            this.blockedFrames++;
+            
+            if (this.blockedFrames > 30) {
+              this.stopMoving();
+              this.isFrustrated = true;
+            } else {
+              this.left = deltaX < 0;
+              this.right = deltaX > 0;
+            }
+          } else {
+            this.blockedFrames = 0;
             this.left = deltaX < 0;
             this.right = deltaX > 0;
           }
-        } else {
-          this.blockedFrames = 0;
-          this.left = deltaX < 0;
-          this.right = deltaX > 0;
         }
       }
     } else {
@@ -454,7 +465,6 @@ export default class PigThrowingBomb extends Entity {
 
       const footY = this.hitbox.y + this.hitbox.height + 1;
 
-      // FIX: Use canMoveHere so the pig respects objects for edge-detection!
       const tileBelowAheadIsSolid = !canMoveHere(
         footX,
         footY,
@@ -473,17 +483,15 @@ export default class PigThrowingBomb extends Entity {
         this.right = false;
       }
     } else {
-      // when pig doesn't have box, allow it to walk and fall naturally
       if (canMove) {
         this.hitbox.x = newX;
       } else {
-        if (xSpeed2 > 0) {
-          this.left = true;
-          this.right = false;
-        } else {
-          this.left = false;
-          this.right = true;
-        }
+        this.hitbox.x = GetEntityXPosNextToWall(
+          this.hitbox, 
+          xSpeed2, 
+          this.palmTreeStanding, 
+          this.palmTreeZ
+        );
       }
     }
   }

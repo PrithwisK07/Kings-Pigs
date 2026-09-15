@@ -451,6 +451,24 @@ const Constants = {
     getSpriteAmount() {
       return 4;
     }
+  }, 
+
+  Water: {
+    WATER_WIDTH: 96,
+    WATER_HEIGHT: 36,
+    WATER_SRC: "../res/water.png",
+
+    FRAME_SPEED: 30,
+
+    getSpriteAmount() {
+      return 6;
+    }
+  },
+
+  Spikes: {
+    SPIKES_WIDTH: 32,
+    SPIKES_HEIGHT: 32,
+    SPIKES_SRC: "../res/Spikes.png",
   }
 };
 

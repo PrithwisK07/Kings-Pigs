@@ -45,6 +45,7 @@ export default class PalmTree extends Object {
         
         let drawX = this.hitbox.x - XlvlOffset - this.hitbox.width - 13 * Constants.SCALE;
 
+        ctx.save();
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
             this.objectImg,
@@ -57,5 +58,6 @@ export default class PalmTree extends Object {
             this.width * Constants.SCALE,
             this.height * Constants.SCALE
         );
+        ctx.restore();
     }
 }

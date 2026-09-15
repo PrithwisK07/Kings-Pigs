@@ -4,7 +4,8 @@ import {
   getSpriteAtlas, getLevelData, getBoxes, getKingPigs,
   getPigThrowingBoxes, getPigs, getCannons, getPigWithMatches,
   getPigThrowingBombs, getBombs, getDoors,
-  getPalmTreeStanding, getPalmTreeZ
+  getPalmTreeStanding, getPalmTreeZ, getWater,
+  getSpikes
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
@@ -22,6 +23,8 @@ export default class LevelManager {
     this.activeBombs = [];
     this.palmTreeStanding = [];
     this.palmTreeZ = [];
+    this.water = [];
+    this.spikes = [];
 
     this.levels = new Levels(this, this.player);
     this.tileSetImg = null;
@@ -44,7 +47,7 @@ export default class LevelManager {
     this.game.pigThrowingBoxes = await getPigThrowingBoxes(this.levelDataImg);
     this.game.pigWithMatches = await getPigWithMatches(this.levelDataImg);
     this.game.pigThrowingBombs = await getPigThrowingBombs(this.levelDataImg);
-
+    
     if(onProgress) onProgress(70, "Placing cannons and objects...");
     this.player.loadLevelData(this.levelData);
     this.boxes = await getBoxes();
@@ -53,6 +56,8 @@ export default class LevelManager {
     this.door = await getDoors();
     this.palmTreeStanding = await getPalmTreeStanding();
     this.palmTreeZ = await getPalmTreeZ();
+    this.water = await getWater();
+    this.spikes = await getSpikes();
 
     if(onProgress) onProgress(90, "Waking up the King Pig...");
     this.game.boxes = this.boxes;
@@ -60,6 +65,8 @@ export default class LevelManager {
     this.game.cannons = this.cannons;
     this.game.palmTreeStanding = this.palmTreeStanding;
     this.game.palmTreeZ = this.palmTreeZ;
+    this.game.water = this.water;
+    this.game.spikes = this.spikes;
 
     this.game.kingPigs.forEach((kp) => kp.loadLevelData(this.levelData));
     this.game.pigs.forEach((p) => p.loadLevelData(this.levelData));
@@ -193,6 +200,18 @@ export default class LevelManager {
         palmTree.draw(ctx, XlvlOffset, YlvlOffset);
       }) 
 
+    if(this.water) {
+      this.water.forEach((w) => {
+        w.draw(ctx, XlvlOffset, YlvlOffset);
+      })
+    }
+    
+    if(this.spikes) {
+      this.spikes.forEach((spike) => {
+        spike.draw(ctx, XlvlOffset, YlvlOffset);
+      })
+    }
+
     if (this.activeBombs)
       this.activeBombs.forEach((bomb) => {
         bomb.draw(ctx, XlvlOffset, YlvlOffset);
@@ -226,6 +245,18 @@ export default class LevelManager {
       this.palmTreeZ.forEach((palmTree) => {
         palmTree.update();
       }) 
+
+    if(this.water) {
+      this.water.forEach((w) => {
+        w.update();
+      })
+    }
+    
+    if(this.spikes) {
+      this.spikes.forEach((spike) => {
+        spike.update();
+      })
+    }
 
     if (this.activeBombs) {
       this.activeBombs.forEach((bomb) => {

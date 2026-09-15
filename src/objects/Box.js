@@ -152,7 +152,8 @@ export default class Box extends Object {
       this.drawExplosion(ctx, XlvlOffset, YlvlOffset);
       return;
     }
-
+  
+    ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
@@ -165,6 +166,7 @@ export default class Box extends Object {
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );
+    ctx.restore();
   }
 
   drawExplosion(ctx, XlvlOffset, YlvlOffset) {

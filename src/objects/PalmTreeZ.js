@@ -47,6 +47,7 @@ export default class PalmTreeZ extends Object {
 
         let drawX = this.hitbox.x - XlvlOffset - this.hitbox.width - 13 * Constants.SCALE;
 
+        ctx.save();
         if (this.flip) {
             ctx.scale(-1, 1);
             drawX = -drawX - this.hitbox.width * 4;
@@ -64,5 +65,7 @@ export default class PalmTreeZ extends Object {
             this.width * Constants.SCALE,
             this.height * Constants.SCALE
         );
+
+        ctx.restore();
     }
 }

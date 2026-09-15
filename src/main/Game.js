@@ -60,6 +60,8 @@ export default class Game {
     this.bombs = [];
     this.palmTreeStanding = [];    
     this.palmTreeZ = [];    
+    this.water = [];
+    this.spikes = [];
 
     // Death animation
     this.deathImg = null;
