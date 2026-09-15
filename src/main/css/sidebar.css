@@ -125,13 +125,6 @@
   max-height: 30vh;
 }
 
-.Objects {
-  display: grid;
-  grid-template-columns: repeat(4, calc(52 * 1.3125px));
-  gap: 6px;
-  max-height: 20vh;
-}
-
 /* ==========================================
    INTERACTIVE TILE PHYSICS
    ========================================== */

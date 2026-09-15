@@ -72,7 +72,7 @@ export default class Player extends Entity {
     this.initHitbox(
       x,
       y,
-      (this.width / 4) * Constants.SCALE,
+      (this.width / 4) * Constants.SCALE - 6 * Constants.SCALE,
       (this.height / 2) * Constants.SCALE
     );
 
@@ -110,6 +110,7 @@ export default class Player extends Entity {
 
     ctx.save();
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
+
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.playerImg,
@@ -118,8 +119,8 @@ export default class Player extends Entity {
       this.width,
       this.height,
       this.flip
-        ? -this.hitbox.x - this.hitbox.width - 21 * Constants.SCALE + XlvlOffset
-        : this.hitbox.x - this.hitbox.width - 1 * Constants.SCALE - XlvlOffset,
+        ? -this.hitbox.x - this.hitbox.width - 23 * Constants.SCALE + XlvlOffset
+        : this.hitbox.x - this.hitbox.width - 10 * Constants.SCALE - XlvlOffset,
       this.hitbox.y - this.hitbox.height / 2 + 1.5 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE

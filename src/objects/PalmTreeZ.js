@@ -9,12 +9,12 @@ export default class PalmTreeZ extends Object {
         this.player = player;
         this.flip = flip;
         
-        const effectiveX = this.flip ? x + 5 * Constants.SCALE : x - 5 * Constants.SCALE;
+        const effectiveX = this.flip ? x + 9 * Constants.SCALE : x + 1 * Constants.SCALE;
 
         this.initHitbox(
             effectiveX,
             y - 35 * Constants.SCALE,
-            Constants.PalmTreeZ.PALM_TREEZ_WIDTH * Constants.SCALE / 3,
+            Constants.PalmTreeZ.PALM_TREEZ_WIDTH * Constants.SCALE / 3 - 8 * Constants.SCALE,
             Constants.PalmTreeZ.PALM_TREEZ_HEIGHT * Constants.SCALE / 4
         );
 
@@ -45,11 +45,11 @@ export default class PalmTreeZ extends Object {
 
         // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
 
-        let drawX = this.hitbox.x - XlvlOffset - this.hitbox.width;
+        let drawX = this.hitbox.x - XlvlOffset - this.hitbox.width - 13 * Constants.SCALE;
 
         if (this.flip) {
             ctx.scale(-1, 1);
-            drawX = -drawX - this.hitbox.width * 3;
+            drawX = -drawX - this.hitbox.width * 4;
         }
 
         ctx.imageSmoothingEnabled = false;

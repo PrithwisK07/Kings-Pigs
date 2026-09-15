@@ -72,7 +72,7 @@ export default class PigWithMatch extends Entity {
     ctx.imageSmoothingEnabled = false;
 
     const drawX = this.hitbox.x - this.hitbox.width / 3 - XlvlOffset;
-    const drawY = this.hitbox.y - this.hitbox.height / 6 + 2 * Constants.SCALE - YlvlOffset;
+    const drawY = this.hitbox.y - this.hitbox.height / 6 + 4 * Constants.SCALE - YlvlOffset;
     const drawW = this.width * Constants.SCALE;
     const drawH = this.height * Constants.SCALE;
 

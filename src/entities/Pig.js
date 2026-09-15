@@ -81,7 +81,7 @@ export default class Pig extends Entity {
       this.flip
         ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
         : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE - YlvlOffset,
+      this.hitbox.y - this.hitbox.height / 3 + 2 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );

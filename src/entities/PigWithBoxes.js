@@ -109,6 +109,8 @@ export default class PigThrowingBox extends Entity {
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
     ctx.imageSmoothingEnabled = false;
 
+    const offsetY = this.hasBox ? 2 : 3;
+
     ctx.drawImage(
       this.kingPigImg,
       this.frameX * this.width,
@@ -118,7 +120,7 @@ export default class PigThrowingBox extends Entity {
       this.flip
         ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
         : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 3 + 1 * Constants.SCALE - YlvlOffset,
+      this.hitbox.y - this.hitbox.height / 3 + offsetY * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE,
     );

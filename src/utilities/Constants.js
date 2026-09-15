@@ -16,7 +16,7 @@ const Constants = {
     FALL: 9,
     JUMP: 10,
     IDLE: 11,
-    FRAME_SPEED: 20,
+    FRAME_SPEED: 15,
 
     PLAYER_IMG_SRC: "../res/KingSprite.png",
     PLAYER_SPEED: 1.5,

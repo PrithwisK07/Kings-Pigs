@@ -19,7 +19,7 @@ export default class Bomb extends Object {
     this.damage = 35;
 
     this.initHitbox(
-      x,
+      x + 5 * Constants.SCALE,
       y,
       (Constants.Bomb.BOMB_WIDTH / 4) * Constants.SCALE,
       (Constants.Bomb.BOMB_HEIGHT / 4) * Constants.SCALE

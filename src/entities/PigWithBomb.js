@@ -1,6 +1,6 @@
 import Constants from "../utilities/Constants.js";
 import Entity from "./Entity.js";
-import { getSpriteAtlas, getBombs } from "../utilities/LoadSave.js";
+import { getSpriteAtlas, getBombs, getPalmTreeStanding, getPalmTreeZ } from "../utilities/LoadSave.js";
 import {
   canMoveHere,
   GetEntityXPosNextToWall,
@@ -64,12 +64,18 @@ export default class PigThrowingBomb extends Entity {
 
     this.loadImage();
     this.loadTheBombs();
+    this.loadSolidObjects();
 
     this.levelData = null;
   }
 
   async loadTheBombs() {
     this.bombs = await getBombs();
+  }
+
+  async loadSolidObjects() {
+    this.palmTreeStanding = await getPalmTreeStanding();
+    this.palmTreeZ = await getPalmTreeZ();
   }
 
   pushActiveBombs() {
@@ -111,6 +117,8 @@ export default class PigThrowingBomb extends Entity {
     this.flip ? ctx.scale(-1, 1) : ctx.scale(1, 1);
     ctx.imageSmoothingEnabled = false;
 
+    const offsetY = this.hasBomb ? 1 : 0;
+
     ctx.drawImage(
       this.pigBomb,
       this.frameX * this.width,
@@ -120,7 +128,7 @@ export default class PigThrowingBomb extends Entity {
       this.flip
         ? -this.hitbox.x - this.hitbox.width * 1.7 + XlvlOffset
         : this.hitbox.x - this.hitbox.width / 1.5 - XlvlOffset,
-      this.hitbox.y - this.hitbox.height / 3 + 3 * Constants.SCALE - YlvlOffset,
+      this.hitbox.y - this.hitbox.height / 3 + 3 * Constants.SCALE - YlvlOffset + offsetY * Constants.SCALE,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE,
     );
@@ -164,8 +172,10 @@ export default class PigThrowingBomb extends Entity {
 
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
-    const playerY = this.player.hitbox.y;
-    const pigY = this.hitbox.y;
+    
+    // Shoot the raycast perfectly horizontally from the pig's center
+    // This prevents the height difference between King and Pig from breaking the tile grid check
+    const pigCenterY = this.hitbox.y + this.hitbox.height / 2;
 
     const deltaX = playerCenterX - pigCenterX;
     const distanceX = Math.abs(deltaX);
@@ -173,7 +183,7 @@ export default class PigThrowingBomb extends Entity {
     const TOLERANCE_RANGE = 200 * Constants.SCALE;
     const ATTACK_RANGE = this.hasBomb
       ? 100 * Constants.SCALE
-      : 20 * Constants.SCALE;
+      : 50 * Constants.SCALE;
 
     if (distanceX > TOLERANCE_RANGE) {
       if (this.chaseTimeout <= 0) {
@@ -182,25 +192,31 @@ export default class PigThrowingBomb extends Entity {
       return;
     }
 
+    // Pass pigCenterY for BOTH Y-coordinates to guarantee a straight line of sight
     const canSeePlayer = this.hasBomb
       ? distanceX < 120 * Constants.SCALE
-      : this.hasLineOfSight(pigCenterX, pigY, playerCenterX, playerY);
+      : this.hasLineOfSight(pigCenterX, pigCenterY, playerCenterX, pigCenterY);
 
     if (canSeePlayer) {
       this.chaseTimeout = this.MAX_CHASE_TIMEOUT;
-
       this.flip = deltaX > 0;
 
       if (distanceX < ATTACK_RANGE && !this.inAir) {
         if (!this.hasBomb) {
+          // Melee Mode: Must physically touch to attack
           if (this.hitbox.intersects(this.player.hitbox)) {
             if (this.attackCooldown === 0) {
               this.stopMoving();
               this.attack = true;
               this.attackCooldown = 75;
             }
+          } else {
+            // FIX: If we are close, but not touching yet, keep walking!
+            this.left = deltaX < 0;
+            this.right = deltaX > 0;
           }
         } else {
+          // Bomb Throwing Mode
           if (this.attackCooldown === 0) {
             this.stopMoving();
             this.attack = true;
@@ -208,10 +224,12 @@ export default class PigThrowingBomb extends Entity {
           }
         }
       } else {
+        // Outside of attack range, keep chasing
         this.left = deltaX < 0;
         this.right = deltaX > 0;
       }
     } else {
+      // Player is hidden behind an object/wall
       if (this.chaseTimeout <= 0) {
         this.stopMoving();
       }
@@ -235,7 +253,28 @@ export default class PigThrowingBomb extends Entity {
   }
 
   hasLineOfSight(x1, y1, x2, y2) {
-    return !detectAnySolidTile(x1, y1, x2, y2, this.levelData);
+    if (detectAnySolidTile(x1, y1, x2, y2, this.levelData)) return false;
+
+    // Check objects for line of sight blocking
+    const minX = Math.min(x1, x2);
+    const maxX = Math.max(x1, x2);
+
+    const checkVisionBlock = (objects) => {
+      if (!objects) return false;
+      for (const obj of objects) {
+        if (obj.hitbox.x < maxX && obj.hitbox.x + obj.hitbox.width > minX) {
+          if (y1 >= obj.hitbox.y && y1 <= obj.hitbox.y + obj.hitbox.height) {
+            return true; // Vision is blocked by object
+          }
+        }
+      }
+      return false;
+    };
+
+    if (checkVisionBlock(this.palmTreeStanding)) return false;
+    if (checkVisionBlock(this.palmTreeZ)) return false;
+
+    return true;
   }
 
   setAnimation() {
@@ -311,7 +350,7 @@ export default class PigThrowingBomb extends Entity {
     if (!this.left && !this.right && !this.inAir && !this.gettingHit) return;
 
     if (!this.inAir)
-      if (!isEntityOnFloor(this.hitbox, this.levelData)) this.inAir = true;
+      if (!isEntityOnFloor(this.hitbox, this.levelData, this.palmTreeStanding, this.palmTreeZ)) this.inAir = true;
 
     if (this.inAir) {
       if (
@@ -321,6 +360,8 @@ export default class PigThrowingBomb extends Entity {
           this.hitbox.width,
           this.hitbox.height,
           this.levelData,
+          this.palmTreeStanding,
+          this.palmTreeZ
         )
       ) {
         this.hitbox.y += this.ySpeed;
@@ -329,6 +370,8 @@ export default class PigThrowingBomb extends Entity {
         this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(
           this.hitbox,
           this.ySpeed,
+          this.palmTreeStanding,
+          this.palmTreeZ
         );
 
         if (this.ySpeed > 0) {
@@ -372,9 +415,11 @@ export default class PigThrowingBomb extends Entity {
       this.hitbox.width,
       this.hitbox.height,
       this.levelData,
+      this.palmTreeStanding,
+      this.palmTreeZ
     );
 
-    const isOnFloor = isEntityOnFloor(hitboxAlias, this.levelData);
+    const isOnFloor = isEntityOnFloor(hitboxAlias, this.levelData, this.palmTreeStanding, this.palmTreeZ);
 
     if (this.hasBomb) {
       const footX = this.flip
@@ -383,12 +428,15 @@ export default class PigThrowingBomb extends Entity {
 
       const footY = this.hitbox.y + this.hitbox.height + 1;
 
-      const tileBelowAheadIsSolid = detectAnySolidTile(
+      // FIX: Use canMoveHere so the pig respects objects for edge-detection!
+      const tileBelowAheadIsSolid = !canMoveHere(
         footX,
         footY,
-        footX,
-        footY + 1,
+        1,
+        1,
         this.levelData,
+        this.palmTreeStanding,
+        this.palmTreeZ
       );
 
       if (canMove && isOnFloor && tileBelowAheadIsSolid) {

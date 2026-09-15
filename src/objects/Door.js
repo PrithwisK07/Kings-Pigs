@@ -10,7 +10,6 @@ export default class Door extends Object {
     super(x, y, Constants.Door.DOOR_WIDTH, Constants.Door.DOOR_HEIGHT);
 
     this.doorType = doorType;
-
     
     this.opening = false;
     this.closing = false;
@@ -24,9 +23,9 @@ export default class Door extends Object {
     this.player = player;
     
     this.initHitbox(
-      x,
+      x + Constants.Door.DOOR_WIDTH / 2,
       y - Constants.Door.DOOR_HEIGHT,
-      Constants.Door.DOOR_WIDTH,
+      Constants.Door.DOOR_WIDTH / 2,
       Constants.Door.DOOR_HEIGHT
     );
     
@@ -152,7 +151,7 @@ export default class Door extends Object {
     if (this.objectImg == null) return;
 
     ctx.save();
-    
+
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.objectImg,
@@ -160,8 +159,8 @@ export default class Door extends Object {
       this.objectState * this.height,
       this.width,
       this.height,
-      this.hitbox.x - this.hitbox.width / 2 - XlvlOffset,
-      this.hitbox.y - this.height + 3 * Constants.SCALE - YlvlOffset,
+      this.hitbox.x - this.hitbox.width * 1.5 - XlvlOffset,
+      this.hitbox.y - this.height + 2 * Constants.SCALE - YlvlOffset,
       this.width * Constants.SCALE,
       this.height * Constants.SCALE
     );

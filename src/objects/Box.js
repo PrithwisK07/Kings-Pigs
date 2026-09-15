@@ -20,7 +20,7 @@ export default class Box extends Object {
     this.damage = 25;
 
     this.initHitbox(
-      x,
+      x - 15 * Constants.SCALE,
       y,
       Constants.Box.BOX_WIDTH * Constants.SCALE,
       Constants.Box.BOX_HEIGHT * Constants.SCALE
