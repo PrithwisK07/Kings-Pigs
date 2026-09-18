@@ -38,7 +38,6 @@ export default class Pig extends Entity {
     this.MAX_CHASE_TIMEOUT = 900;
     this.blockedFrames = 0;
 
-    // NEW: Replaced the cooldown timer with a single state flag
     this.hasThrownTantrum = false;
 
     this.damage = 10;
@@ -138,18 +137,28 @@ export default class Pig extends Entity {
     if(this.player.isDead) return;
     if(this.isDead || this.afterDeath || this.dyingWait) return;
 
-    if (this.isFrustrated) {
-      this.stopMoving();
-      return;
-    }
-
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
     
+    const playerCenterY = this.player.hitbox.y + this.player.hitbox.height / 2;
     const pigCenterY = this.hitbox.y + this.hitbox.height / 2;
 
     const deltaX = playerCenterX - pigCenterX;
     const distanceX = Math.abs(deltaX);
+    
+    const distanceY = Math.abs(playerCenterY - pigCenterY);
+    
+    if (this.isFrustrated) {
+      const isTouching = this.hitbox.intersects(this.player.hitbox);
+      const isSameY = distanceY < 15 * Constants.SCALE; 
+      
+      if (isTouching || this.gettingHit || isSameY) {
+        this.isFrustrated = false; 
+      } else {
+        this.stopMoving();
+        return; 
+      }
+    }
 
     const TOLERANCE_RANGE = 200 * Constants.SCALE;
     const ATTACK_RANGE = 50 * Constants.SCALE; 
@@ -158,7 +167,7 @@ export default class Pig extends Entity {
       if (this.chaseTimeout <= 0) {
         this.stopMoving();
         this.blockedFrames = 0;
-        this.hasThrownTantrum = false; // Reset if player ran far away
+        this.hasThrownTantrum = false; 
       }
       return;
     }
@@ -203,7 +212,6 @@ export default class Pig extends Entity {
               this.hasThrownTantrum = true;
             } 
             
-            // Cap at 30 so it doesn't reset and loop
             this.blockedFrames = 30;   
           } else {
             this.stopMoving(); 
@@ -231,14 +239,12 @@ export default class Pig extends Entity {
                 this.hasThrownTantrum = true;
               }
                
-              // Cap at 30 so it doesn't reset and loop
               this.blockedFrames = 30; 
             } else {
               this.left = deltaX < 0;
               this.right = deltaX > 0;
             }
           } else {
-            // If the pig successfully moves, reset the tantrum flags
             this.blockedFrames = 0; 
             this.hasThrownTantrum = false; 
             this.left = deltaX < 0;
@@ -249,7 +255,7 @@ export default class Pig extends Entity {
     } else {
       this.stopMoving();
       this.blockedFrames = 0;
-      this.hasThrownTantrum = false; // Reset if it lost interest
+      this.hasThrownTantrum = false; 
     }
   }
 

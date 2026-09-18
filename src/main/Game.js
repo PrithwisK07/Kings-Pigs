@@ -401,6 +401,8 @@ export default class Game {
       if(p.active) p.draw(this.ctx, this.XlvlOffset, this.YlvlOffset);
     });
 
+    this.levelManager.drawObjects(this.ctx, this.XlvlOffset, this.YlvlOffset);
+
     this.ctx.beginPath();
     this.ctx.fillStyle = "white";
     this.ctx.font = "bold 14px sans-serif";
