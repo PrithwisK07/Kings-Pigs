@@ -153,6 +153,7 @@ const Constants = {
     JUMP: 7,
     RUNNING: 8,
     IDLE: 9,
+    FRUSTRATED: 10,
 
     getSpriteAmount(entityState) {
       switch (entityState) {
@@ -175,6 +176,8 @@ const Constants = {
         case Constants.Pig.RUNNING:
           return 6;
         case Constants.Pig.IDLE:
+          return 11;
+        case Constants.Pig.FRUSTRATED:
           return 11;
         default:
           return -1;
@@ -469,6 +472,65 @@ const Constants = {
     SPIKES_WIDTH: 32,
     SPIKES_HEIGHT: 32,
     SPIKES_SRC: "../res/Spikes.png",
+  }, 
+
+  Ship: {
+    SHIP_WIDTH: 80,
+    SHIP_HEIGHT: 26,
+    SHIP_SRC: "../res/ship.png",
+
+    SHIP_SPEED: 30,
+
+    IDLE: 0,
+    HIT: 1,
+    DEAD: 2,
+    SAILING: 3,
+    
+    getSpriteAmount(objectState) {
+      switch(objectState) {
+        case Constants.Ship.DEAD:
+          return 5;
+        case Constants.Ship.HIT:
+          return 4;
+        case Constants.Ship.IDLE:
+          return 6;
+        case Constants.Ship.SAILING:
+          return 6;
+        default:
+          return -1;
+      }
+    }
+  },
+
+  Sail: {
+    SAIL_WIDTH: 28,
+    SAIL_HEIGHT: 50,
+    SAIL_SRC: "../res/sail.png",
+
+    SAIL_SPEED: 30,
+
+    IDLE: 0,
+    SAILING: 1,
+    CLOSE: 2,
+    OPEN: 3,
+    DEAD: 4,
+    
+    getSpriteAmount(objectState) {
+      switch(objectState) {
+        case Constants.Sail.DEAD:
+          return 1;
+        case Constants.Sail.CLOSE:
+          return 3;
+        case Constants.Sail.IDLE:
+          return 8;
+        case Constants.Sail.OPEN:
+          return 3;
+        case Constants.Sail.SAILING:
+          return 4;
+        default:
+          return -1;
+      }
+    }
   }
 };
 

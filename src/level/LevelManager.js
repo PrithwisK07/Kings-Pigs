@@ -5,7 +5,8 @@ import {
   getPigThrowingBoxes, getPigs, getCannons, getPigWithMatches,
   getPigThrowingBombs, getBombs, getDoors,
   getPalmTreeStanding, getPalmTreeZ, getWater,
-  getSpikes
+  getSpikes,
+  getShips
 } from "../utilities/LoadSave.js";
 
 export default class LevelManager {
@@ -25,6 +26,7 @@ export default class LevelManager {
     this.palmTreeZ = [];
     this.water = [];
     this.spikes = [];
+    this.ships = [];
 
     this.levels = new Levels(this, this.player);
     this.tileSetImg = null;
@@ -58,6 +60,7 @@ export default class LevelManager {
     this.palmTreeZ = await getPalmTreeZ();
     this.water = await getWater();
     this.spikes = await getSpikes();
+    this.ships = await getShips();
 
     if(onProgress) onProgress(90, "Waking up the King Pig...");
     this.game.boxes = this.boxes;
@@ -67,6 +70,7 @@ export default class LevelManager {
     this.game.palmTreeZ = this.palmTreeZ;
     this.game.water = this.water;
     this.game.spikes = this.spikes;
+    this.game.ships = this.ships;
 
     this.game.kingPigs.forEach((kp) => kp.loadLevelData(this.levelData));
     this.game.pigs.forEach((p) => p.loadLevelData(this.levelData));
@@ -126,7 +130,11 @@ export default class LevelManager {
         const tileID = this.levelData[i][j];
 
         if (tileID !== 255) {
+          ctx.save();
+
+          ctx.globalAlpha = tileID === 141 ? 0.5 : 1;
           ctx.imageSmoothingEnabled = false;
+
           ctx.drawImage(
             this.levelSprite[tileID],
             Math.floor(j * Constants.TILE_SIZE),
@@ -134,6 +142,7 @@ export default class LevelManager {
             Constants.TILE_SIZE,
             Constants.TILE_SIZE
           );
+          ctx.restore();
         }
       }
     }
@@ -199,6 +208,12 @@ export default class LevelManager {
       this.palmTreeZ.forEach((palmTree) => {
         palmTree.draw(ctx, XlvlOffset, YlvlOffset);
       }) 
+    
+    if(this.ships) {
+      this.ships.forEach((ship) => {
+        ship.draw(ctx, XlvlOffset, YlvlOffset);
+      })
+    }
 
     if(this.water) {
       this.water.forEach((w) => {
@@ -245,6 +260,12 @@ export default class LevelManager {
       this.palmTreeZ.forEach((palmTree) => {
         palmTree.update();
       }) 
+      
+    if(this.ships) {
+      this.ships.forEach((ship) => {
+        ship.update();
+      })
+    }
 
     if(this.water) {
       this.water.forEach((w) => {

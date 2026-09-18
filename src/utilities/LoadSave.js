@@ -12,6 +12,7 @@ import PalmTree from "../objects/PalmTree.js";
 import PalmTreeZ from "../objects/PalmTreeZ.js";
 import Water from "../objects/Water.js";
 import Spikes from "../objects/Spikes.js";
+import Ship from "../objects/Ship.js";
 
 let boxes = [];
 let cannons = [];
@@ -26,6 +27,7 @@ let palmTreeStanding = [];
 let palmTreeZ = [];
 let water = [];
 let spikes = [];
+let ships = [];
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -61,6 +63,7 @@ export function getLevelData(levelDataImg, player, levelManager) {
   palmTreeZ = [];
   water = [];
   spikes = [];
+  ships = [];
   
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -240,6 +243,18 @@ export function getLevelData(levelDataImg, player, levelManager) {
           )
         );
       }
+      
+      if (blueValue == 16) {
+        ships.push(
+          new Ship(
+            j * Constants.OG_TILE_SIZE * Constants.SCALE,
+            i * Constants.OG_TILE_SIZE * Constants.SCALE,
+            isFlipped,
+            levelManager,
+            player
+          )
+        );
+      }
 
       row.push(redValue);
     }
@@ -299,4 +314,8 @@ export async function getWater() {
 
 export async function getSpikes() {
   return spikes;
+}
+
+export async function getShips() {
+  return ships;
 }

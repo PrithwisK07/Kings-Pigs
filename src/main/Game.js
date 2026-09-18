@@ -62,6 +62,7 @@ export default class Game {
     this.palmTreeZ = [];    
     this.water = [];
     this.spikes = [];
+    this.ships = [];
 
     // Death animation
     this.deathImg = null;
@@ -144,7 +145,6 @@ export default class Game {
   async loadImage() {
     try {
       this.deathImg = await getSpriteAtlas(this.imagePath);
-      console.log("image: ", this.deathImg);
     } catch (error) {
       console.log(error.message);
     }

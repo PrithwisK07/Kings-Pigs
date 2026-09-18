@@ -7,8 +7,8 @@ export default class Water extends Object {
         super(x, y, Constants.Water.WATER_WIDTH, Constants.Water.WATER_HEIGHT);
 
         this.initHitbox(
-            x - 32 * Constants.SCALE, 
-            y,
+            x - 32 * Constants.SCALE - 2, 
+            y - 4.5,
             Constants.Water.WATER_WIDTH * Constants.SCALE,
             Constants.Water.WATER_HEIGHT * Constants.SCALE
         );
@@ -38,7 +38,10 @@ export default class Water extends Object {
         // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
         
         ctx.save();
+        
         ctx.imageSmoothingEnabled = false;
+        ctx.globalAlpha = 0.5;
+
         ctx.drawImage(
             this.objectImg,
             this.frameX * this.width,

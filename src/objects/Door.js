@@ -76,7 +76,6 @@ export default class Door extends Object {
       }
     } else {
       if (this.hitbox.intersects(this.player.hitbox)) {
-        console.log("exit door");
         if (this.player.exitDoor) {
           this.opening = true;
         }
