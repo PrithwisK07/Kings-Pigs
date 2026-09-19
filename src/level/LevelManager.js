@@ -219,6 +219,12 @@ export default class LevelManager {
       d.draw(ctx, XlvlOffset, YlvlOffset);
     });
 
+    if (this.ships) {
+      this.ships.forEach((ship) => {
+        ship.draw(ctx, XlvlOffset, YlvlOffset);
+      });
+    }
+
     ctx.restore();
   }
 
@@ -269,12 +275,6 @@ export default class LevelManager {
       this.palmTreeZ.forEach((palmTree) => {
         palmTree.draw(ctx, XlvlOffset, YlvlOffset);
       });
-
-    if (this.ships) {
-      this.ships.forEach((ship) => {
-        ship.draw(ctx, XlvlOffset, YlvlOffset);
-      });
-    }
 
     if (this.spikes) {
       this.spikes.forEach((spike) => {

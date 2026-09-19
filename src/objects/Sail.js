@@ -28,6 +28,11 @@ export default class Sail extends Object {
 
         this.sailSpeedY = -0.085;
 
+        this.sailing = false;
+        this.closeMast = false;
+        this.openMast = false;
+        this.hasOpenedOnce = false;
+
         this.loadImg(Constants.Sail.SAIL_SRC);
     }
 
@@ -63,6 +68,21 @@ export default class Sail extends Object {
 
         this.objectState = Constants.Sail.IDLE;
 
+        if(this.closeMast) return;
+
+        if(this.sailing) {
+            this.objectState = Constants.Sail.SAILING;
+        }
+
+        if(this.openMast) {
+            console.log('masting');
+            this.objectState = Constants.Sail.OPEN;
+        }
+
+        if(this.closeMast) {
+            this.objectState = Constants.Sail.CLOSE;
+        }
+
         if (this.lastObjectState != this.objectState) {
             this.frameX = 0;
             this.countdown = 0;
@@ -84,6 +104,12 @@ export default class Sail extends Object {
             
             if(this.frameX >= Constants.Sail.getSpriteAmount(this.objectState)) {
                 this.frameX = 0;
+
+                if(this.objectState === Constants.Sail.OPEN) {
+                    this.sailing = true;
+                }
+
+                this.openMast = false;
             }
         }
     }

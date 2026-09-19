@@ -68,6 +68,7 @@ export default class Player extends Entity {
     this.boxes = [];
     this.palmTreeStanding = [];
     this.palmTreeZ = [];
+    this.ships = [];
     
     this.initHitbox(
       x,
@@ -149,6 +150,7 @@ export default class Player extends Entity {
     this.cannons = this.game.cannons;
     this.palmTreeStanding = this.game.palmTreeStanding;
     this.palmTreeZ = this.game.palmTreeZ;
+    this.ships = this.game.ships;
   }
 
   enterTheDoor() {
@@ -247,7 +249,7 @@ export default class Player extends Entity {
       if (this.ySpeed < 0) this.entityState = Constants.Player.JUMP;
       else this.entityState = Constants.Player.FALL;
 
-    if ((this.left || this.right) && !this.inAir) {
+    if ((this.left || this.right) && !this.inAir && !(this.left && this.right)) {
       this.entityState = Constants.Player.RUNNING;
     }
 
@@ -290,7 +292,7 @@ export default class Player extends Entity {
     if (!this.left && !this.right && !this.inAir && !this.gettingHit) return;
 
     if (!this.inAir)
-      if (!isEntityOnFloor(this.hitbox, this.levelData, this.palmTreeStanding, this.palmTreeZ)) 
+      if (!isEntityOnFloor(this.hitbox, this.levelData, this.palmTreeStanding, this.palmTreeZ, this.ships)) 
         this.inAir = true;
 
     if (this.inAir) {
@@ -302,7 +304,8 @@ export default class Player extends Entity {
           this.hitbox.height,
           this.levelData,
           this.palmTreeStanding,
-          this.palmTreeZ
+          this.palmTreeZ, 
+          this.ships
         )
       ) {
         this.hitbox.y += this.ySpeed;
@@ -312,7 +315,8 @@ export default class Player extends Entity {
           this.hitbox,
           this.ySpeed,
           this.palmTreeStanding,
-          this.palmTreeZ
+          this.palmTreeZ,
+          this.ships
         );
 
         if (this.ySpeed > 0 && !this.attack) {
@@ -343,12 +347,13 @@ export default class Player extends Entity {
         this.hitbox.height,
         this.levelData,
         this.palmTreeStanding,
-        this.palmTreeZ
+        this.palmTreeZ,
+        this.ships
       )
     ) {
       this.hitbox.x += xSpeed2;
     } else {
-      this.hitbox.x = GetEntityXPosNextToWall(this.hitbox, xSpeed2, this.palmTreeStanding, this.palmTreeZ);
+      this.hitbox.x = GetEntityXPosNextToWall(this.hitbox, xSpeed2, this.palmTreeStanding, this.palmTreeZ, this.ships);
     }
   }
 

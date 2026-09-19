@@ -1,6 +1,6 @@
 import Constants from "./Constants.js";
 
-function getCollidingObject(hitbox, xSpeed, ySpeed, palmTreeStanding, palmTreeZ) {
+function getCollidingObject(hitbox, xSpeed, ySpeed, palmTreeStanding, palmTreeZ, ships) {
   if (palmTreeStanding) {
     for (const palmTree of palmTreeStanding) {
       if (
@@ -27,17 +27,28 @@ function getCollidingObject(hitbox, xSpeed, ySpeed, palmTreeStanding, palmTreeZ)
     }
   }
 
+  if (ships) {
+    for (const ship of ships) {
+      if (
+        hitbox.x + xSpeed < ship.hitbox.x + ship.hitbox.width &&
+        hitbox.x + hitbox.width + xSpeed > ship.hitbox.x &&
+        hitbox.y + ySpeed < ship.hitbox.y + ship.hitbox.height &&
+        hitbox.y + hitbox.height + ySpeed > ship.hitbox.y
+      ) {
+        return ship;
+      }
+    }
+  }
+
   return null;
 }
 
-export function canMoveHere(x, y, width, height, levelData, palmTreeStanding, palmTreeZ) {
-  // Exact boundary check for objects (stops you BEFORE you get inside)
+export function canMoveHere(x, y, width, height, levelData, palmTreeStanding, palmTreeZ, ships) {
   const dummyHitbox = { x, y, width, height };
-  if (getCollidingObject(dummyHitbox, 0, 0, palmTreeStanding, palmTreeZ)) {
+  if (getCollidingObject(dummyHitbox, 0, 0, palmTreeStanding, palmTreeZ, ships)) {
     return false;
   }
 
-  // Corner checks for tiles
   if (!isSolid(x, y, levelData))
     if (!isSolid(x + width, y + height, levelData))
       if (!isSolid(x + width, y, levelData))
@@ -69,8 +80,8 @@ function isSolid(x, y, levelData) {
   return false;
 }
 
-export function GetEntityYPosUnderRoofOrAboveFloor(hitbox, ySpeed, palmTreeStanding, palmTreeZ) {
-  const obj = getCollidingObject(hitbox, 0, ySpeed, palmTreeStanding, palmTreeZ);
+export function GetEntityYPosUnderRoofOrAboveFloor(hitbox, ySpeed, palmTreeStanding, palmTreeZ, ships) {
+  const obj = getCollidingObject(hitbox, 0, ySpeed, palmTreeStanding, palmTreeZ, ships);
   
   if (obj) {
     if (ySpeed > 0) return obj.hitbox.y - hitbox.height - 1; 
@@ -88,8 +99,8 @@ export function GetEntityYPosUnderRoofOrAboveFloor(hitbox, ySpeed, palmTreeStand
   }
 }
 
-export function GetEntityXPosNextToWall(hitbox, xSpeed, palmTreeStanding, palmTreeZ) {
-  const obj = getCollidingObject(hitbox, xSpeed, 0, palmTreeStanding, palmTreeZ);
+export function GetEntityXPosNextToWall(hitbox, xSpeed, palmTreeStanding, palmTreeZ, ships) {
+  const obj = getCollidingObject(hitbox, xSpeed, 0, palmTreeStanding, palmTreeZ, ships);
   
   if (obj) {
     if (xSpeed > 0) return obj.hitbox.x - hitbox.width - 1;
@@ -107,13 +118,11 @@ export function GetEntityXPosNextToWall(hitbox, xSpeed, palmTreeStanding, palmTr
   }
 }
 
-export function isEntityOnFloor(hitbox, levelData, palmTreeStanding, palmTreeZ) {
-  // AABB floor check for objects (projected 2 pixels downwards)
-  if (getCollidingObject(hitbox, 0, 2, palmTreeStanding, palmTreeZ)) {
+export function isEntityOnFloor(hitbox, levelData, palmTreeStanding, palmTreeZ, ships) {
+  if (getCollidingObject(hitbox, 0, 2, palmTreeStanding, palmTreeZ, ships)) {
     return true;
   }
 
-  // Tile checks
   const bottomLeftTile = isSolid(hitbox.x, hitbox.y + hitbox.height + 2, levelData);
   const bottomRightTile = isSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, levelData);
 

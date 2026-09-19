@@ -173,6 +173,7 @@ export default class PigThrowingBomb extends Entity {
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
     if (this.player.isDead) return;
+    if(this.player.onShip) return;
     if (this.isDead || this.afterDeath || this.dyingWait) return;
 
     // 1. Calculate positions FIRST

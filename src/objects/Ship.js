@@ -1,7 +1,8 @@
 import Constants from "../utilities/Constants.js";
 import Object from "./Object.js";
-import { GetEntityYPosUnderRoofOrAboveFloor } from "../utilities/HelperMethods.js";
 import Sail from "./Sail.js";
+import { canMoveHere } from "../utilities/HelperMethods.js";
+import Rectangle2D from "../custom/Rectangle2D.js";
 
 export default class Ship extends Object {
     constructor(x, y, flip, levelManager, player) {
@@ -12,19 +13,25 @@ export default class Ship extends Object {
         this.levelManager = levelManager;
         this.player = player;
         this.flip = flip;
+        this.sailing = false;
 
         this.objectState = Constants.Ship.IDLE;
 
         this.initHitbox(
             x,
-            y,
+            y + 20 * Constants.SCALE,
             Constants.Ship.SHIP_WIDTH * Constants.SCALE,
-            Constants.Ship.SHIP_HEIGHT * Constants.SCALE
+            Constants.Ship.SHIP_HEIGHT * Constants.SCALE - 5 * Constants.SCALE
+        );
+
+        this.topBox = new Rectangle2D(
+            this.hitbox.x,
+            this.hitbox.y - 2 * Constants.SCALE,
+            Constants.Ship.SHIP_WIDTH * Constants.SCALE,
+            Constants.Ship.SHIP_HEIGHT * Constants.SCALE / 4
         );
 
         this.countdownTimer = Constants.Ship.SHIP_SPEED;
-
-        this.hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(this.hitbox, 1) + 11 * Constants.SCALE;
 
         const offsetY = 3;
         
@@ -33,6 +40,7 @@ export default class Ship extends Object {
         this.troughYDuringSail = this.hitbox.y + offsetY * Constants.SCALE;
 
         this.sailSpeedY = -0.085;
+        this.sailSpeedX = 0.25;
 
         this.loadImg(Constants.Ship.SHIP_SRC);
     }
@@ -45,6 +53,7 @@ export default class Ship extends Object {
         this.sail.draw(ctx, XlvlOffset, YlvlOffset);
         
         ctx.save();
+
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
             this.objectImg,
@@ -53,7 +62,7 @@ export default class Ship extends Object {
             this.width,
             this.height,
             this.hitbox.x - XlvlOffset,
-            this.hitbox.y + 3 * Constants.SCALE - YlvlOffset,
+            this.hitbox.y - 2 * Constants.SCALE - YlvlOffset,
             this.width * Constants.SCALE, 
             this.height * Constants.SCALE
         );
@@ -64,14 +73,62 @@ export default class Ship extends Object {
         this.updateAnimationTick();
         this.setAnimation();
         this.sailAnimation();
+        this.updateXPos(this.sailSpeedX);
+        this.checkPlayerCollision();
 
         this.sail.update();
+    }
+
+    checkPlayerCollision() {
+        if(this.topBox.intersects(this.player.hitbox)) {
+            this.player.onShip = true;
+        } else {
+            this.player.onShip = false;
+        }
+    }
+
+    updateXPos(xSpeed) {
+        if(!this.sailing) 
+            if(!this.player.onShip) return;
+
+        if (
+            canMoveHere(
+                this.hitbox.x + xSpeed,
+                this.hitbox.y,
+                this.hitbox.width,
+                this.hitbox.height,
+                this.levelManager.levelData
+            )
+        ) {
+            if(!this.sail.openMast && !this.sail.hasOpenedOnce) {
+                this.sail.openMast = true;
+                this.sail.hasOpenedOnce = true;
+            }
+            
+            if(this.sail.sailing) {
+                this.sailing = true;
+                this.hitbox.x += xSpeed;
+                this.topBox.x += xSpeed;
+
+                if(this.player.onShip) this.player.hitbox.x += xSpeed;
+                
+                this.sail.hitbox.x += xSpeed;
+            }
+        } else {
+            this.sail.closeMast = true;
+            this.sail.sailing = false;
+            this.sailing = false;
+        }
     }
 
     setAnimation() {
         this.lastObjectState = this.objectState;
 
         this.objectState = Constants.Ship.IDLE;
+
+        if(this.sailing) {
+            this.objectState = Constants.Ship.SAILING;
+        }
 
         if (this.lastObjectState != this.objectState) {
             this.frameX = 0;
@@ -81,9 +138,14 @@ export default class Ship extends Object {
 
     sailAnimation() {
         this.hitbox.y -= this.sailSpeedY;
+        this.topBox.y -= this.sailSpeedY;
 
-        if(this.hitbox.y <= this.peakYDuringSail || this.hitbox.y >= this.troughYDuringSail) 
+        if(this.player.onShip)
+            this.player.hitbox.y -= this.sailSpeedY;
+
+        if(this.hitbox.y <= this.peakYDuringSail || this.hitbox.y >= this.troughYDuringSail) { 
             this.sailSpeedY = - this.sailSpeedY;
+        }
     }
 
     updateAnimationTick() {
