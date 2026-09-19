@@ -1,14 +1,14 @@
 import Constants from "../utilities/Constants.js";
 import Object from "./Object.js";
-import { getSpriteAtlas } from "../utilities/LoadSave.js"; // <-- Import the async loader!
+import { getSpriteAtlas, getPigThrowingBombs, getPigThrowingBoxes, getPigs, getKingPigs } from "../utilities/LoadSave.js";
 
 export default class Water extends Object {
     constructor(x, y, levelManager, player) {
         super(x, y, Constants.Water.WATER_WIDTH, Constants.Water.WATER_HEIGHT);
 
         this.initHitbox(
-            x - 32 * Constants.SCALE, 
-            y,
+            x - 32 * Constants.SCALE - 2, 
+            y - 4.5,
             Constants.Water.WATER_WIDTH * Constants.SCALE,
             Constants.Water.WATER_HEIGHT * Constants.SCALE
         );
@@ -21,6 +21,14 @@ export default class Water extends Object {
         this.countdownTimer = Constants.Water.FRAME_SPEED;
 
         this.loadImage();
+        this.getEnemies();
+    }
+
+    async getEnemies() {
+        this.pigs = await getPigs();
+        this.kingPigs = await getKingPigs();
+        this.pigThrowingBoxes = await getPigThrowingBoxes();
+        this.pigThrowingBombs = await getPigThrowingBombs();
     }
 
     async loadImage() {
@@ -38,7 +46,10 @@ export default class Water extends Object {
         // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
         
         ctx.save();
+        
         ctx.imageSmoothingEnabled = false;
+        ctx.globalAlpha = 0.5;
+
         ctx.drawImage(
             this.objectImg,
             this.frameX * this.width,
@@ -55,6 +66,33 @@ export default class Water extends Object {
     
     update() {
         this.updateAnimationTick();
+        this.checkCollisions();
+    }
+
+    checkCollisions() {
+        this.pigs.forEach(pig => {
+            if(this.hitbox.intersects(pig.hitbox)) {
+                pig.takeDamage(100);
+            }
+        });
+
+        this.kingPigs.forEach(pig => {
+            if(this.hitbox.intersects(pig.hitbox)) {
+                pig.takeDamage(100);
+            }
+        });
+        
+        this.pigThrowingBombs.forEach(pig => {
+            if(this.hitbox.intersects(pig.hitbox)) {
+                pig.takeDamage(100);
+            }
+        });
+        
+        this.pigThrowingBoxes.forEach(pig => {
+            if(this.hitbox.intersects(pig.hitbox)) {
+                pig.takeDamage(100);
+            }
+        });
     }
 
     updateAnimationTick() {

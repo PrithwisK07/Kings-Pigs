@@ -31,7 +31,10 @@ export default class Entity {
 
   takeDamage(damage) {
     this.health -= damage;
+
     if (this.health <= 0) {
+      this.left = false;
+      this.right = false;
       this.health = 0;
       this.isDead = true;
       return;

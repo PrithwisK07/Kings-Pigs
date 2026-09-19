@@ -50,8 +50,11 @@ export default class Spikes extends Object {
     }
     
     update() {
-        if(this.hitbox.intersects(this.player.hitbox))
+        if(this.hitbox.intersects(this.player.hitbox)) {
             this.player.takeDamage(1);
+            this.player.left = false;
+            this.player.right = false;
+        }
 
         if(!this.pigs || !this.kingPigs || !this.pigThrowingBombs || !this.pigThrowingBoxes) return;
 

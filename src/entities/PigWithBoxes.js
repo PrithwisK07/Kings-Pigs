@@ -36,6 +36,7 @@ export default class PigThrowingBox extends Entity {
     this.jumping = false;
     this.flip = isFlipped;
     this.inAir = true;
+    this.isFrustrated = false; // NEW: Added missing state
 
     this.hasBox = true;
     this.pickingBox = false;
@@ -48,7 +49,10 @@ export default class PigThrowingBox extends Entity {
     this.attackCooldown = 0;
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 1800;
+    
+    // NEW: Frustration memory logic
     this.blockedFrames = 0; 
+    this.hasThrownTantrum = false;
 
     this.damage = 10;
 
@@ -178,8 +182,10 @@ export default class PigThrowingBox extends Entity {
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
     if (this.player.isDead) return;
+    if (this.player.onShip) return;
     if (this.isDead || this.afterDeath || this.dyingWait) return;
 
+    // 1. Calculate positions FIRST
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
     const playerCenterY = this.player.hitbox.y + this.player.hitbox.height / 2;
@@ -187,6 +193,20 @@ export default class PigThrowingBox extends Entity {
 
     const deltaX = playerCenterX - pigCenterX;
     const distanceX = Math.abs(deltaX);
+    const distanceY = Math.abs(playerCenterY - pigCenterY); // NEW: Y distance
+
+    // 2. EXPLOIT FIX: Snap out of tantrum early
+    if (this.isFrustrated) {
+      const isTouching = this.hitbox.intersects(this.player.hitbox);
+      const isSameY = distanceY < 15 * Constants.SCALE;
+
+      if (isTouching || this.gettingHit || isSameY) {
+        this.isFrustrated = false; 
+      } else {
+        this.stopMoving();
+        return; // Keep throwing the tantrum
+      }
+    }
 
     const TOLERANCE_RANGE = 200 * Constants.SCALE;
     const ATTACK_RANGE = this.hasBox
@@ -196,6 +216,8 @@ export default class PigThrowingBox extends Entity {
     if (distanceX > TOLERANCE_RANGE) {
       if (this.chaseTimeout <= 0) {
         this.stopMoving();
+        this.blockedFrames = 0;
+        this.hasThrownTantrum = false; // Reset if player runs far away
       }
       return;
     }
@@ -239,6 +261,14 @@ export default class PigThrowingBox extends Entity {
           this.blockedFrames++;
           if (this.blockedFrames > 30) {
             this.stopMoving();
+            
+            // FIX: One-and-done tantrum logic
+            if (!this.hasThrownTantrum) {
+              this.isFrustrated = true;
+              this.hasThrownTantrum = true;
+            }
+            
+            this.blockedFrames = 30; // Cap
           } else {
             this.stopMoving(); 
           }
@@ -259,12 +289,22 @@ export default class PigThrowingBox extends Entity {
             this.blockedFrames++;
             if (this.blockedFrames > 30) {
               this.stopMoving();
+              
+              // FIX: One-and-done tantrum logic
+              if (!this.hasThrownTantrum) {
+                this.isFrustrated = true;
+                this.hasThrownTantrum = true;
+              }
+              
+              this.blockedFrames = 30; // Cap
             } else {
               this.left = deltaX < 0;
               this.right = deltaX > 0;
             }
           } else {
+            // FIX: Reset tantrum flag when successfully moving again
             this.blockedFrames = 0;
+            this.hasThrownTantrum = false;
             this.left = deltaX < 0;
             this.right = deltaX > 0;
           }
@@ -273,6 +313,7 @@ export default class PigThrowingBox extends Entity {
     } else {
       this.stopMoving();
       this.blockedFrames = 0;
+      this.hasThrownTantrum = false; // Reset if it loses interest
     }
   }
 
@@ -325,6 +366,9 @@ export default class PigThrowingBox extends Entity {
           this.entityState = Constants.PigThrowingBox.withBox.RUNNING;
         }
 
+        // FIX: Add mapping for frustration with box
+        if (this.isFrustrated) this.entityState = Constants.PigThrowingBox.withBox.FRUSTRATED;
+
         if (this.attack) {
           this.entityState = Constants.PigThrowingBox.withBox.ATTACK;
         }
@@ -346,6 +390,9 @@ export default class PigThrowingBox extends Entity {
         if ((this.left || this.right) && !this.inAir) {
           this.entityState = Constants.PigThrowingBox.withoutBox.RUNNING;
         }
+
+        // FIX: Add mapping for frustration without box
+        if (this.isFrustrated) this.entityState = Constants.PigThrowingBox.withoutBox.FRUSTRATED;
 
         if(this.gettingHit) {
           this.entityState = Constants.PigThrowingBox.withoutBox.HIT;
@@ -537,6 +584,9 @@ export default class PigThrowingBox extends Entity {
         this.frameX = 0;
         this.attack = false;
         this.gettingHit = false;
+        
+        // FIX: Reset frustration state at end of animation
+        this.isFrustrated = false;
 
         if (this.isDead || this.afterDeath || this.dyingWait) return;
 

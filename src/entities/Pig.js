@@ -26,6 +26,7 @@ export default class Pig extends Entity {
     this.jumping = false;
     this.flip = isFlipped;
     this.inAir = true;
+    this.isFrustrated = false;
 
     this.ySpeed = 0;
     this.gravity = 0.05;
@@ -35,7 +36,9 @@ export default class Pig extends Entity {
     this.attackCooldown = 0;
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 900;
-    this.blockedFrames = 0; // NEW: Memory for frustration/blocking
+    this.blockedFrames = 0;
+
+    this.hasThrownTantrum = false;
 
     this.damage = 10;
 
@@ -50,12 +53,11 @@ export default class Pig extends Entity {
     );
 
     this.loadImage();
-    this.loadSolidObjects(); // NEW: Load palm trees
+    this.loadSolidObjects();
 
     this.levelData = null;
   }
 
-  // NEW: Fetching the objects for collision
   async loadSolidObjects() {
     this.palmTreeStanding = await getPalmTreeStanding();
     this.palmTreeZ = await getPalmTreeZ();
@@ -74,6 +76,7 @@ export default class Pig extends Entity {
     if (!this.pigImg) return;
 
     // this.drawHitbox(ctx, XlvlOffset, YlvlOffset);
+
     this.drawHealthBar(ctx, XlvlOffset, YlvlOffset);
 
     ctx.save();
@@ -132,24 +135,40 @@ export default class Pig extends Entity {
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
     if(this.player.isDead) return;
+    if(this.player.onShip) return;
     if(this.isDead || this.afterDeath || this.dyingWait) return;
 
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
     
-    // Y-Centers for flattened line of sight and robust logic
     const playerCenterY = this.player.hitbox.y + this.player.hitbox.height / 2;
     const pigCenterY = this.hitbox.y + this.hitbox.height / 2;
 
     const deltaX = playerCenterX - pigCenterX;
     const distanceX = Math.abs(deltaX);
+    
+    const distanceY = Math.abs(playerCenterY - pigCenterY);
+    
+    if (this.isFrustrated) {
+      const isTouching = this.hitbox.intersects(this.player.hitbox);
+      const isSameY = distanceY < 15 * Constants.SCALE; 
+      
+      if (isTouching || this.gettingHit || isSameY) {
+        this.isFrustrated = false; 
+      } else {
+        this.stopMoving();
+        return; 
+      }
+    }
 
     const TOLERANCE_RANGE = 200 * Constants.SCALE;
-    const ATTACK_RANGE = 50 * Constants.SCALE; // Bumped to 50 for consistent melee interaction
+    const ATTACK_RANGE = 50 * Constants.SCALE; 
 
     if (distanceX > TOLERANCE_RANGE) {
       if (this.chaseTimeout <= 0) {
         this.stopMoving();
+        this.blockedFrames = 0;
+        this.hasThrownTantrum = false; 
       }
       return;
     }
@@ -166,7 +185,6 @@ export default class Pig extends Entity {
       this.flip = deltaX > 0;
     }
 
-    // Unify movement intention
     if (canSeePlayer || this.chaseTimeout > 0) {
       let wantsToMove = false;
 
@@ -185,11 +203,17 @@ export default class Pig extends Entity {
       }
 
       if (wantsToMove) {
-        // Vertical Dancing check
         if (distanceX < 10 * Constants.SCALE) {
           this.blockedFrames++;
           if (this.blockedFrames > 30) {
             this.stopMoving();
+
+            if (!this.hasThrownTantrum) {
+              this.isFrustrated = true; 
+              this.hasThrownTantrum = true;
+            } 
+            
+            this.blockedFrames = 30;   
           } else {
             this.stopMoving(); 
           }
@@ -210,12 +234,20 @@ export default class Pig extends Entity {
             this.blockedFrames++;
             if (this.blockedFrames > 30) {
               this.stopMoving();
+              
+              if (!this.hasThrownTantrum) {
+                this.isFrustrated = true;
+                this.hasThrownTantrum = true;
+              }
+               
+              this.blockedFrames = 30; 
             } else {
               this.left = deltaX < 0;
               this.right = deltaX > 0;
             }
           } else {
-            this.blockedFrames = 0;
+            this.blockedFrames = 0; 
+            this.hasThrownTantrum = false; 
             this.left = deltaX < 0;
             this.right = deltaX > 0;
           }
@@ -224,6 +256,7 @@ export default class Pig extends Entity {
     } else {
       this.stopMoving();
       this.blockedFrames = 0;
+      this.hasThrownTantrum = false; 
     }
   }
 
@@ -232,7 +265,6 @@ export default class Pig extends Entity {
     this.right = false;
   }
 
-  // NEW: Updated Line of Sight with Object Vision Blocking
   hasLineOfSight(x1, y1, x2, y2) {
     if (detectAnySolidTile(x1, y1, x2, y2, this.levelData)) return false;
 
@@ -273,6 +305,8 @@ export default class Pig extends Entity {
     if ((this.left || this.right) && !this.inAir) {
       this.entityState = Constants.Pig.RUNNING;
     }
+
+    if(this.isFrustrated) this.entityState = Constants.Pig.FRUSTRATED;
 
     if(this.gettingHit) this.entityState = Constants.Pig.HIT;
 
@@ -355,8 +389,6 @@ export default class Pig extends Entity {
     ) {
       this.hitbox.x += xSpeed2;
     } else {
-      // FIX: Removed the automatic direction flipping (Dancing bug fix)
-      // Physics Engine just snaps to the wall, AI handles the rest!
       this.hitbox.x = GetEntityXPosNextToWall(
         this.hitbox, 
         xSpeed2, 
@@ -392,6 +424,7 @@ export default class Pig extends Entity {
         this.frameX = 0;
         this.attack = false;
         this.gettingHit = false;
+        this.isFrustrated = false;
         
         if(this.afterDeath || this.isDead || this.dyingWait) return;
         

@@ -108,6 +108,7 @@ const Constants = {
     JUMP: 7,
     RUNNING: 8,
     IDLE: 9,
+    FRUSTRATED: 10,
 
     getSpriteAmount(entityState) {
       switch (entityState) {
@@ -128,14 +129,17 @@ const Constants = {
         case Constants.KingPig.JUMP:
           return 1;
         case Constants.KingPig.RUNNING:
-          return 5;
+          return 6;
         case Constants.KingPig.IDLE:
+          return 12;
+        case Constants.KingPig.FRUSTRATED:
           return 12;
         default:
           break;
       }
     },
   },
+
   Pig: {
     PIG_WIDTH: 34,
     PIG_HEIGHT: 28,
@@ -153,6 +157,7 @@ const Constants = {
     JUMP: 7,
     RUNNING: 8,
     IDLE: 9,
+    FRUSTRATED: 10,
 
     getSpriteAmount(entityState) {
       switch (entityState) {
@@ -176,11 +181,14 @@ const Constants = {
           return 6;
         case Constants.Pig.IDLE:
           return 11;
+        case Constants.Pig.FRUSTRATED:
+          return 11;
         default:
           return -1;
       }
     },
   },
+
   PigThrowingBox: {
     PIG_THROWING_BOX_WIDTH: 34,
     PIG_THROWING_BOX_HEIGHT: 30,
@@ -195,14 +203,16 @@ const Constants = {
       ATTACK: 4,
       GROUND: 5,
       FALL: 6,
-      RUNNING: 7,
-      IDLE: 8,
+      JUMP: 7,
+      RUNNING: 8,
+      IDLE: 9,
+      FRUSTRATED: 10,
     },
     withBox: {
-      ATTACK: 9,
-      RUNNING: 10,
-      IDLE: 11,
-      PICKING: 12,
+      ATTACK: 11,
+      RUNNING: 12,
+      IDLE: 13,
+      PICKING: 14,
     },
 
     getSpriteAmount(entityState, hasBox) {
@@ -241,6 +251,8 @@ const Constants = {
             return 6;
           case Constants.PigThrowingBox.withoutBox.IDLE:
             return 11;
+          case Constants.PigThrowingBox.withoutBox.FRUSTRATED:
+            return 11;
           default:
             return -1;
         }
@@ -262,14 +274,16 @@ const Constants = {
       ATTACK: 4,
       GROUND: 5,
       FALL: 6,
-      RUNNING: 7,
-      IDLE: 8,
+      JUMP: 7,
+      RUNNING: 8,
+      IDLE: 9,
+      FRUSTRATED: 10,
     },
     withBomb: {
-      PICKING: 9,
-      ATTACK: 10,
-      RUNNING: 11,
-      IDLE: 12,
+      PICKING: 11,
+      ATTACK: 12,
+      RUNNING: 13,
+      IDLE: 14,
     },
 
     getSpriteAmount(entityState, hasBomb) {
@@ -308,6 +322,8 @@ const Constants = {
             return 6;
           case Constants.PigThrowingBomb.withoutBomb.IDLE:
             return 11;
+          case Constants.PigThrowingBomb.withoutBomb.FRUSTRATED:
+            return 11;  
           default:
             return -1;
         }
@@ -469,6 +485,65 @@ const Constants = {
     SPIKES_WIDTH: 32,
     SPIKES_HEIGHT: 32,
     SPIKES_SRC: "../res/Spikes.png",
+  }, 
+
+  Ship: {
+    SHIP_WIDTH: 80,
+    SHIP_HEIGHT: 26,
+    SHIP_SRC: "../res/ship.png",
+
+    SHIP_SPEED: 30,
+
+    IDLE: 0,
+    HIT: 1,
+    DEAD: 2,
+    SAILING: 3,
+    
+    getSpriteAmount(objectState) {
+      switch(objectState) {
+        case Constants.Ship.DEAD:
+          return 5;
+        case Constants.Ship.HIT:
+          return 4;
+        case Constants.Ship.IDLE:
+          return 6;
+        case Constants.Ship.SAILING:
+          return 6;
+        default:
+          return -1;
+      }
+    }
+  },
+
+  Sail: {
+    SAIL_WIDTH: 28,
+    SAIL_HEIGHT: 50,
+    SAIL_SRC: "../res/sail.png",
+
+    SAIL_SPEED: 30,
+
+    IDLE: 0,
+    SAILING: 1,
+    CLOSE: 2,
+    OPEN: 3,
+    DEAD: 4,
+    
+    getSpriteAmount(objectState) {
+      switch(objectState) {
+        case Constants.Sail.DEAD:
+          return 1;
+        case Constants.Sail.CLOSE:
+          return 3;
+        case Constants.Sail.IDLE:
+          return 8;
+        case Constants.Sail.OPEN:
+          return 3;
+        case Constants.Sail.SAILING:
+          return 4;
+        default:
+          return -1;
+      }
+    }
   }
 };
 

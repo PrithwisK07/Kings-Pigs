@@ -37,6 +37,7 @@ export default class PigThrowingBomb extends Entity {
     this.jumping = false;
     this.flip = isFlipped;
     this.inAir = true;
+    this.isFrustrated = false;
 
     this.hasBomb = true;
     this.pickingBomb = false;
@@ -49,7 +50,10 @@ export default class PigThrowingBomb extends Entity {
     this.attackCooldown = 0;
     this.chaseTimeout = 0;
     this.MAX_CHASE_TIMEOUT = 1800;
+    
+    // NEW: Frustration memory logic
     this.blockedFrames = 0;
+    this.hasThrownTantrum = false;
 
     this.damage = 10;
 
@@ -169,17 +173,32 @@ export default class PigThrowingBomb extends Entity {
   detectAndChasePlayer() {
     if (!this.player || !this.levelData) return;
     if (this.player.isDead) return;
+    if(this.player.onShip) return;
     if (this.isDead || this.afterDeath || this.dyingWait) return;
 
-    this.isFrustrated = false;
-
+    // 1. Calculate positions FIRST
     const playerCenterX = this.player.hitbox.x + this.player.hitbox.width / 2;
     const pigCenterX = this.hitbox.x + this.hitbox.width / 2;
   
+    const playerCenterY = this.player.hitbox.y + this.player.hitbox.height / 2;
     const pigCenterY = this.hitbox.y + this.hitbox.height / 2;
 
     const deltaX = playerCenterX - pigCenterX;
     const distanceX = Math.abs(deltaX);
+    const distanceY = Math.abs(playerCenterY - pigCenterY); // NEW: Y distance for exploit fix
+
+    // 2. EXPLOIT FIX: Snap out of tantrum early
+    if (this.isFrustrated) {
+      const isTouching = this.hitbox.intersects(this.player.hitbox);
+      const isSameY = distanceY < 15 * Constants.SCALE;
+
+      if (isTouching || this.gettingHit || isSameY) {
+        this.isFrustrated = false; 
+      } else {
+        this.stopMoving();
+        return; // Otherwise, keep throwing the tantrum
+      }
+    }
 
     const TOLERANCE_RANGE = 200 * Constants.SCALE;
     const ATTACK_RANGE = this.hasBomb
@@ -189,6 +208,8 @@ export default class PigThrowingBomb extends Entity {
     if (distanceX > TOLERANCE_RANGE) {
       if (this.chaseTimeout <= 0) {
         this.stopMoving();
+        this.blockedFrames = 0;
+        this.hasThrownTantrum = false; // Reset if player ran away
       }
       return;
     }
@@ -233,7 +254,14 @@ export default class PigThrowingBomb extends Entity {
           
           if (this.blockedFrames > 30) {
             this.stopMoving();
-            this.isFrustrated = true;
+            
+            // FIX: One-and-done tantrum logic
+            if (!this.hasThrownTantrum) {
+              this.isFrustrated = true;
+              this.hasThrownTantrum = true;
+            }
+            
+            this.blockedFrames = 30; // Cap
           } else {
             this.stopMoving(); 
           }
@@ -255,13 +283,22 @@ export default class PigThrowingBomb extends Entity {
             
             if (this.blockedFrames > 30) {
               this.stopMoving();
-              this.isFrustrated = true;
+              
+              // FIX: One-and-done tantrum logic
+              if (!this.hasThrownTantrum) {
+                this.isFrustrated = true;
+                this.hasThrownTantrum = true;
+              }
+              
+              this.blockedFrames = 30; // Cap
             } else {
               this.left = deltaX < 0;
               this.right = deltaX > 0;
             }
           } else {
+            // FIX: Reset the tantrum flag when successfully moving again
             this.blockedFrames = 0;
+            this.hasThrownTantrum = false;
             this.left = deltaX < 0;
             this.right = deltaX > 0;
           }
@@ -270,6 +307,7 @@ export default class PigThrowingBomb extends Entity {
     } else {
       this.stopMoving();
       this.blockedFrames = 0; 
+      this.hasThrownTantrum = false; // Reset if it loses interest
     }
   }
 
@@ -333,6 +371,9 @@ export default class PigThrowingBomb extends Entity {
         this.entityState = Constants.PigThrowingBomb.withBomb.RUNNING;
       }
 
+      // FIX: Added mapping for frustrated animation (with bomb)
+      if(this.isFrustrated) this.entityState = Constants.PigThrowingBomb.withBomb.FRUSTRATED;
+
       if (this.attack) {
         this.entityState = Constants.PigThrowingBomb.withBomb.ATTACK;
       }
@@ -355,6 +396,9 @@ export default class PigThrowingBomb extends Entity {
         if ((this.left || this.right) && !this.inAir) {
           this.entityState = Constants.PigThrowingBomb.withoutBomb.RUNNING;
         }
+
+        // FIX: Added mapping for frustrated animation (without bomb)
+        if(this.isFrustrated) this.entityState = Constants.PigThrowingBomb.withoutBomb.FRUSTRATED;
 
         if(this.gettingHit) this.entityState = Constants.PigThrowingBomb.withoutBomb.HIT;
 
@@ -550,6 +594,9 @@ export default class PigThrowingBomb extends Entity {
         this.frameX = 0;
         this.attack = false;
         this.gettingHit = false;
+        
+        // FIX: Reset frustration state at the end of the animation
+        this.isFrustrated = false;
 
         if (this.isDead || this.afterDeath || this.dyingWait) return;
 
